@@ -1,5 +1,5 @@
 // ================================
-// UNDERCOVER - GAME LOGIC
+// UNDERCOVER - GAME LOGIC (REDESIGNED)
 // ================================
 
 // Game State
@@ -20,7 +20,8 @@ let gameState = {
     viewingOrder: [],
     currentViewIndex: 0,
     speakingOrder: [],
-    allWordPairs: null
+    allWordPairs: null,
+    selectedEliminationId: null
 };
 
 // ================================
@@ -62,9 +63,9 @@ function setupEventListeners() {
     document.getElementById('decrease-spies').addEventListener('click', () => adjustRoleCount('spies', -1));
     document.getElementById('increase-spies').addEventListener('click', () => adjustRoleCount('spies', 1));
 
-    // Word selection
-    document.getElementById('random-words-btn').addEventListener('click', selectRandomWords);
-    document.getElementById('custom-words-btn').addEventListener('click', toggleCustomWords);
+    // Rules button
+    document.getElementById('rules-btn').addEventListener('click', showRules);
+    document.getElementById('close-rules-btn').addEventListener('click', hideRules);
 
     // Start game
     document.getElementById('start-game-btn').addEventListener('click', startGame);
@@ -74,8 +75,7 @@ function setupEventListeners() {
     document.getElementById('done-viewing-btn').addEventListener('click', nextViewer);
 
     // Word rounds
-    document.getElementById('next-word-round-btn').addEventListener('click', nextWordRound);
-    document.getElementById('end-game-btn').addEventListener('click', endGame);
+    document.getElementById('next-word-round-btn').addEventListener('click', confirmElimination);
 
     // Mr. White guess
     document.getElementById('submit-guess-btn').addEventListener('click', submitMrWhiteGuess);
@@ -83,6 +83,18 @@ function setupEventListeners() {
 
     // Play again
     document.getElementById('play-again-btn').addEventListener('click', playAgain);
+}
+
+// ================================
+// RULES MODAL
+// ================================
+
+function showRules() {
+    document.getElementById('rules-modal').classList.remove('hidden');
+}
+
+function hideRules() {
+    document.getElementById('rules-modal').classList.add('hidden');
 }
 
 // ================================
@@ -107,72 +119,16 @@ function generatePlayerInputs(count) {
 
     for (let i = 0; i < count; i++) {
         const playerDiv = createElement('div', {
-            classes: ['player-name-input'],
-            attributes: { draggable: 'true', 'data-index': i }
+            classes: ['player-name-input']
         });
 
         playerDiv.innerHTML = `
-      <span class="drag-handle">☰</span>
       <div class="player-number">${i + 1}</div>
       <input type="text" placeholder="Player ${i + 1}" data-player-index="${i}">
     `;
 
-        // Drag and drop for reordering
-        playerDiv.addEventListener('dragstart', handleDragStart);
-        playerDiv.addEventListener('dragover', handleDragOver);
-        playerDiv.addEventListener('drop', handleDrop);
-        playerDiv.addEventListener('dragend', handleDragEnd);
-
         container.appendChild(playerDiv);
     }
-}
-
-// Drag and Drop Handlers
-let draggedElement = null;
-
-function handleDragStart(e) {
-    draggedElement = this;
-    this.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-}
-
-function handleDragOver(e) {
-    if (e.preventDefault) {
-        e.preventDefault();
-    }
-    e.dataTransfer.dropEffect = 'move';
-    return false;
-}
-
-function handleDrop(e) {
-    if (e.stopPropagation) {
-        e.stopPropagation();
-    }
-
-    if (draggedElement !== this) {
-        const container = document.getElementById('player-names-container');
-        const allItems = [...container.children];
-        const draggedIndex = allItems.indexOf(draggedElement);
-        const targetIndex = allItems.indexOf(this);
-
-        if (draggedIndex < targetIndex) {
-            container.insertBefore(draggedElement, this.nextSibling);
-        } else {
-            container.insertBefore(draggedElement, this);
-        }
-    }
-
-    return false;
-}
-
-function handleDragEnd(e) {
-    this.classList.remove('dragging');
-
-    // Renumber players
-    const inputs = document.querySelectorAll('.player-name-input');
-    inputs.forEach((item, index) => {
-        item.querySelector('.player-number').textContent = index + 1;
-    });
 }
 
 function adjustRoleCount(role, delta) {
@@ -211,39 +167,6 @@ function updateRoleDistribution() {
     }
 }
 
-function selectRandomWords() {
-    if (!gameState.allWordPairs || gameState.allWordPairs.length === 0) {
-        alert('Word pairs not loaded yet. Please wait...');
-        return;
-    }
-
-    const pair = getRandomItem(gameState.allWordPairs);
-    gameState.words.word1 = pair[0];
-    gameState.words.word2 = pair[1];
-
-    displaySelectedWords();
-    hideElement('#custom-words-input');
-}
-
-function toggleCustomWords() {
-    const customInput = document.getElementById('custom-words-input');
-    customInput.classList.toggle('hidden');
-
-    if (!customInput.classList.contains('hidden')) {
-        document.getElementById('word1-input').focus();
-    }
-}
-
-function displaySelectedWords() {
-    const display = document.getElementById('selected-words-display');
-    const preview = document.getElementById('words-preview');
-
-    if (gameState.words.word1 && gameState.words.word2) {
-        preview.textContent = `${gameState.words.word1} vs ${gameState.words.word2}`;
-        showElement('#selected-words-display');
-    }
-}
-
 function startGame() {
     // Validate players
     const playerInputs = document.querySelectorAll('.player-name-input input');
@@ -260,40 +183,35 @@ function startGame() {
         return;
     }
 
-    // Get words (custom or selected)
-    if (!gameState.words.word1 || !gameState.words.word2) {
-        const word1 = document.getElementById('word1-input').value.trim();
-        const word2 = document.getElementById('word2-input').value.trim();
-
-        if (!word1 || !word2) {
-            alert('Please select random words or enter custom words!');
-            return;
-        }
-
-        gameState.words.word1 = word1;
-        gameState.words.word2 = word2;
-    }
-
     // Validate roles
-    const roleValidation = validateRoleDistribution(gameState.roles, gameState.totalPlayers);
-    if (!roleValidation.valid) {
-        alert(roleValidation.error);
+    if (gameState.roles.agents < 1) {
+        alert('Must have at least 1 Agent! Reduce other roles.');
         return;
     }
 
-    if (gameState.roles.agents < 1) {
-        alert('Must have at least 1 Agent!');
+    // Auto-select random words (GM doesn't see them)
+    if (!gameState.allWordPairs || gameState.allWordPairs.length === 0) {
+        alert('Word pairs not loaded yet. Please wait...');
         return;
     }
+
+    const pair = getRandomItem(gameState.allWordPairs);
+    gameState.words.word1 = pair[0];
+    gameState.words.word2 = pair[1];
 
     // Create players with roles
     assignRoles(names);
 
-    // Generate viewing order
-    gameState.viewingOrder = shuffleArray([...Array(gameState.totalPlayers).keys()]);
+    // Generate RANDOM viewing order (not sequential)
+    const randomStartIndex = getRandomInt(0, gameState.totalPlayers - 1);
+    gameState.viewingOrder = [];
+    for (let i = 0; i < gameState.totalPlayers; i++) {
+        gameState.viewingOrder.push((randomStartIndex + i) % gameState.totalPlayers);
+    }
     gameState.currentViewIndex = 0;
 
     gameState.gameId = generateId().slice(0, 8).toUpperCase();
+    gameState.currentRound = 1;
     saveGame('undercover', gameState);
 
     showScreen('screen-role-viewing');
@@ -335,7 +253,8 @@ function assignRoles(names) {
             name: name,
             role: role,
             word: word,
-            isEliminated: false
+            isEliminated: false,
+            originalIndex: index + 1
         });
     });
 }
@@ -362,31 +281,35 @@ function showRoleCard() {
     const playerIndex = gameState.viewingOrder[gameState.currentViewIndex];
     const player = gameState.players[playerIndex];
 
-    // Set role image
-    let imageSrc = '../images/Agent.png';
-    let roleName = 'Agent';
+    // DON'T SHOW ROLE NAME except for Mr. White
+    let imageSrc = '../images/Agent.png'; // Both Agent and Spy use same image
 
-    if (player.role === 'spy') {
-        imageSrc = '../images/Agent.png'; // Spies use same image
-        roleName = 'Spy';
-    } else if (player.role === 'mrwhite') {
+    if (player.role === 'mrwhite') {
         imageSrc = '../images/Mr. White.png';
-        roleName = 'Mr. White';
     }
 
     document.getElementById('role-image').src = imageSrc;
-    document.getElementById('role-name').textContent = roleName;
 
     // Set word
-    const wordDisplay = document.querySelector('.word-display');
+    const wordDisplay = document.getElementById('word-display-card');
     const wordText = document.getElementById('word-text');
 
     if (player.word) {
         wordText.textContent = player.word;
         wordDisplay.classList.remove('no-word');
     } else {
-        wordText.textContent = 'You have NO word!';
+        // Mr. White sees this
+        wordText.textContent = 'You are Mr. White!';
         wordDisplay.classList.add('no-word');
+    }
+
+    // Update button text for next player
+    const nextIndex = gameState.currentViewIndex + 1;
+    if (nextIndex < gameState.viewingOrder.length) {
+        const nextPlayer = gameState.players[gameState.viewingOrder[nextIndex]];
+        document.getElementById('next-player-name').textContent = nextPlayer.name;
+    } else {
+        document.getElementById('next-player-name').textContent = 'Game Master';
     }
 
     showScreen('screen-role-card');
@@ -403,7 +326,6 @@ function nextViewer() {
 // ================================
 
 function startWordRounds() {
-    gameState.currentRound = 1;
     generateSpeakingOrder();
     showScreen('screen-word-round');
     displayWordRound();
@@ -411,28 +333,34 @@ function startWordRounds() {
 
 function generateSpeakingOrder() {
     const alivePlayers = gameState.players.filter(p => !p.isEliminated);
-    const indices = alivePlayers.map((_, i) => i);
-    gameState.speakingOrder = shuffleArray(indices);
+
+    // Random starting player
+    const randomStartIndex = getRandomInt(0, alivePlayers.length - 1);
+    gameState.speakingOrder = [];
+
+    for (let i = 0; i < alivePlayers.length; i++) {
+        gameState.speakingOrder.push((randomStartIndex + i) % alivePlayers.length);
+    }
 }
 
 function displayWordRound() {
     document.getElementById('word-round-number').textContent = gameState.currentRound;
 
-    // Display speaking order
+    // Display speaking order (by player names)
     const orderContainer = document.getElementById('speaking-order-list');
     orderContainer.innerHTML = '';
 
     const alivePlayers = gameState.players.filter(p => !p.isEliminated);
-    gameState.speakingOrder.forEach((index, order) => {
+    gameState.speakingOrder.forEach((index) => {
         const player = alivePlayers[index];
         const orderDiv = createElement('div', {
             classes: ['speaking-order-item'],
-            text: `${order + 1}. ${player.name}`
+            text: player.name
         });
         orderContainer.appendChild(orderDiv);
     });
 
-    // Display elimination checkboxes
+    // Display elimination list (ALL players in original fixed order)
     displayEliminationList();
 }
 
@@ -446,26 +374,69 @@ function displayEliminationList() {
         });
 
         itemDiv.innerHTML = `
-      <input type="checkbox" id="elim-${player.id}" ${player.isEliminated ? 'checked disabled' : ''} data-player-id="${player.id}">
-      <label class="player-name" for="elim-${player.id}">${player.name}</label>
+      <div class="player-info">
+        <div class="player-number">${player.originalIndex}</div>
+        <span class="player-name">${player.name}</span>
+      </div>
+      <button class="eliminate-btn" data-player-id="${player.id}" ${player.isEliminated ? 'disabled' : ''}>✕</button>
     `;
 
         if (!player.isEliminated) {
-            itemDiv.querySelector('input').addEventListener('change', (e) => {
-                handleElimination(e.target.dataset.playerId, e.target.checked);
-            });
+            const btn = itemDiv.querySelector('.eliminate-btn');
+            btn.addEventListener('click', () => selectForElimination(player.id));
         }
 
         container.appendChild(itemDiv);
     });
+
+    // Reset selection
+    gameState.selectedEliminationId = null;
+    document.getElementById('next-word-round-btn').disabled = true;
 }
 
-function handleElimination(playerId, isEliminated) {
-    const player = gameState.players.find(p => p.id === playerId);
-    player.isEliminated = isEliminated;
+function selectForElimination(playerId) {
+    // Deselect all
+    document.querySelectorAll('.elimination-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+
+    // Select this one
+    const selectedItem = document.querySelector(`[data-player-id="${playerId}"]`).closest('.elimination-item');
+    selectedItem.classList.add('selected');
+
+    gameState.selectedEliminationId = playerId;
+    document.getElementById('next-word-round-btn').disabled = false;
+}
+
+function confirmElimination() {
+    if (!gameState.selectedEliminationId) {
+        alert('Please select a player to eliminate!');
+        return;
+    }
+
+    const player = gameState.players.find(p => p.id === gameState.selectedEliminationId);
+    player.isEliminated = true;
+
+    // Reveal role (Agent or Spy) but NOT their word
+    let roleText = player.role === 'agent' ? 'Agent' : player.role === 'spy' ? 'Spy' : 'Mr. White';
+    alert(`${player.name} was a ${roleText}!`);
+
+    // Check if Mr. White was eliminated
+    if (player.role === 'mrwhite') {
+        showScreen('screen-mrwhite-guess');
+        return;
+    }
+
     saveGame('undercover', gameState);
 
-    checkWinConditions();
+    if (checkWinConditions()) {
+        return;
+    }
+
+    gameState.currentRound++;
+    generateSpeakingOrder();
+    saveGame('undercover', gameState);
+    displayWordRound();
 }
 
 function checkWinConditions() {
@@ -480,40 +451,13 @@ function checkWinConditions() {
         return true;
     }
 
-    // Spies/Mr. White win: Outnumber Agents
+    // Spies/Mr. White win: (Spies + Mr. Whites) >= Agents
     if (aliveSpies.length + aliveMrWhites.length >= aliveAgents.length) {
         showWinner('Spies & Mr. White');
         return true;
     }
 
     return false;
-}
-
-function nextWordRound() {
-    // Check if any Mr. White was just eliminated
-    const justEliminatedMrWhite = gameState.players.some(p =>
-        p.role === 'mrwhite' && p.isEliminated && !p.hasGuessed
-    );
-
-    if (justEliminatedMrWhite) {
-        showScreen('screen-mrwhite-guess');
-        return;
-    }
-
-    if (checkWinConditions()) {
-        return;
-    }
-
-    gameState.currentRound++;
-    generateSpeakingOrder();
-    saveGame('undercover', gameState);
-    displayWordRound();
-}
-
-function endGame() {
-    if (confirm('End the game and check final results?')) {
-        checkWinConditions() || showWinner('Draw');
-    }
 }
 
 // ================================
@@ -529,32 +473,18 @@ function submitMrWhiteGuess() {
         return;
     }
 
-    const correct1 = guess1 === gameState.words.word1.toLowerCase();
-    const correct2 = guess2 === gameState.words.word2.toLowerCase();
+    const correct1 = guess1 === gameState.words.word1.toLowerCase() || guess1 === gameState.words.word2.toLowerCase();
+    const correct2 = guess2 === gameState.words.word1.toLowerCase() || guess2 === gameState.words.word2.toLowerCase();
 
-    // Mark Mr. White as having guessed
-    gameState.players.forEach(p => {
-        if (p.role === 'mrwhite' && p.isEliminated) {
-            p.hasGuessed = true;
-        }
-    });
-
-    if (correct1 && correct2) {
+    if (correct1 && correct2 && guess1 !== guess2) {
         showWinner('Mr. White (Solo Win!)');
     } else {
-        alert('Wrong guess! Game continues.');
+        alert(`Wrong guess! The words were: ${gameState.words.word1} and ${gameState.words.word2}`);
         skipMrWhiteGuess();
     }
 }
 
 function skipMrWhiteGuess() {
-    // Mark as guessed
-    gameState.players.forEach(p => {
-        if (p.role === 'mrwhite' && p.isEliminated) {
-            p.hasGuessed = true;
-        }
-    });
-
     if (checkWinConditions()) {
         return;
     }
