@@ -417,13 +417,15 @@ function confirmElimination() {
     const player = gameState.players.find(p => p.id === gameState.selectedEliminationId);
     player.isEliminated = true;
 
-    // Reveal role (Agent or Spy) but NOT their word
-    let roleText = player.role === 'agent' ? 'Agent' : player.role === 'spy' ? 'Spy' : 'Mr. White';
-    alert(`${player.name} was a ${roleText}!`);
+    // Show role reveal with image
+    showRoleReveal(player);
 
     // Check if Mr. White was eliminated
     if (player.role === 'mrwhite') {
-        showScreen('screen-mrwhite-guess');
+        // Wait for user to see the reveal, then show guess screen
+        setTimeout(() => {
+            showScreen('screen-mrwhite-guess');
+        }, 2000);
         return;
     }
 
@@ -436,7 +438,71 @@ function confirmElimination() {
     gameState.currentRound++;
     generateSpeakingOrder();
     saveGame('undercover', gameState);
-    displayWordRound();
+
+    // Wait a bit before showing next round
+    setTimeout(() => {
+        displayWordRound();
+    }, 2000);
+}
+
+// Show role reveal when player is eliminated
+function showRoleReveal(player) {
+    let roleText = player.role === 'agent' ? 'Agent' : player.role === 'spy' ? 'Spy' : 'Mr. White';
+    let imageSrc = '../images/Mr. White.png'; // Default
+
+    // Use specific image for each role
+    if (player.role === 'agent') {
+        imageSrc = '../images/Agent.png';
+    } else if (player.role === 'spy') {
+        imageSrc = '../images/Spy.png';
+    }
+
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+  `;
+
+    overlay.innerHTML = `
+    <div style="
+      background: white;
+      padding: 40px;
+      border-radius: 24px;
+      text-align: center;
+      max-width: 350px;
+      width: 90%;
+      animation: flipCard 0.6s ease-out;
+    ">
+      <img src="${imageSrc}" alt="${roleText}" style="
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        margin-bottom: 20px;
+      ">
+      <h2 style="color: #1f2937; font-size: 28px; margin-bottom: 10px;">${player.name}</h2>
+      <p style="color: #6b7280; font-size: 18px; margin-bottom: 10px;">was a</p>
+      <h1 style="color: #8B5CF6; font-size: 36px; font-weight: bold; margin: 0;">${roleText}!</h1>
+    </div>
+  `;
+
+    document.body.appendChild(overlay);
+
+    // Auto-remove after 2 seconds
+    setTimeout(() => {
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.3s';
+        setTimeout(() => overlay.remove(), 300);
+    }, 1700);
 }
 
 function checkWinConditions() {
