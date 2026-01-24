@@ -49,7 +49,7 @@
                         <img src="../images/God.png" alt="God" class="role-icon">
                         <div class="role-info">
                             <span class="role-label">God</span>
-                            <p class="role-desc">Narrates game, controls flow (Fixed: 1)</p>
+                            <p class="role-desc">Can save one player each night (Fixed: 1)</p>
                         </div>
                         <span class="role-value">1</span>
                     </div>
@@ -99,7 +99,7 @@
                         <img src="../images/Bomber.png" alt="Bomber" class="role-icon">
                         <div class="role-info">
                             <span class="role-label">Suicide Bomber</span>
-                            <p class="role-desc">If eliminated, take someone with you</p>
+                            <p class="role-desc">If voted out, can take someone with them</p>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="bomber-toggle">
@@ -111,8 +111,8 @@
                     <div class="role-row-with-img">
                         <img src="../images/Lover.png" alt="Lover" class="role-icon">
                         <div class="role-info">
-                            <span class="role-label">Lovers</span>
-                            <p class="role-desc">Linked pair; if one dies, both die (2 players)</p>
+                            <span class="role-label">Lover</span>
+                            <p class="role-desc">Protects chosen player by sacrificing self (1 player)</p>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="lover-toggle">
@@ -148,21 +148,25 @@
 
                     <p><strong>🌙 Night Phase Order:</strong></p>
                     <ol>
-                        <li><strong>City sleeps:</strong> "Everyone close your eyes"</li>
+                        <li><strong>Game Master says:</strong> "Everyone close your eyes"</li>
                         <li><strong>Mafia wakes:</strong> "Mafia open your eyes, choose victim"</li>
-                        <li><strong>God saves:</strong> God silently chooses to save someone (once per game)</li>
-                        <li><strong>Detective:</strong> "Detective open your eyes, suspect someone" (God nods Yes/No)
+                        <li><strong>God saves:</strong> God silently chooses to save someone (self or other, once per
+                            night)</li>
+                        <li><strong>Detective investigates:</strong> "Detective open your eyes, suspect someone" (God
+                            nods Yes/No)</li>
+                        <li><strong>Lover protects:</strong> Night 1 only - Lover picks target to protect (permanent)
                         </li>
-                        <li><strong>Lover gives kiss:</strong> Round 1 only - Lover picks partner (stays all game)</li>
-                        <li><strong>City wakes:</strong> God announces who died (if saved, no one dies)</li>
+                        <li><strong>City wakes:</b> Game Master announces deaths (if protected, no one dies)</li>
                     </ol>
 
                     <p><strong>⚔️ Special Role Rules:</strong></p>
                     <ul>
-                        <li><strong>💣 Bomber:</strong> If voted out, can take ANY player with them</li>
-                        <li><strong>🤡 Jester:</strong> Wins if voted out; picks someone to die with them</li>
-                        <li><strong>💕 Lover:</strong> Picks partner Round 1; if either dies later, both die</li>
-                        <li><strong>🛡️ God:</strong> Can save themself OR others (once only)</li>
+                        <li><strong>💣 Bomber:</strong> If VOTED OUT, can take ANY player with them</li>
+                        <li><strong>🤡 Jester:</strong> Wins solo if voted out; picks someone to die</li>
+                        <li><strong>💕 Lover:</strong> Picks protected target Night 1; if target dies, Lover sacrifices
+                            self instead (permanent)</li>
+                        <li><strong>🛡️ God:</strong> Saves one player each night (self or other), victim survives</li>
+                        <li><strong>🎭 Game Master:</strong> Player acting as God narrates the story</li>
                     </ul>
 
                     <p><strong>🏆 Win Conditions:</strong></p>

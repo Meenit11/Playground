@@ -126,11 +126,8 @@ function adjustMafiaCount(delta) {
 }
 
 function toggleRole(role, isEnabled) {
-    if (role === 'lover') {
-        gameState.roleConfig[role] = isEnabled ? 2 : 0; // Lovers are always 2
-    } else {
-        gameState.roleConfig[role] = isEnabled ? 1 : 0;
-    }
+    // All special roles are 1 person (including lover)
+    gameState.roleConfig[role] = isEnabled ? 1 : 0;
     updateRoleDistribution();
 }
 
@@ -207,9 +204,7 @@ function assignRoles(names) {
     if (gameState.roleConfig.detective) roles.push('detective');
     if (gameState.roleConfig.jester) roles.push('jester');
     if (gameState.roleConfig.bomber) roles.push('bomber');
-    if (gameState.roleConfig.lover === 2) {
-        roles.push('lover', 'lover');
-    }
+    if (gameState.roleConfig.lover) roles.push('lover');
     for (let i = 0; i < gameState.roleConfig.civilian; i++) {
         roles.push('civilian');
     }
@@ -224,19 +219,9 @@ function assignRoles(names) {
             name: name,
             role: shuffledRoles[index],
             isAlive: true,
-            loverPair: null
+            loverProtectedTarget: null // For lover role
         });
     });
-
-    // Set lover pair
-    if (gameState.roleConfig.lover === 2) {
-        const lovers = gameState.players.filter(p => p.role === 'lover');
-        if (lovers.length === 2) {
-            lovers[0].loverPair = lovers[1].id;
-            lovers[1].loverPair = lovers[0].id;
-            gameState.loverPair = [lovers[0].id, lovers[1].id];
-        }
-    }
 }
 
 // ================================
@@ -269,11 +254,7 @@ function showRoleCard() {
 
     let description = roleData.description;
 
-    // Add lover pair info
-    if (player.role === 'lover' && player.loverPair) {
-        const partner = gameState.players.find(p => p.id === player.loverPair);
-        description += ` Your partner is: ${partner.name}`;
-    }
+    // Note: Lover target selection happens during night phase, not role viewing
 
     document.getElementById('role-description').textContent = description;
 
@@ -310,7 +291,7 @@ function getRoleData(role) {
         lover: {
             name: 'Lover',
             image: '../images/Lover.png',
-            description: 'You are in love! If your partner dies, you die too.'
+            description: 'Pick a target on Night 1 to protect. If they die, you sacrifice yourself instead!'
         },
         civilian: {
             name: 'Civilian',
@@ -486,20 +467,24 @@ function eliminatePlayer(playerId, phase) {
         return;
     }
 
-    // Check for Suicide Bomber
-    if (player.role === 'bomber') {
+    // Check for Suicide Bomber (ONLY if voted out, not mafia-killed)
+    if (phase === 'day' && player.role === 'bomber') {
         showBomberModal();
         return;
     }
 
-    // Check for Lover pair
-    if (player.loverPair) {
-        const partner = gameState.players.find(p => p.id === player.loverPair);
-        if (partner && partner.isAlive) {
-            partner.isAlive = false;
-            gameState.deadPlayers.push(partner.id);
-            alert(`${partner.name} (Lover) dies with their partner!`);
+    // Check if player is protected by Lover
+    const lover = gameState.players.find(p => p.role === 'lover' && p.isAlive && p.loverProtectedTarget === playerId);
+    if (lover) {
+        // Lover sacrifices self instead
+        lover.isAlive = false;
+        gameState.deadPlayers.push(lover.id);
+        player.isAlive = true; // Revive the protected player
+        const deadIndex = gameState.deadPlayers.indexOf(playerId);
+        if (deadIndex > -1) {
+            gameState.deadPlayers.splice(deadIndex, 1);
         }
+        alert(`${lover.name} (Lover) sacrifices themselves to save ${player.name}!`);
     }
 
     saveGame('mafia', gameState);

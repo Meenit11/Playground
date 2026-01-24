@@ -3,7 +3,7 @@
    ================================ */
 
 body {
-    background: linear-gradient(135deg, #F97316 0%, #DC2626 100%);
+    background: linear-gradient(135deg, #4B5563 0%, #1F2937 100%);
     min-height: 100vh;
 }
 
@@ -30,6 +30,49 @@ body {
 .form-group>label {
     color: var(--light) !important;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Number buttons for player count */
+.number-btn {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    color: var(--light);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.number-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.number-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.number-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--gray-400);
+}
+
+.number-input input {
+    width: 80px;
+    text-align: center;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--radius-md);
 }
 
 /* Back link visibility */
@@ -193,6 +236,53 @@ input:checked+.toggle-slider {
 
 input:checked+.toggle-slider:before {
     transform: translateX(22px);
+}
+
+/* Number buttons for Mafia count */
+.number-btn-small {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+    color: var(--light);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.number-btn-small:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.number-btn-small:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.number-btn-small:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--gray-400);
+}
+
+.number-input-small {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.number-input-small input {
+    width: 60px;
+    text-align: center;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.9);
+    min-height: auto;
+    padding: var(--spacing-xs);
+    border-radius: var(--spacing-sm);
 }
 
 /* Old role config styles - keep for backward compatibility */
