@@ -181,8 +181,12 @@ function startGame() {
     // Assign roles
     assignRoles(names);
 
-    // Generate viewing order
-    gameState.viewingOrder = shuffleArray([...Array(gameState.totalPlayers).keys()]);
+    // Generate RANDOM viewing order (like Undercover)
+    const randomStartIndex = getRandomInt(0, gameState.totalPlayers - 1);
+    gameState.viewingOrder = [];
+    for (let i = 0; i < gameState.totalPlayers; i++) {
+        gameState.viewingOrder.push((randomStartIndex + i) % gameState.totalPlayers);
+    }
     gameState.currentViewIndex = 0;
 
     gameState.gameId = generateId().slice(0, 8).toUpperCase();

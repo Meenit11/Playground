@@ -33,12 +33,19 @@ body {
 }
 
 /* Number buttons for player count */
+.number-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
 .number-btn {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, #F97316 0%, #FFFFFF 100%);
-    color: var(--dark);
-    border: 2px solid rgba(249, 115, 22, 0.5);
+    background: linear-gradient(135deg, #C2410C 0%, #FB923C 100%);
+    color: var(--light);
+    border: 2px solid rgba(251, 146, 60, 0.5);
     border-radius: var(--radius-md);
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
@@ -53,7 +60,7 @@ body {
 .number-btn:hover:not(:disabled) {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(135deg, #EA580C 0%, #F3F4F6 100%);
+    background: linear-gradient(135deg, #9A3412 0%, #F97316 100%);
 }
 
 .number-btn:active:not(:disabled) {
@@ -71,8 +78,8 @@ body {
     text-align: center;
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(251, 146, 60, 0.5);
+    background: rgba(255, 255, 255, 0.95);
     border-radius: var(--radius-md);
 }
 
@@ -192,6 +199,45 @@ body {
     flex-shrink: 0;
 }
 
+/* ================================
+   ROLE VIEWING - CENTERED STYLE
+   ================================ */
+.role-viewing-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.centered-title {
+    color: var(--light);
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-2xl);
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.pass-phone-box {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    margin-bottom: var(--spacing-2xl);
+    min-width: 300px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.player-name-large {
+    color: var(--light);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    margin: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Toggle Switch */
 .toggle-switch {
     position: relative;
@@ -243,9 +289,9 @@ input:checked+.toggle-slider:before {
 .number-btn-small {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #F97316 0%, #FFFFFF 100%);
-    color: var(--dark);
-    border: 2px solid rgba(249, 115, 22, 0.5);
+    background: linear-gradient(135deg, #C2410C 0%, #FB923C 100%);
+    color: var(--light);
+    border: 2px solid rgba(251, 146, 60, 0.5);
     border-radius: var(--radius-sm);
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
@@ -256,7 +302,7 @@ input:checked+.toggle-slider:before {
 
 .number-btn-small:hover:not(:disabled) {
     transform: scale(1.05);
-    background: linear-gradient(135deg, #EA580C 0%, #F3F4F6 100%);
+    background: linear-gradient(135deg, #9A3412 0%, #F97316 100%);
 }
 
 .number-btn-small:active:not(:disabled) {
@@ -280,8 +326,8 @@ input:checked+.toggle-slider:before {
     text-align: center;
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(251, 146, 60, 0.5);
+    background: rgba(255, 255, 255, 0.95);
     min-height: auto;
     padding: var(--spacing-xs);
     border-radius: var(--spacing-sm);
@@ -289,13 +335,13 @@ input:checked+.toggle-slider:before {
 
 /* Start Game button - match orange gradient */
 #start-game-btn {
-    background: linear-gradient(135deg, #F97316 0%, #FFFFFF 100%) !important;
-    color: var(--dark) !important;
-    border: 2px solid rgba(249, 115, 22, 0.5) !important;
+    background: linear-gradient(135deg, #C2410C 0%, #FB923C 100%) !important;
+    color: var(--light) !important;
+    border: 2px solid rgba(251, 146, 60, 0.5) !important;
 }
 
 #start-game-btn:hover {
-    background: linear-gradient(135deg, #EA580C 0%, #F3F4F6 100%) !important;
+    background: linear-gradient(135deg, #9A3412 0%, #F97316 100%) !important;
     transform: translateY(-2px);
 }
 
