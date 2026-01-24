@@ -36,9 +36,9 @@ body {
 .number-btn {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-    color: var(--light);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #F97316 0%, #FFFFFF 100%);
+    color: var(--dark);
+    border: 2px solid rgba(249, 115, 22, 0.5);
     border-radius: var(--radius-md);
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
@@ -53,6 +53,7 @@ body {
 .number-btn:hover:not(:disabled) {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #EA580C 0%, #F3F4F6 100%);
 }
 
 .number-btn:active:not(:disabled) {
@@ -242,9 +243,9 @@ input:checked+.toggle-slider:before {
 .number-btn-small {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-    color: var(--light);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #F97316 0%, #FFFFFF 100%);
+    color: var(--dark);
+    border: 2px solid rgba(249, 115, 22, 0.5);
     border-radius: var(--radius-sm);
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
@@ -255,6 +256,7 @@ input:checked+.toggle-slider:before {
 
 .number-btn-small:hover:not(:disabled) {
     transform: scale(1.05);
+    background: linear-gradient(135deg, #EA580C 0%, #F3F4F6 100%);
 }
 
 .number-btn-small:active:not(:disabled) {
@@ -283,6 +285,18 @@ input:checked+.toggle-slider:before {
     min-height: auto;
     padding: var(--spacing-xs);
     border-radius: var(--spacing-sm);
+}
+
+/* Start Game button - match orange gradient */
+#start-game-btn {
+    background: linear-gradient(135deg, #F97316 0%, #FFFFFF 100%) !important;
+    color: var(--dark) !important;
+    border: 2px solid rgba(249, 115, 22, 0.5) !important;
+}
+
+#start-game-btn:hover {
+    background: linear-gradient(135deg, #EA580C 0%, #F3F4F6 100%) !important;
+    transform: translateY(-2px);
 }
 
 /* Old role config styles - keep for backward compatibility */

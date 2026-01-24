@@ -274,15 +274,40 @@ body {
 }
 
 .footer-text {
-    color: var(--gray-300);
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-xs);
+    color: var(--gray-200);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-sm);
+    font-weight: var(--font-weight-medium);
 }
 
-.footer-version {
-    color: var(--gray-400);
-    font-size: var(--font-size-xs);
+.footer-heart {
+    color: var(--gray-300);
+    font-size: var(--font-size-sm);
     margin-bottom: 0;
+}
+
+.heart-pump {
+    display: inline-block;
+    color: #EF4444;
+    animation: heartPump 1.2s ease-in-out infinite;
+}
+
+@keyframes heartPump {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    10%,
+    30% {
+        transform: scale(1.2);
+    }
+
+    20%,
+    40% {
+        transform: scale(1);
+    }
 }
 
 /* ================================
