@@ -280,8 +280,8 @@ function showRoleCard() {
     const playerIndex = gameState.viewingOrder[gameState.currentViewIndex];
     const player = gameState.players[playerIndex];
 
-    // DON'T SHOW ROLE NAME except for Mr. White
-    let imageSrc = '../images/Agent.png'; // Both Agent and Spy use same image
+    // Use Spy Agent.png for both Agents and Spies, Mr. White gets different image
+    let imageSrc = '../images/Spy Agent.png'; // Both Agent and Spy use this image
 
     if (player.role === 'mrwhite') {
         imageSrc = '../images/Mr. White.png';
@@ -367,10 +367,11 @@ function displayEliminationList() {
     const container = document.getElementById('elimination-list');
     container.innerHTML = '';
 
+    console.log('Displaying elimination list, players:', gameState.players.length);
+
     gameState.players.forEach(player => {
-        const itemDiv = createElement('div', {
-            classes: ['elimination-item', player.isEliminated ? 'eliminated' : '']
-        });
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `elimination-item ${player.isEliminated ? 'eliminated' : ''}`;
 
         itemDiv.innerHTML = `
       <div class="player-info">

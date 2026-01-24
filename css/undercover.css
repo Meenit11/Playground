@@ -20,6 +20,16 @@ body {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Back link visibility override */
+.back-link {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--primary) !important;
+    padding: var(--spacing-md) var(--spacing-xl) !important;
+    border-radius: var(--radius-full) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    font-weight: var(--font-weight-semibold) !important;
+}
+
 /* ================================
    NUMBER INPUTS
    ================================ */
