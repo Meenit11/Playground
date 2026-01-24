@@ -12,6 +12,80 @@ body {
     padding: var(--spacing-lg);
 }
 
+/* Logo centering and size */
+.screen-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.game-logo {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Better label visibility */
+.form-group>label {
+    color: var(--light) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Back link visibility */
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: var(--spacing-xl);
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #F97316 !important;
+    padding: var(--spacing-md) var(--spacing-xl) !important;
+    border-radius: var(--radius-full) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    font-weight: var(--font-weight-semibold) !important;
+    text-decoration: none;
+    font-size: var(--font-size-base);
+}
+
+/* Rules section at bottom */
+.rules-section-footer {
+    margin-top: var(--spacing-2xl);
+    padding: var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--spacing-xl);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.rules-section-footer h3 {
+    color: var(--dark);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+}
+
+.rules-content {
+    color: var(--gray-700);
+    font-size: var(--font-size-sm);
+}
+
+.rules-content p {
+    margin-bottom: var(--spacing-xs);
+}
+
+.rules-content ul {
+    margin-left: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.rules-content ol {
+    margin-left: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.rules-content li {
+    margin-bottom: var(--spacing-xs);
+    line-height: 1.5;
+}
+
 /* ================================
    ROLE CONFIGURATION
    ================================ */
@@ -82,6 +156,7 @@ body {
     color: var(--dark);
 }
 
+/* ==================================== REST OF FILE CONTINUES UNCHANGED ==== */
 /* ================================
    ROLE CARD
    ================================ */
