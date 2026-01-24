@@ -29,7 +29,7 @@
                     <label class="label-white">Total Players</label>
                     <div class="number-input">
                         <button class="number-btn" id="decrease-players">−</button>
-                        <input type="number" id="player-count-input" value="6" min="4" max="15" readonly>
+                        <input type="number" id="player-count-input" value="4" min="4" max="15" readonly>
                         <button class="number-btn" id="increase-players">+</button>
                     </div>
                 </div>
@@ -52,20 +52,20 @@
                         </div>
                         <div class="number-input-small">
                             <button class="number-btn-small" id="decrease-mrwhite">−</button>
-                            <input type="number" id="mrwhite-count" value="1" min="1" max="3" readonly>
+                            <input type="number" id="mrwhite-count" value="0" min="0" max="3" readonly>
                             <button class="number-btn-small" id="increase-mrwhite">+</button>
                         </div>
                     </div>
 
                     <div class="role-row-with-img">
-                        <img src="../images/Spy Agent.png" alt="Spy" class="role-icon">
+                        <img src="../images/Spy.png" alt="Spy" class="role-icon">
                         <div class="role-info">
                             <span class="role-label">Spy</span>
                             <p class="role-desc">Gets different word</p>
                         </div>
                         <div class="number-input-small">
                             <button class="number-btn-small" id="decrease-spies">−</button>
-                            <input type="number" id="spies-count" value="2" min="1" max="5" readonly>
+                            <input type="number" id="spies-count" value="1" min="0" max="5" readonly>
                             <button class="number-btn-small" id="increase-spies">+</button>
                         </div>
                     </div>
@@ -85,19 +85,36 @@
 
             <!-- Rules Section -->
             <div class="rules-section-footer">
-                <h3>📜 How to Play</h3>
+                <h3>🎮 How to Play</h3>
                 <div class="rules-content">
-                    <p><strong>Roles:</strong></p>
+                    <p><strong>🎯 Game Flow:</strong></p>
+                    <ol>
+                        <li>👁️ Each player views their secret role & word</li>
+                        <li>💬 Each round, players speak in order about their word</li>
+                        <li>🗳️ Vote to eliminate ONE suspicious player</li>
+                        <li>🔍 Their role is revealed (but NOT their word!)</li>
+                        <li>🔄 Repeat until a team wins</li>
+                    </ol>
+
+                    <p><strong>👥 Roles:</strong></p>
                     <ul>
-                        <li><strong>Agents:</strong> Get Word 1. Find and eliminate Spies & Mr. Whites</li>
-                        <li><strong>Spies:</strong> Get Word 2. Blend in and survive</li>
-                        <li><strong>Mr. White:</strong> Gets NO word. Survive or guess both words if eliminated</li>
+                        <li><strong>🛡️ Agents:</strong> Get Word 1. Work together to find Spies & Mr. White</li>
+                        <li><strong>🕵️ Spies:</strong> Get Word 2. Pretend you have Word 1 and survive</li>
+                        <li><strong>👤 Mr. White:</strong> Gets NO word! Blend in without knowing either word</li>
                     </ul>
-                    <p><strong>Win Conditions:</strong></p>
+
+                    <p><strong>🏆 Win Conditions:</strong></p>
                     <ul>
-                        <li>Agents win: All Spies + Mr. Whites eliminated</li>
-                        <li>Spies/Mr. White win: (Spies + Mr. Whites) ≥ Agents</li>
-                        <li>Mr. White solo win: Guess both words correctly</li>
+                        <li>✅ Agents win: All Spies + Mr. Whites eliminated</li>
+                        <li>✅ Spies/Mr. White win: (Spies + Mr. Whites) ≥ Agents</li>
+                        <li>✅ Mr. White solo win: If eliminated, guess BOTH words correctly</li>
+                    </ul>
+
+                    <p><strong>💡 Pro Tips:</strong></p>
+                    <ul>
+                        <li>🎭 Agents & Spies don't know their role - only their word!</li>
+                        <li>🤫 Mr. White knows they're Mr. White but has no word</li>
+                        <li>💭 Listen carefully to spot who has a different word</li>
                     </ul>
                 </div>
             </div>

@@ -5,10 +5,10 @@
 // Game State
 let gameState = {
     gameId: null,
-    totalPlayers: 6,
+    totalPlayers: 4,
     roles: {
-        mrWhite: 1,
-        spies: 2,
+        mrWhite: 0,
+        spies: 1,
         agents: 3
     },
     words: {
@@ -126,9 +126,9 @@ function adjustRoleCount(role, delta) {
     let newValue = parseInt(input.value) + delta;
 
     if (role === 'mrWhite') {
-        newValue = Math.max(1, Math.min(3, newValue));
+        newValue = Math.max(0, Math.min(3, newValue));
     } else if (role === 'spies') {
-        newValue = Math.max(1, Math.min(5, newValue));
+        newValue = Math.max(0, Math.min(5, newValue));
     }
 
     input.value = newValue;
@@ -136,10 +136,10 @@ function adjustRoleCount(role, delta) {
 
     // Update button states
     if (role === 'mrWhite') {
-        document.getElementById('decrease-mrwhite').disabled = (newValue <= 1);
+        document.getElementById('decrease-mrwhite').disabled = (newValue <= 0);
         document.getElementById('increase-mrwhite').disabled = (newValue >= 3);
     } else if (role === 'spies') {
-        document.getElementById('decrease-spies').disabled = (newValue <= 1);
+        document.getElementById('decrease-spies').disabled = (newValue <= 0);
         document.getElementById('increase-spies').disabled = (newValue >= 5);
     }
 

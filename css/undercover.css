@@ -13,10 +13,17 @@ body {
 }
 
 /* Reduce logo size for Undercover */
+.screen-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
 .game-logo {
     max-width: 280px;
     width: 100%;
     height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 /* ================================
@@ -29,12 +36,17 @@ body {
 
 /* Back link visibility override */
 .back-link {
+    display: block;
+    text-align: center;
+    margin-top: var(--spacing-xl);
     background: rgba(255, 255, 255, 0.95) !important;
-    color: var(--primary) !important;
+    color: #8B5CF6 !important;
     padding: var(--spacing-md) var(--spacing-xl) !important;
     border-radius: var(--radius-full) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
     font-weight: var(--font-weight-semibold) !important;
+    text-decoration: none;
+    font-size: var(--font-size-base);
 }
 
 /* Rules section at bottom */
@@ -62,6 +74,11 @@ body {
 }
 
 .rules-content ul {
+    margin-left: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.rules-content ol {
     margin-left: var(--spacing-lg);
     margin-bottom: var(--spacing-md);
 }
