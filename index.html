@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="Meenit's Playground - Mobile party games including Odd One In, Undercover, and Mafia">
+  <meta name="description"
+    content="Meenit's Playground - Mobile party games including Odd One In, Undercover, and Mafia">
   <meta name="theme-color" content="#8B5CF6">
   <title>Meenit's Playground - Party Games</title>
-  
+
   <!-- Styles -->
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/home.css">
-  
+
   <!-- Preload fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
+
 <body>
   <!-- Floating Background Elements -->
   <div class="floating-shapes">
@@ -38,7 +41,7 @@
     <!-- Game Selection -->
     <main class="games-section">
       <h2 class="section-title">Choose Your Game</h2>
-      
+
       <div class="games-grid">
         <!-- Odd One In Card -->
         <div class="game-card" data-game="odd-one-in">
@@ -49,7 +52,7 @@
             <h3 class="game-title">Odd One In</h3>
             <p class="game-description">Think fast, answer faster! Spot the odd answers in 10 seconds.</p>
             <div class="game-meta">
-              <span class="players">👥 3-20 Players</span>
+              <span class="players">👥 3-∞ Players</span>
               <span class="difficulty">⏱️ Quick Rounds</span>
             </div>
             <a href="games/odd-one-in.html" class="btn btn-primary btn-full play-btn">
@@ -67,7 +70,7 @@
             <h3 class="game-title">Undercover</h3>
             <p class="game-description">Agents vs Spies! Find the imposters using your word clues.</p>
             <div class="game-meta">
-              <span class="players">👥 4-12 Players</span>
+              <span class="players">👥 4-∞ Players</span>
               <span class="difficulty">🎭 Deception</span>
             </div>
             <a href="games/undercover.html" class="btn btn-primary btn-full play-btn">
@@ -85,7 +88,7 @@
             <h3 class="game-title">Mafia</h3>
             <p class="game-description">Classic social deduction! Civilians hunt the hidden Mafia.</p>
             <div class="game-meta">
-              <span class="players">👥 5-15 Players</span>
+              <span class="players">👥 5-∞ Players</span>
               <span class="difficulty">🕵️ Strategy</span>
             </div>
             <a href="games/mafia.html" class="btn btn-primary btn-full play-btn">
@@ -108,18 +111,18 @@
   <script>
     // Add ripple effects to all buttons
     document.querySelectorAll('.play-btn').forEach(btn => {
-      btn.addEventListener('click', function(e) {
+      btn.addEventListener('click', function (e) {
         addRippleEffect(this, e);
       });
     });
 
     // Add hover animations to game cards
     document.querySelectorAll('.game-card').forEach(card => {
-      card.addEventListener('touchstart', function() {
+      card.addEventListener('touchstart', function () {
         this.style.transform = 'translateY(-8px)';
       });
-      
-      card.addEventListener('touchend', function() {
+
+      card.addEventListener('touchend', function () {
         this.style.transform = '';
       });
     });
@@ -127,7 +130,7 @@
     // Animate elements on load
     window.addEventListener('load', () => {
       document.querySelector('.hero').classList.add('animate-fadeIn');
-      
+
       const cards = document.querySelectorAll('.game-card');
       cards.forEach((card, index) => {
         setTimeout(() => {
@@ -137,4 +140,5 @@
     });
   </script>
 </body>
+
 </html>

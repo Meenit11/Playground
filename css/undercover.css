@@ -13,36 +13,6 @@ body {
 }
 
 /* ================================
-   RULES BUTTON
-   ================================ */
-.rules-btn {
-    position: fixed;
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
-    width: 48px;
-    height: 48px;
-    background: var(--light);
-    color: var(--primary);
-    border: none;
-    border-radius: 50%;
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-    cursor: pointer;
-    box-shadow: var(--shadow-xl);
-    z-index: 100;
-    transition: all var(--transition-base);
-}
-
-.rules-btn:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow-2xl);
-}
-
-.rules-btn:active {
-    transform: scale(0.95);
-}
-
-/* ================================
    WHITE LABELS FOR BETTER VISIBILITY
    ================================ */
 .label-white {
@@ -63,9 +33,9 @@ body {
 .number-btn {
     width: 48px;
     height: 48px;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
     color: var(--light);
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-md);
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
@@ -74,14 +44,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.number-btn:hover {
+.number-btn:hover:not(:disabled) {
     transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
-.number-btn:active {
+.number-btn:active:not(:disabled) {
     transform: scale(0.95);
+}
+
+.number-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--gray-400);
 }
 
 .number-input input {
@@ -89,7 +67,9 @@ body {
     text-align: center;
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
-    border: 2px solid var(--gray-300);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--radius-md);
 }
 
 /* ================================
@@ -242,18 +222,25 @@ body {
 .number-btn-small {
     width: 32px;
     height: 32px;
-    background: var(--primary);
+    background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
     color: var(--light);
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-sm);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
     cursor: pointer;
     transition: all var(--transition-base);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.number-btn-small:hover {
+.number-btn-small:hover:not(:disabled) {
     transform: scale(1.05);
+}
+
+.number-btn-small:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--gray-400);
 }
 
 .number-input-small input {
@@ -261,9 +248,11 @@ body {
     text-align: center;
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
-    border: 2px solid var(--gray-300);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.9);
     min-height: auto;
     padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
 }
 
 /* ================================

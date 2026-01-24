@@ -63,10 +63,6 @@ function setupEventListeners() {
     document.getElementById('decrease-spies').addEventListener('click', () => adjustRoleCount('spies', -1));
     document.getElementById('increase-spies').addEventListener('click', () => adjustRoleCount('spies', 1));
 
-    // Rules button
-    document.getElementById('rules-btn').addEventListener('click', showRules);
-    document.getElementById('close-rules-btn').addEventListener('click', hideRules);
-
     // Start game
     document.getElementById('start-game-btn').addEventListener('click', startGame);
 
@@ -85,17 +81,7 @@ function setupEventListeners() {
     document.getElementById('play-again-btn').addEventListener('click', playAgain);
 }
 
-// ================================
-// RULES MODAL
-// ================================
 
-function showRules() {
-    document.getElementById('rules-modal').classList.remove('hidden');
-}
-
-function hideRules() {
-    document.getElementById('rules-modal').classList.add('hidden');
-}
 
 // ================================
 // SETUP SCREEN
@@ -108,6 +94,10 @@ function adjustPlayerCount(delta) {
 
     input.value = newValue;
     gameState.totalPlayers = newValue;
+
+    // Update button states
+    document.getElementById('decrease-players').disabled = (newValue <= 4);
+    document.getElementById('increase-players').disabled = (newValue >= 15);
 
     generatePlayerInputs(newValue);
     updateRoleDistribution();
@@ -143,6 +133,15 @@ function adjustRoleCount(role, delta) {
 
     input.value = newValue;
     gameState.roles[role] = newValue;
+
+    // Update button states
+    if (role === 'mrWhite') {
+        document.getElementById('decrease-mrwhite').disabled = (newValue <= 1);
+        document.getElementById('increase-mrwhite').disabled = (newValue >= 3);
+    } else if (role === 'spies') {
+        document.getElementById('decrease-spies').disabled = (newValue <= 1);
+        document.getElementById('increase-spies').disabled = (newValue >= 5);
+    }
 
     updateRoleDistribution();
 }
