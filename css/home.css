@@ -257,7 +257,11 @@ body {
 }
 
 .game-card[data-game="mafia"] .play-btn {
-    background: linear-gradient(135deg, #F97316 0%, #EF4444 100%);
+    background: linear-gradient(135deg, #4B5563 0%, #1F2937 100%);
+}
+
+.game-card[data-game="mafia"] .play-btn:hover {
+    background: linear-gradient(135deg, #374151 0%, #111827 100%);
 }
 
 /* ================================

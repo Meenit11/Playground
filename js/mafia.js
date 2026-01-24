@@ -5,15 +5,15 @@
 // Game State
 let gameState = {
     gameId: null,
-    totalPlayers: 7,
+    totalPlayers: 5,
     roleConfig: {
         god: 1,
-        mafia: 2,
+        mafia: 1,
         detective: 0,
         jester: 0,
         bomber: 0,
         lover: 0,
-        civilian: 4
+        civilian: 3
     },
     players: [],
     currentRound: 1,
@@ -113,10 +113,14 @@ function generatePlayerInputs(count) {
 function adjustMafiaCount(delta) {
     const input = document.getElementById('mafia-count');
     let newValue = parseInt(input.value) + delta;
-    newValue = Math.max(1, Math.min(5, newValue));
+    newValue = Math.max(0, Math.min(5, newValue));
 
     input.value = newValue;
     gameState.roleConfig.mafia = newValue;
+
+    // Update button states
+    document.getElementById('decrease-mafia').disabled = (newValue <= 0);
+    document.getElementById('increase-mafia').disabled = (newValue >= 5);
 
     updateRoleDistribution();
 }

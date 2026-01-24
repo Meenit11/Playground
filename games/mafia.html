@@ -26,71 +26,108 @@
 
                 <!-- Player Count -->
                 <div class="form-group">
-                    <label>Total Players</label>
+                    <label class="label-white">Total Players</label>
                     <div class="number-input">
                         <button class="number-btn" id="decrease-players">−</button>
-                        <input type="number" id="player-count-input" value="7" min="5" max="15" readonly>
+                        <input type="number" id="player-count-input" value="5" min="5" max="15" readonly>
                         <button class="number-btn" id="increase-players">+</button>
                     </div>
                 </div>
 
                 <!-- Player Names -->
                 <div class="form-group">
-                    <label>Player Names</label>
-                    <div id="player-names-container">
-                        <!-- Player name inputs will be added here -->
-                    </div>
+                    <label class="label-white">Player Names</label>
+                    <div id="player-names-container"></div>
                 </div>
 
-                <!-- Role Configuration -->
-                <div class="role-config">
-                    <h3>Role Configuration</h3>
+                <!-- Role Selection -->
+                <div class="role-distribution">
+                    <h3>Role Selection</h3>
 
-                    <div class="role-row">
-                        <span class="role-label">👁️ God (Fixed)</span>
+                    <!-- God (Fixed) -->
+                    <div class="role-row-with-img">
+                        <img src="../images/God.png" alt="God" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">God</span>
+                            <p class="role-desc">Narrates game, controls flow (Fixed: 1)</p>
+                        </div>
                         <span class="role-value">1</span>
                     </div>
 
-                    <div class="role-row">
-                        <span class="role-label">🔫 Mafia</span>
+                    <!-- Mafia -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Mafia.png" alt="Mafia" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Mafia</span>
+                            <p class="role-desc">Kill one player each night</p>
+                        </div>
                         <div class="number-input-small">
                             <button class="number-btn-small" id="decrease-mafia">−</button>
-                            <input type="number" id="mafia-count" value="2" min="1" max="5" readonly>
+                            <input type="number" id="mafia-count" value="1" min="0" max="5" readonly>
                             <button class="number-btn-small" id="increase-mafia">+</button>
                         </div>
                     </div>
 
-                    <div class="role-toggle-row">
-                        <label class="toggle-label">
+                    <!-- Detective -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Detective.png" alt="Detective" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Detective</span>
+                            <p class="role-desc">Check if one player is Mafia each night</p>
+                        </div>
+                        <label class="toggle-switch">
                             <input type="checkbox" id="detective-toggle">
-                            <span class="toggle-text">🕵️ Detective</span>
+                            <span class="toggle-slider"></span>
                         </label>
                     </div>
 
-                    <div class="role-toggle-row">
-                        <label class="toggle-label">
+                    <!-- Jester -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Jester.png" alt="Jester" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Jester</span>
+                            <p class="role-desc">Win if voted out; picks someone to die</p>
+                        </div>
+                        <label class="toggle-switch">
                             <input type="checkbox" id="jester-toggle">
-                            <span class="toggle-text">🤡 Jester</span>
+                            <span class="toggle-slider"></span>
                         </label>
                     </div>
 
-                    <div class="role-toggle-row">
-                        <label class="toggle-label">
+                    <!-- Bomber -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Bomber.png" alt="Bomber" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Suicide Bomber</span>
+                            <p class="role-desc">If eliminated, take someone with you</p>
+                        </div>
+                        <label class="toggle-switch">
                             <input type="checkbox" id="bomber-toggle">
-                            <span class="toggle-text">💣 Suicide Bomber</span>
+                            <span class="toggle-slider"></span>
                         </label>
                     </div>
 
-                    <div class="role-toggle-row">
-                        <label class="toggle-label">
+                    <!-- Lovers -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Lover.png" alt="Lover" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Lovers</span>
+                            <p class="role-desc">Linked pair; if one dies, both die (2 players)</p>
+                        </div>
+                        <label class="toggle-switch">
                             <input type="checkbox" id="lover-toggle">
-                            <span class="toggle-text">💕 Lovers (2 players)</span>
+                            <span class="toggle-slider"></span>
                         </label>
                     </div>
 
-                    <div class="role-row">
-                        <span class="role-label">👔 Civilians</span>
-                        <span class="role-value" id="civilian-count">3</span>
+                    <!-- Civilians (Auto-calculated) -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Civilian.png" alt="Civilian" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Civilians</span>
+                            <p class="role-desc">Find and eliminate Mafia members</p>
+                        </div>
+                        <span class="role-value" id="civilian-count">2</span>
                     </div>
                 </div>
 
@@ -104,44 +141,43 @@
                     <p><strong>🎯 Game Flow:</strong></p>
                     <ol>
                         <li>👁️ Each player secretly views their role</li>
-                        <li>🌙 <strong>Night Phase:</strong> Mafia chooses victim, Detective investigates, roles
-                            activate</li>
-                        <li>☀️ <strong>Day Phase:</strong> Players discuss and vote to eliminate someone</li>
-                        <li>🔄 Repeat Night/Day until a team wins</li>
+                        <li>🌙 <strong>Night Phase:</strong> God narrates actions</li>
+                        <li>☀️ <strong>Day Phase:</strong> Players discuss and vote</li>
+                        <li>🔄 Repeat until a team wins</li>
                     </ol>
 
-                    <p><strong>👥 Main Roles:</strong></p>
-                    <ul>
-                        <li><strong>👁️ God:</strong> Game Master who narrates and controls flow</li>
-                        <li><strong>🔫 Mafia:</strong> Kill one person each night. Win when ≥ Civilians</li>
-                        <li><strong>👔 Civilians:</strong> Find and eliminate all Mafia members</li>
-                    </ul>
+                    <p><strong>🌙 Night Phase Order:</strong></p>
+                    <ol>
+                        <li><strong>City sleeps:</strong> "Everyone close your eyes"</li>
+                        <li><strong>Mafia wakes:</strong> "Mafia open your eyes, choose victim"</li>
+                        <li><strong>God saves:</strong> God silently chooses to save someone (once per game)</li>
+                        <li><strong>Detective:</strong> "Detective open your eyes, suspect someone" (God nods Yes/No)
+                        </li>
+                        <li><strong>Lover gives kiss:</strong> Round 1 only - Lover picks partner (stays all game)</li>
+                        <li><strong>City wakes:</strong> God announces who died (if saved, no one dies)</li>
+                    </ol>
 
-                    <p><strong>✨ Special Roles:</strong></p>
+                    <p><strong>⚔️ Special Role Rules:</strong></p>
                     <ul>
-                        <li><strong>🕵️ Detective:</strong> Check if one player is Mafia each night</li>
-                        <li><strong>🤡 Jester:</strong> If eliminated during day, picks someone to die with them</li>
-                        <li><strong>💣 Suicide Bomber:</strong> If eliminated, takes one person with them</li>
-                        <li><strong>💕 Lovers:</strong> Two players linked - if one dies, both die</li>
+                        <li><strong>💣 Bomber:</strong> If voted out, can take ANY player with them</li>
+                        <li><strong>🤡 Jester:</strong> Wins if voted out; picks someone to die with them</li>
+                        <li><strong>💕 Lover:</strong> Picks partner Round 1; if either dies later, both die</li>
+                        <li><strong>🛡️ God:</strong> Can save themself OR others (once only)</li>
                     </ul>
 
                     <p><strong>🏆 Win Conditions:</strong></p>
                     <ul>
                         <li>✅ Civilians win: All Mafia eliminated</li>
-                        <li>✅ Mafia wins: Mafia count ≥ Civilian count</li>
-                    </ul>
-
-                    <p><strong>💡 Pro Tips:</strong></p>
-                    <ul>
-                        <li>🗣️ Day phase is for discussion - talk through suspicions!</li>
-                        <li>👂 Listen carefully to inconsistencies in stories</li>
-                        <li>🤫 Night kills and special roles create critical info</li>
+                        <li>✅ Mafia wins: Mafia ≥ Civilians</li>
+                        <li>✅ Jester solo win: Gets voted out</li>
                     </ul>
                 </div>
             </div>
 
             <a href="../index.html" class="back-link">← Back to Games</a>
         </div>
+
+        <!-- REST OF THE SCREENS STAY THE SAME -->
 
         <!-- SCREEN 2: Pass-Phone Role Viewing -->
         <div id="screen-role-viewing" class="screen hidden">
@@ -181,9 +217,7 @@
             </div>
 
             <div class="content-card">
-                <div id="all-roles-list">
-                    <!-- All player roles will be displayed here -->
-                </div>
+                <div id="all-roles-list"></div>
 
                 <button class="btn btn-success btn-full btn-lg mt-xl" id="start-night-btn">Start Night Phase</button>
             </div>
@@ -199,9 +233,7 @@
             <div class="content-card">
                 <div class="night-instructions">
                     <h3>GM Instructions (Read Aloud):</h3>
-                    <ol id="night-order-list">
-                        <!-- Night order instructions will be added here -->
-                    </ol>
+                    <ol id="night-order-list"></ol>
                 </div>
 
                 <button class="btn btn-primary btn-full btn-lg mt-xl" id="start-day-btn">Start Day Phase</button>
@@ -220,9 +252,7 @@
 
                 <div class="alive-players-list">
                     <h3>Alive Players (<span id="alive-count">7</span>)</h3>
-                    <div id="alive-players-container">
-                        <!-- Alive players will be listed here -->
-                    </div>
+                    <div id="alive-players-container"></div>
                 </div>
 
                 <button class="btn btn-danger btn-full btn-lg mt-xl" id="eliminate-day-btn">Eliminate Voted
@@ -241,9 +271,7 @@
 
                 <div class="winner-details">
                     <h3>Final Roles</h3>
-                    <div id="final-roles-list">
-                        <!-- Final role reveals will be shown here -->
-                    </div>
+                    <div id="final-roles-list"></div>
                 </div>
 
                 <button class="btn btn-primary btn-lg mt-2xl" id="play-again-btn">Play Again</button>
@@ -257,9 +285,7 @@
     <div id="elimination-modal" class="modal hidden">
         <div class="modal-content">
             <h3>Select Player to Eliminate</h3>
-            <div id="elimination-player-list">
-                <!-- Player buttons will be added here -->
-            </div>
+            <div id="elimination-player-list"></div>
             <button class="btn btn-ghost btn-full mt-md" id="cancel-elimination-btn">Cancel</button>
         </div>
     </div>
@@ -269,9 +295,7 @@
         <div class="modal-content">
             <h3>💣 Suicide Bomber Activated!</h3>
             <p class="modal-text">The Suicide Bomber takes someone with them. Select target:</p>
-            <div id="bomber-target-list">
-                <!-- Target buttons will be added here -->
-            </div>
+            <div id="bomber-target-list"></div>
         </div>
     </div>
 
