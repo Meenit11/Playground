@@ -1,0 +1,514 @@
+/* ================================
+   UNDERCOVER - GAME STYLES
+   ================================ */
+
+body {
+    background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
+    min-height: 100vh;
+}
+
+.game-container {
+    min-height: 100vh;
+    padding: var(--spacing-lg);
+}
+
+/* ================================
+   NUMBER INPUTS
+   ================================ */
+.number-input {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    justify-content: center;
+}
+
+.number-btn {
+    width: 48px;
+    height: 48px;
+    background: var(--gradient-primary);
+    color: var(--light);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.number-btn:hover {
+    transform: scale(1.05);
+}
+
+.number-btn:active {
+    transform: scale(0.95);
+}
+
+.number-input input {
+    width: 80px;
+    text-align: center;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    border: 2px solid var(--gray-300);
+}
+
+/* ================================
+   PLAYER NAMES
+   ================================ */
+#player-names-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-height: 300px;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+}
+
+.player-name-input {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--gray-200);
+    transition: all var(--transition-base);
+}
+
+.player-name-input.dragging {
+    opacity: 0.5;
+    background: var(--gray-200);
+}
+
+.player-name-input .drag-handle {
+    cursor: grab;
+    font-size: var(--font-size-xl);
+    color: var(--gray-400);
+    user-select: none;
+}
+
+.player-name-input .drag-handle:active {
+    cursor: grabbing;
+}
+
+.player-name-input .player-number {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: var(--light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+}
+
+.player-name-input input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: var(--font-size-base);
+    min-height: 40px;
+    padding: var(--spacing-sm);
+}
+
+.player-name-input input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* ================================
+   ROLE DISTRIBUTION
+   ================================ */
+.role-distribution {
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+    border: 2px solid var(--gray-200);
+}
+
+.role-distribution h3 {
+    color: var(--dark);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.role-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    background: var(--light);
+    border-radius: var(--radius-md);
+}
+
+.role-label {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+.role-value {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary);
+    min-width: 40px;
+    text-align: center;
+}
+
+.number-input-small {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.number-btn-small {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: var(--light);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.number-btn-small:hover {
+    transform: scale(1.05);
+}
+
+.number-input-small input {
+    width: 50px;
+    text-align: center;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    border: 2px solid var(--gray-300);
+    min-height: auto;
+    padding: var(--spacing-xs);
+}
+
+/* ================================
+   WORD SELECTION
+   ================================ */
+.word-selection-btns {
+    display: flex;
+    flex-direction: column;
+}
+
+.selected-words {
+    padding: var(--spacing-lg);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.selected-words .label {
+    color: var(--gray-600);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.words-preview {
+    color: var(--primary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 0;
+}
+
+/* ================================
+   PASS-PHONE VIEWING
+   ================================ */
+.pass-phone-indicator {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    background: var(--gradient-secondary);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.pass-phone-indicator .label {
+    color: var(--light);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-md);
+    opacity: 0.9;
+}
+
+.player-name-large {
+    color: var(--light);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-extrabold);
+    margin-bottom: 0;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ================================
+   ROLE CARD
+   ================================ */
+.role-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--spacing-xl);
+}
+
+.role-card {
+    width: 100%;
+    max-width: 350px;
+    perspective: 1000px;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.role-card-front {
+    background: var(--light);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    text-align: center;
+    animation: flipCard 0.6s ease-out;
+}
+
+.role-image {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: var(--spacing-xl);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.role-name {
+    color: var(--dark);
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.word-display {
+    padding: var(--spacing-xl);
+    background: var(--gradient-primary);
+    border-radius: var(--radius-xl);
+}
+
+.word-display .label {
+    color: var(--light);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+    opacity: 0.9;
+}
+
+.word-text {
+    color: var(--light);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-extrabold);
+    margin-bottom: 0;
+    letter-spacing: 2px;
+}
+
+.word-display.no-word {
+    background: var(--gradient-dark);
+}
+
+.word-display.no-word .word-text {
+    font-size: var(--font-size-2xl);
+    letter-spacing: normal;
+}
+
+/* ================================
+   SPEAKING ORDER
+   ================================ */
+.speaking-order {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.speaking-order h3 {
+    color: var(--dark);
+    margin-bottom: var(--spacing-lg);
+}
+
+#speaking-order-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.speaking-order-item {
+    flex: 1;
+    min-width: 60px;
+    padding: var(--spacing-md);
+    background: var(--gradient-primary);
+    color: var(--light);
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    box-shadow: var(--shadow-md);
+}
+
+/* ================================
+   ELIMINATION LIST
+   ================================ */
+.elimination-section h3 {
+    color: var(--dark);
+    margin-bottom: var(--spacing-lg);
+}
+
+#elimination-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.elimination-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.elimination-item.eliminated {
+    background: #FEE2E2;
+    border-color: var(--danger);
+    opacity: 0.7;
+}
+
+.elimination-item input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    min-height: auto;
+    margin-right: var(--spacing-md);
+    cursor: pointer;
+}
+
+.elimination-item .player-name {
+    flex: 1;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+.elimination-item.eliminated .player-name {
+    text-decoration: line-through;
+    color: var(--gray-500);
+}
+
+/* ================================
+   MR WHITE GUESS
+   ================================ */
+.info-text {
+    color: var(--gray-700);
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+}
+
+/* ================================
+   WINNER SCREEN
+   ================================ */
+.winner-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: var(--spacing-xl);
+    justify-content: center;
+}
+
+.trophy-icon {
+    font-size: 100px;
+    margin-bottom: var(--spacing-xl);
+    animation: float 2s ease-in-out infinite;
+}
+
+.winner-title {
+    color: var(--light);
+    font-size: var(--font-size-4xl);
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.winner-details {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-2xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.winner-details h3 {
+    color: var(--dark);
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+#role-reveals-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.role-reveal-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--gray-200);
+}
+
+.role-reveal-item .player-name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+.role-reveal-item .role-badge {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.role-badge.agent {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.role-badge.spy {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.role-badge.mrwhite {
+    background: #F3F4F6;
+    color: #374151;
+}
+
+/* ================================
+   RESPONSIVE
+   ================================ */
+@media (max-width: 374px) {
+    .speaking-order-item {
+        min-width: 50px;
+        font-size: var(--font-size-xs);
+    }
+
+    .role-image {
+        width: 120px;
+        height: 120px;
+    }
+}

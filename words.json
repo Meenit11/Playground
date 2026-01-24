@@ -1,0 +1,30 @@
+{
+  "game_title": "Undercover",
+  "word_pairs": [
+    ["21 Din Me Paisa Double", "Chit Fund"], ["Anuradha", "Kavita"], ["Totla Seth", "Kachra Seth"], ["Nana Patekar", "Paresh Rawal"],
+    ["Johnny Lever", "Rajpal Yadav"], ["Vasooli Bhai", "Khalnayak"], ["Circuit", "Shorty"], ["Masterji", "Principal"],
+    ["Shark Tank", "Dragon's Den"], ["Ashneer Grover", "Aman Gupta"], ["Namita Thapar", "Anupam Mittal"], ["BoAt", "Sony"],
+    ["MBA Chai Wala", "Graduate Chai Wali"], ["Flying Beast", "CarryMinati"], ["Technical Guruji", "Manoj Dey"], ["BB Ki Vines", "Ashish Chanchlani"],
+    ["Dolly Chaiwala", "Puneet Superstar"], ["Arpit Bala", "Elvish Yadav"], ["Orry", "Kusha Kapila"], ["Physics Wallah", "Unacademy"],
+    ["Parle-G", "Marie Gold"], ["Hide & Seek", "Bourbon"], ["Frooti", "Maaza"], ["Thums Up", "Coca-Cola"],
+    ["Limca", "Sprite"], ["Red Bull", "Sting"], ["Kurkure", "Lays"], ["Bingo", "Uncle Chips"],
+    ["Momo", "Dim Sum"], ["Chowmein", "Manchurian"], ["Kulcha", "Bhatura"], ["Dhokla", "Khandvi"],
+    ["Kaju Katli", "Soan Papdi"], ["Jalebi", "Imarti"], ["Petha", "Gajak"], ["Kulfi", "Cornetto"],
+    ["Belan", "Chimta"], ["Kadai", "Tawa"], ["Mixer", "Grinder"], ["Pressure Cooker", "Rice Cooker"],
+    ["Broom", "Mop"], ["Bucket", "Tub"], ["Soap", "Detergent"], ["Phenyl", "Colin"],
+    ["Sarkari Job", "Private Job"], ["Work From Home", "Office"], ["Monday", "Friday"], ["Overtime", "Sick Leave"],
+    ["Appraisal", "Promotion"], ["HR", "Manager"], ["Startup", "Corporate"], ["Laptop", "Desktop"],
+    ["Auto", "E-Rickshaw"], ["Tractor", "Truck"], ["Bullet", "Jawa"], ["Swift", "WagonR"],
+    ["Innova", "Fortuner"], ["Cycle", "Scooty"], ["Uber", "Ola"], ["Flight", "Train"],
+    ["Gully Cricket", "Stadium Cricket"], ["Tennis Ball", "Season Ball"], ["Sixer", "Boundary"], ["Umpire", "Third Umpire"],
+    ["Lagan", "Chak De India"], ["Dangal", "Sultan"], ["Sholay", "Don"], ["Gadar", "Lagaan"],
+    ["Hero", "Villain"], ["Item Song", "Romantic Song"], ["Climax", "Interval"], ["Dubbing", "Subtitles"],
+    ["Sarojini Nagar", "Palika Bazaar"], ["Chandni Chowk", "Chur Bazaar"], ["Mall", "Local Market"], ["Dhaba", "Restaurant"],
+    ["Hostel", "PG"], ["Mess Food", "Ghar Ka Khana"], ["Canteen", "Cafeteria"], ["Library", "Study Room"],
+    ["Bua", "Masi"], ["Mama", "Chacha"], ["Nana", "Dada"], ["Saas", "Bahu"],
+    ["Rishta", "Date"], ["Engagement", "Roka"], ["Kundli", "Biodata"], ["Pandit", "Astrologer"],
+    ["Tinder", "Shaadi.com"], ["Star Plus", "Colors TV"], ["Sony TV", "Zee TV"], ["C.I.D", "Crime Patrol"],
+    ["ACP Pradyuman", "Daya"], ["Abhijeet", "Dr. Salunkhe"], ["Kyunki Saas Bhi", "Kasautii Zindagii"], ["Anupama", "Gopi Bahu"],
+    ["Aadhar Card", "PAN Card"], ["Passport", "Visa"], ["Ration Card", "Voter ID"], ["Traffic Police", "Mama"]
+  ]
+}

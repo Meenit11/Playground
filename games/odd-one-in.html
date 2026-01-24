@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Odd One In - Fast-paced party game">
+    <meta name="theme-color" content="#8B5CF6">
+    <title>Odd One In - Meenit's Playground</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/odd-one-in.css">
+</head>
+
+<body>
+    <div class="game-container">
+
+        <!-- SCREEN 1: GM Name Entry -->
+        <div id="screen-gm-entry" class="screen">
+            <div class="screen-header">
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo">
+                <h1>Odd One In</h1>
+                <p class="subtitle">Spot the odd answers in 10 seconds!</p>
+            </div>
+
+            <div class="content-card">
+                <h2>Create Game</h2>
+                <div class="form-group">
+                    <label for="gm-name">Game Master Name</label>
+                    <input type="text" id="gm-name" placeholder="Enter your name" autocomplete="off">
+                </div>
+                <button class="btn btn-primary btn-full" id="create-room-btn">Create Room</button>
+            </div>
+
+            <a href="../index.html" class="back-link">← Back to Games</a>
+        </div>
+
+        <!-- SCREEN 2: Lobby (GM View) -->
+        <div id="screen-lobby" class="screen hidden">
+            <div class="screen-header">
+                <h1>Waiting Room</h1>
+                <p class="subtitle">Share the room code with players</p>
+            </div>
+
+            <div class="content-card">
+                <div class="room-code-container">
+                    <p class="label">Room Code</p>
+                    <div class="room-code" id="room-code">XXXX</div>
+                    <button class="btn btn-sm btn-outline" id="copy-code-btn">📋 Copy Code</button>
+                </div>
+
+                <div class="players-list">
+                    <h3>Players (<span id="player-count">1</span>)</h3>
+                    <div id="players-container">
+                        <!-- Players will be added here -->
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full" id="add-player-btn">➕ Add Player</button>
+                <button class="btn btn-success btn-full mt-md" id="start-game-btn">Start Game</button>
+            </div>
+
+            <button class="btn btn-danger btn-full mt-lg" id="cancel-game-btn">Cancel Game</button>
+        </div>
+
+        <!-- SCREEN 3: Player Join -->
+        <div id="screen-player-join" class="screen hidden">
+            <div class="screen-header">
+                <h1>Join Game</h1>
+                <p class="subtitle">Enter your name to join</p>
+            </div>
+
+            <div class="content-card">
+                <div class="form-group">
+                    <label for="player-name">Your Name</label>
+                    <input type="text" id="player-name" placeholder="Enter your name" autocomplete="off">
+                </div>
+                <button class="btn btn-primary btn-full" id="join-game-btn">Join Game</button>
+                <button class="btn btn-ghost btn-full mt-sm" id="back-to-lobby-btn">Back to Lobby</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: Game Playing (Question & Answer) -->
+        <div id="screen-playing" class="screen hidden">
+            <div class="game-header">
+                <div class="round-info">
+                    <span class="round-number">Round <span id="current-round">1</span></span>
+                    <span class="alive-count"><span id="alive-players">5</span> Players Left</span>
+                </div>
+            </div>
+
+            <div class="question-container">
+                <div class="timer-circle" id="timer-circle">
+                    <span class="timer-number" id="timer-display">10</span>
+                </div>
+
+                <div class="question-card">
+                    <h2 id="question-text">Name a fruit</h2>
+                </div>
+
+                <div class="gm-controls" id="gm-controls">
+                    <button class="btn btn-sm btn-ghost" id="pause-timer-btn">⏸️ Pause</button>
+                    <button class="btn btn-sm btn-ghost" id="reset-timer-btn">🔄 Reset</button>
+                    <button class="btn btn-sm btn-ghost" id="edit-question-btn">✏️ Edit</button>
+                    <button class="btn btn-sm btn-ghost" id="skip-question-btn">⏭️ Skip</button>
+                </div>
+            </div>
+
+            <div class="answer-section" id="answer-section">
+                <div class="current-player-turn" id="current-player-turn">
+                    <p class="turn-label">Current Turn:</p>
+                    <p class="player-name-turn" id="player-name-turn">---</p>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="answer-input" placeholder="Type your answer..." autocomplete="off">
+                </div>
+                <button class="btn btn-primary btn-full" id="submit-answer-btn">Submit Answer</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Judging Phase -->
+        <div id="screen-judging" class="screen hidden">
+            <div class="screen-header">
+                <h1>Judging Phase</h1>
+                <p class="subtitle">Find the odd ones!</p>
+            </div>
+
+            <div class="content-card">
+                <div class="question-display">
+                    <p class="label">Question</p>
+                    <p class="question-text-small" id="judging-question">Name a fruit</p>
+                </div>
+
+                <div class="answers-list">
+                    <h3>Answers (Alphabetical)</h3>
+                    <div id="answers-container">
+                        <!-- Answer items will be added here -->
+                    </div>
+                </div>
+
+                <button class="btn btn-success btn-full mt-lg" id="next-round-btn">Continue to Next Round</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: Winner Screen -->
+        <div id="screen-winner" class="screen hidden">
+            <div class="confetti-container" id="confetti-container"></div>
+
+            <div class="winner-content">
+                <div class="trophy-icon">🏆</div>
+                <h1 class="winner-title">Winner!</h1>
+                <p class="winner-name" id="winner-name">Player Name</p>
+                <p class="winner-subtitle">Congratulations! 🎉</p>
+
+                <button class="btn btn-primary btn-lg mt-2xl" id="play-again-btn">Play Again</button>
+                <a href="../index.html" class="btn btn-ghost btn-lg mt-md">Back to Games</a>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: Spectator Mode -->
+        <div id="screen-spectator" class="screen hidden">
+            <div class="spectator-overlay">
+                <div class="spectator-card">
+                    <h2>👻 You're Out!</h2>
+                    <p>You've been eliminated, but you can still watch the game.</p>
+                    <div class="spectator-info">
+                        <p class="label">Remaining Players</p>
+                        <p class="big-number" id="spectator-alive-count">5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Edit Question Modal -->
+    <div id="edit-question-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Edit Question</h3>
+            <div class="form-group">
+                <input type="text" id="edit-question-input" placeholder="Enter new question">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="save-question-btn">Save</button>
+                <button class="btn btn-ghost" id="cancel-edit-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/odd-one-in.js"></script>
+</body>
+
+</html>

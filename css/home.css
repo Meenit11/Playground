@@ -1,0 +1,316 @@
+/* ================================
+   HOME PAGE STYLES
+   ================================ */
+
+body {
+    min-height: 100vh;
+    background: var(--gradient-dark);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* ================================
+   FLOATING BACKGROUND SHAPES
+   ================================ */
+.floating-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    filter: blur(40px);
+}
+
+.shape-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--primary);
+    top: -100px;
+    left: -100px;
+    animation: floatSlow 20s ease-in-out infinite;
+}
+
+.shape-2 {
+    width: 250px;
+    height: 250px;
+    background: var(--secondary);
+    top: 20%;
+    right: -80px;
+    animation: floatSlow 25s ease-in-out infinite reverse;
+    animation-delay: 2s;
+}
+
+.shape-3 {
+    width: 200px;
+    height: 200px;
+    background: var(--accent);
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: floatSlow 18s ease-in-out infinite;
+    animation-delay: 4s;
+}
+
+.shape-4 {
+    width: 150px;
+    height: 150px;
+    background: var(--success);
+    top: 50%;
+    left: -50px;
+    animation: floatSlow 22s ease-in-out infinite reverse;
+    animation-delay: 1s;
+}
+
+.shape-5 {
+    width: 180px;
+    height: 180px;
+    background: var(--secondary);
+    bottom: 20%;
+    right: 10%;
+    animation: floatSlow 16s ease-in-out infinite;
+    animation-delay: 3s;
+}
+
+/* ================================
+   CONTAINER
+   ================================ */
+.container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-2xl);
+}
+
+/* ================================
+   HERO SECTION
+   ================================ */
+.hero {
+    text-align: center;
+    margin-bottom: var(--spacing-3xl);
+    opacity: 0;
+}
+
+.logo-container {
+    margin-bottom: var(--spacing-xl);
+    animation: float 4s ease-in-out infinite;
+}
+
+.main-logo {
+    width: 180px;
+    height: auto;
+    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3));
+}
+
+.hero-title {
+    color: var(--light);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-extrabold);
+    margin-bottom: var(--spacing-sm);
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #FFFFFF 0%, #E0C3FC 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    color: var(--gray-200);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: 0;
+}
+
+/* ================================
+   GAMES SECTION
+   ================================ */
+.games-section {
+    margin-bottom: var(--spacing-3xl);
+}
+
+.section-title {
+    color: var(--light);
+    text-align: center;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+}
+
+/* ================================
+   GAME CARDS
+   ================================ */
+.game-card {
+    opacity: 0;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-xl);
+    transition: all var(--transition-base);
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.game-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.game-card:active {
+    transform: translateY(-4px);
+}
+
+.game-card-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.game-icon {
+    width: 100px;
+    height: 100px;
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-md);
+    transition: transform var(--transition-base);
+}
+
+.game-card:hover .game-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.game-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.game-title {
+    color: var(--light);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-sm);
+}
+
+.game-description {
+    color: var(--gray-200);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
+    min-height: 50px;
+}
+
+.game-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+}
+
+.game-meta span {
+    color: var(--gray-300);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+}
+
+.play-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Game-specific gradients */
+.game-card[data-game="odd-one-in"] .play-btn {
+    background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+}
+
+.game-card[data-game="undercover"] .play-btn {
+    background: linear-gradient(135deg, #EC4899 0%, #F43F5E 100%);
+}
+
+.game-card[data-game="mafia"] .play-btn {
+    background: linear-gradient(135deg, #F97316 0%, #EF4444 100%);
+}
+
+/* ================================
+   FOOTER
+   ================================ */
+.footer {
+    text-align: center;
+    padding-top: var(--spacing-2xl);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-text {
+    color: var(--gray-300);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.footer-version {
+    color: var(--gray-400);
+    font-size: var(--font-size-xs);
+    margin-bottom: 0;
+}
+
+/* ================================
+   RESPONSIVE - TABLET & DESKTOP
+   ================================ */
+@media (min-width: 768px) {
+    .games-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .main-logo {
+        width: 220px;
+    }
+
+    .hero-title {
+        font-size: var(--font-size-5xl);
+    }
+
+    .game-description {
+        min-height: 70px;
+    }
+}
+
+/* ================================
+   TOUCH IMPROVEMENTS
+   ================================ */
+@media (hover: none) and (pointer: coarse) {
+    .game-card:hover {
+        transform: none;
+    }
+
+    .game-card:active {
+        transform: scale(0.98);
+    }
+}

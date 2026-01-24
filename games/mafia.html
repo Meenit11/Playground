@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Mafia - Classic social deduction game">
+    <meta name="theme-color" content="#F97316">
+    <title>Mafia - Meenit's Playground</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/mafia.css">
+</head>
+
+<body>
+    <div class="game-container">
+
+        <!-- SCREEN 1: Setup -->
+        <div id="screen-setup" class="screen">
+            <div class="screen-header">
+                <img src="../images/Mafia Logo.png" alt="Mafia" class="game-logo">
+                <h1>Mafia</h1>
+                <p class="subtitle">Classic social deduction!</p>
+            </div>
+
+            <div class="content-card">
+                <h2>Game Setup</h2>
+
+                <!-- Player Count -->
+                <div class="form-group">
+                    <label>Total Players</label>
+                    <div class="number-input">
+                        <button class="number-btn" id="decrease-players">−</button>
+                        <input type="number" id="player-count-input" value="7" min="5" max="15" readonly>
+                        <button class="number-btn" id="increase-players">+</button>
+                    </div>
+                </div>
+
+                <!-- Player Names -->
+                <div class="form-group">
+                    <label>Player Names</label>
+                    <div id="player-names-container">
+                        <!-- Player name inputs will be added here -->
+                    </div>
+                </div>
+
+                <!-- Role Configuration -->
+                <div class="role-config">
+                    <h3>Role Configuration</h3>
+
+                    <div class="role-row">
+                        <span class="role-label">👁️ God (Fixed)</span>
+                        <span class="role-value">1</span>
+                    </div>
+
+                    <div class="role-row">
+                        <span class="role-label">🔫 Mafia</span>
+                        <div class="number-input-small">
+                            <button class="number-btn-small" id="decrease-mafia">−</button>
+                            <input type="number" id="mafia-count" value="2" min="1" max="5" readonly>
+                            <button class="number-btn-small" id="increase-mafia">+</button>
+                        </div>
+                    </div>
+
+                    <div class="role-toggle-row">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="detective-toggle">
+                            <span class="toggle-text">🕵️ Detective</span>
+                        </label>
+                    </div>
+
+                    <div class="role-toggle-row">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="jester-toggle">
+                            <span class="toggle-text">🤡 Jester</span>
+                        </label>
+                    </div>
+
+                    <div class="role-toggle-row">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="bomber-toggle">
+                            <span class="toggle-text">💣 Suicide Bomber</span>
+                        </label>
+                    </div>
+
+                    <div class="role-toggle-row">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="lover-toggle">
+                            <span class="toggle-text">💕 Lovers (2 players)</span>
+                        </label>
+                    </div>
+
+                    <div class="role-row">
+                        <span class="role-label">👔 Civilians</span>
+                        <span class="role-value" id="civilian-count">3</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="start-game-btn">Start Game</button>
+            </div>
+
+            <a href="../index.html" class="back-link">← Back to Games</a>
+        </div>
+
+        <!-- SCREEN 2: Pass-Phone Role Viewing -->
+        <div id="screen-role-viewing" class="screen hidden">
+            <div class="screen-header">
+                <h1>Role Assignment</h1>
+                <p class="subtitle">Pass the phone around (randomized order)</p>
+            </div>
+
+            <div class="content-card">
+                <div class="pass-phone-indicator">
+                    <p class="label">Next to View</p>
+                    <p class="player-name-large" id="next-viewer-name">Player Name</p>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">👁️ Reveal My Role</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: Role Card Display -->
+        <div id="screen-role-card" class="screen hidden">
+            <div class="role-card-container">
+                <div class="role-card">
+                    <img src="../images/Civilian.png" alt="Role" class="role-image" id="role-image">
+                    <h2 class="role-name" id="role-name">Civilian</h2>
+                    <p class="role-description" id="role-description">Find the Mafia and eliminate them!</p>
+                </div>
+
+                <button class="btn btn-primary btn-full mt-2xl" id="done-viewing-btn">✓ Done (Pass Phone)</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: GM Overview -->
+        <div id="screen-gm-overview" class="screen hidden">
+            <div class="screen-header">
+                <h1>GM Overview</h1>
+                <p class="subtitle">All player roles (for God/GM only)</p>
+            </div>
+
+            <div class="content-card">
+                <div id="all-roles-list">
+                    <!-- All player roles will be displayed here -->
+                </div>
+
+                <button class="btn btn-success btn-full btn-lg mt-xl" id="start-night-btn">Start Night Phase</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Night Phase -->
+        <div id="screen-night" class="screen hidden">
+            <div class="screen-header">
+                <h1>🌙 Night Phase</h1>
+                <p class="subtitle">Round <span id="night-round-number">1</span> - GM speaks aloud</p>
+            </div>
+
+            <div class="content-card">
+                <div class="night-instructions">
+                    <h3>GM Instructions (Read Aloud):</h3>
+                    <ol id="night-order-list">
+                        <!-- Night order instructions will be added here -->
+                    </ol>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="start-day-btn">Start Day Phase</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: Day Phase -->
+        <div id="screen-day" class="screen hidden">
+            <div class="screen-header">
+                <h1>☀️ Day Phase</h1>
+                <p class="subtitle">Round <span id="day-round-number">1</span> - Discussion & Voting</p>
+            </div>
+
+            <div class="content-card">
+                <p class="info-text">Players discuss and vote to eliminate someone.</p>
+
+                <div class="alive-players-list">
+                    <h3>Alive Players (<span id="alive-count">7</span>)</h3>
+                    <div id="alive-players-container">
+                        <!-- Alive players will be listed here -->
+                    </div>
+                </div>
+
+                <button class="btn btn-danger btn-full btn-lg mt-xl" id="eliminate-day-btn">Eliminate Voted
+                    Player</button>
+                <button class="btn btn-ghost btn-full mt-md" id="skip-elimination-btn">Skip (No Elimination)</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: Winner Screen -->
+        <div id="screen-winner" class="screen hidden">
+            <div class="confetti-container" id="confetti-container"></div>
+
+            <div class="winner-content">
+                <div class="trophy-icon">🏆</div>
+                <h1 class="winner-title" id="winner-title">Civilians Win!</h1>
+
+                <div class="winner-details">
+                    <h3>Final Roles</h3>
+                    <div id="final-roles-list">
+                        <!-- Final role reveals will be shown here -->
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-lg mt-2xl" id="play-again-btn">Play Again</button>
+                <a href="../index.html" class="btn btn-ghost btn-lg mt-md">Back to Games</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Elimination Modal -->
+    <div id="elimination-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Select Player to Eliminate</h3>
+            <div id="elimination-player-list">
+                <!-- Player buttons will be added here -->
+            </div>
+            <button class="btn btn-ghost btn-full mt-md" id="cancel-elimination-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Bomber Target Modal -->
+    <div id="bomber-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>💣 Suicide Bomber Activated!</h3>
+            <p class="modal-text">The Suicide Bomber takes someone with them. Select target:</p>
+            <div id="bomber-target-list">
+                <!-- Target buttons will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/mafia.js"></script>
+</body>
+
+</html>

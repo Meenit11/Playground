@@ -1,0 +1,454 @@
+/* ================================
+   MAFIA - GAME STYLES
+   ================================ */
+
+body {
+    background: linear-gradient(135deg, #F97316 0%, #DC2626 100%);
+    min-height: 100vh;
+}
+
+.game-container {
+    min-height: 100vh;
+    padding: var(--spacing-lg);
+}
+
+/* ================================
+   ROLE CONFIGURATION
+   ================================ */
+.role-config {
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+    border: 2px solid var(--gray-200);
+}
+
+.role-config h3 {
+    color: var(--dark);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.role-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    background: var(--light);
+    border-radius: var(--radius-md);
+}
+
+.role-label {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+.role-value {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--accent);
+    min-width: 40px;
+    text-align: center;
+}
+
+.role-toggle-row {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    background: var(--light);
+    border-radius: var(--radius-md);
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-label input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    min-height: auto;
+    cursor: pointer;
+}
+
+.toggle-text {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+/* ================================
+   ROLE CARD
+   ================================ */
+.role-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--spacing-xl);
+}
+
+.role-card {
+    width: 100%;
+    max-width: 350px;
+    background: var(--light);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    text-align: center;
+    animation: flipCard 0.6s ease-out;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.role-image {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: var(--spacing-xl);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.role-name {
+    color: var(--dark);
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-md);
+}
+
+.role-description {
+    color: var(--gray-600);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* ================================
+   GM OVERVIEW
+   ================================ */
+#all-roles-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.player-role-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+}
+
+.player-role-item .player-name {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+.player-role-item .role-badge {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.role-badge.god {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.role-badge.mafia {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.role-badge.detective {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.role-badge.jester {
+    background: #E9D5FF;
+    color: #6B21A8;
+}
+
+.role-badge.bomber {
+    background: #FED7AA;
+    color: #9A3412;
+}
+
+.role-badge.lover {
+    background: #FBCFE8;
+    color: #9F1239;
+}
+
+.role-badge.civilian {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+/* ================================
+   NIGHT PHASE
+   ================================ */
+.night-instructions {
+    background: var(--dark);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    color: var(--light);
+}
+
+.night-instructions h3 {
+    color: var(--light);
+    margin-bottom: var(--spacing-lg);
+}
+
+.night-instructions ol {
+    padding-left: var(--spacing-xl);
+}
+
+.night-instructions li {
+    font-size: var(--font-size-base);
+    line-height: 1.8;
+    margin-bottom: var(--spacing-md);
+    color: var(--gray-100);
+}
+
+.night-instructions strong {
+    color: var(--light);
+    font-weight: var(--font-weight-bold);
+}
+
+/* ================================
+   DAY PHASE
+   ================================ */
+.alive-players-list {
+    margin-bottom: var(--spacing-xl);
+}
+
+.alive-players-list h3 {
+    color: var(--dark);
+    margin-bottom: var(--spacing-lg);
+}
+
+#alive-players-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.alive-player-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+}
+
+.alive-player-item .player-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient-secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--light);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+}
+
+.alive-player-item .player-name {
+    flex: 1;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+/* ================================
+   WINNER SCREEN
+   ================================ */
+.winner-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: var(--spacing-xl);
+    justify-content: center;
+}
+
+.trophy-icon {
+    font-size: 100px;
+    margin-bottom: var(--spacing-xl);
+    animation: float 2s ease-in-out infinite;
+}
+
+.winner-title {
+    color: var(--light);
+    font-size: var(--font-size-4xl);
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.winner-details {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-2xl);
+    margin-bottom: var(--spacing-2xl);
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.winner-details h3 {
+    color: var(--dark);
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+#final-roles-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.final-role-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--gray-200);
+}
+
+.final-role-item.dead {
+    opacity: 0.6;
+}
+
+.final-role-item .player-name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+}
+
+.final-role-item.dead .player-name {
+    text-decoration: line-through;
+    color: var(--gray-500);
+}
+
+/* ================================
+   MODALS
+   ================================ */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--spacing-lg);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--light);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    max-width: 400px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h3 {
+    color: var(--dark);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.modal-text {
+    color: var(--gray-700);
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+#elimination-player-list,
+#bomber-target-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.modal-player-btn {
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-align: left;
+}
+
+.modal-player-btn:hover {
+    background: var(--danger);
+    color: var(--light);
+    border-color: var(--danger);
+    transform: translateX(4px);
+}
+
+.modal-player-btn:active {
+    transform: scale(0.98);
+}
+
+/* ================================
+   INFO TEXT
+   ================================ */
+.info-text {
+    color: var(--gray-700);
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+/* ================================
+   RESPONSIVE
+   ================================ */
+@media (max-width: 374px) {
+    .role-image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .night-instructions li {
+        font-size: var(--font-size-sm);
+    }
+}
