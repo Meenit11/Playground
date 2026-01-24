@@ -27,9 +27,11 @@ body {
 }
 
 /* Better label visibility */
-.form-group>label {
+.form-group>label,
+.label-white {
     color: var(--light) !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Number buttons for player count */
@@ -460,8 +462,89 @@ input:checked+.toggle-slider:before {
 }
 
 /* ================================
-   GM OVERVIEW
+   GM OVERVIEW - GRID LAYOUT
    ================================ */
+.roles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.role-grid-item {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.player-name-header {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--dark);
+    margin-bottom: var(--spacing-md);
+}
+
+.role-image-small {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin: 0 auto var(--spacing-md) auto;
+    display: block;
+}
+
+.role-name-badge {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    display: inline-block;
+}
+
+/* Role badge colors */
+.role-name-badge.god {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.role-name-badge.mafia {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.role-name-badge.detective {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.role-name-badge.jester {
+    background: #E9D5FF;
+    color: #6B21A8;
+}
+
+.role-name-badge.bomber {
+    background: #FED7AA;
+    color: #9A3412;
+}
+
+.role-name-badge.lover {
+    background: #FBCFE8;
+    color: #9F1239;
+}
+
+.role-name-badge.civilian {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+@media (max-width: 600px) {
+    .roles-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Old GM overview styles - keep for backward compatibility */
 #all-roles-list {
     display: flex;
     flex-direction: column;

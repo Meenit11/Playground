@@ -73,7 +73,7 @@
                         <img src="../images/Detective.png" alt="Detective" class="role-icon">
                         <div class="role-info">
                             <span class="role-label">Detective</span>
-                            <p class="role-desc">Check if one player is Mafia each night</p>
+                            <p class="role-desc">Check if one player is Mafia (Game Master tells you)</p>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="detective-toggle">
@@ -98,7 +98,7 @@
                     <div class="role-row-with-img">
                         <img src="../images/Bomber.png" alt="Bomber" class="role-icon">
                         <div class="role-info">
-                            <span class="role-label">Suicide Bomber</span>
+                            <span class="role-label">Bomber</span>
                             <p class="role-desc">If voted out, can take someone with them</p>
                         </div>
                         <label class="toggle-switch">
@@ -152,8 +152,8 @@
                         <li><strong>Mafia wakes:</strong> "Mafia open your eyes, choose victim"</li>
                         <li><strong>God saves:</strong> God silently chooses to save someone (self or other, once per
                             night)</li>
-                        <li><strong>Detective investigates:</strong> "Detective open your eyes, suspect someone" (God
-                            nods Yes/No)</li>
+                        <li><strong>Detective investigates:</strong> "Detective open your eyes, suspect someone" (Game
+                            Master nods Yes/No)</li>
                         <li><strong>Lover protects:</strong> Night 1 only - Lover picks target to protect (permanent)
                         </li>
                         <li><strong>City wakes:</b> Game Master announces deaths (if protected, no one dies)</li>
@@ -205,19 +205,20 @@
                     <p class="role-description" id="role-description">Find the Mafia and eliminate them!</p>
                 </div>
 
-                <button class="btn btn-primary btn-full mt-2xl" id="done-viewing-btn">✓ Done (Pass Phone)</button>
+                <button class="btn btn-primary btn-full mt-2xl" id="done-viewing-btn">Pass Phone to <span
+                        id="next-player-name">Next Player</span></button>
             </div>
         </div>
 
         <!-- SCREEN 4: GM Overview -->
         <div id="screen-gm-overview" class="screen hidden">
             <div class="screen-header">
-                <h1>GM Overview</h1>
-                <p class="subtitle">All player roles (for God/GM only)</p>
+                <h1>Game Master Overview</h1>
+                <p class="subtitle">All player roles (Game Master only)</p>
             </div>
 
             <div class="content-card">
-                <div id="all-roles-list"></div>
+                <div id="all-roles-list" class="roles-grid"></div>
 
                 <button class="btn btn-success btn-full btn-lg mt-xl" id="start-night-btn">Start Night Phase</button>
             </div>
@@ -227,12 +228,12 @@
         <div id="screen-night" class="screen hidden">
             <div class="screen-header">
                 <h1>🌙 Night Phase</h1>
-                <p class="subtitle">Round <span id="night-round-number">1</span> - GM speaks aloud</p>
+                <p class="subtitle">Round <span id="night-round-number">1</span> - Game Master speaks aloud</p>
             </div>
 
             <div class="content-card">
                 <div class="night-instructions">
-                    <h3>GM Instructions (Read Aloud):</h3>
+                    <h3>Game Master Instructions (Read Aloud):</h3>
                     <ol id="night-order-list"></ol>
                 </div>
 
@@ -293,8 +294,8 @@
     <!-- Bomber Target Modal -->
     <div id="bomber-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>💣 Suicide Bomber Activated!</h3>
-            <p class="modal-text">The Suicide Bomber takes someone with them. Select target:</p>
+            <h3>💣 Bomber Activated!</h3>
+            <p class="modal-text">The Bomber takes someone with them. Select target:</p>
             <div id="bomber-target-list"></div>
         </div>
     </div>

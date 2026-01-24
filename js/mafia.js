@@ -263,6 +263,9 @@ function showRoleCard() {
     document.getElementById('role-description').textContent = description;
 
     showScreen('screen-role-card');
+
+    // Update pass phone button with next player name
+    updatePassPhoneButton();
 }
 
 function getRoleData(role) {
@@ -280,7 +283,7 @@ function getRoleData(role) {
         detective: {
             name: 'Detective',
             image: '../images/Detective.png',
-            description: 'Once per night, point to someone. God will tell you if they are Mafia.'
+            description: 'Once per night, point to someone. Game Master will tell you if they are Mafia.'
         },
         jester: {
             name: 'Jester',
@@ -288,7 +291,7 @@ function getRoleData(role) {
             description: 'Your goal: Get voted out during the day! If you succeed, you win alone.'
         },
         bomber: {
-            name: 'Suicide Bomber',
+            name: 'Bomber',
             image: '../images/Bomber.png',
             description: 'If eliminated, you can take one person with you!'
         },
@@ -313,6 +316,21 @@ function nextViewer() {
     showNextViewer();
 }
 
+function updatePassPhoneButton() {
+    const nextPlayerSpan = document.getElementById('next-player-name');
+    const nextIndex = gameState.currentViewIndex + 1;
+
+    if (nextIndex >= gameState.viewingOrder.length) {
+        // Last player - pass to Game Master
+        nextPlayerSpan.textContent = 'Game Master';
+    } else {
+        // Get next player name
+        const nextPlayerIndex = gameState.viewingOrder[nextIndex];
+        const nextPlayer = gameState.players[nextPlayerIndex];
+        nextPlayerSpan.textContent = nextPlayer.name;
+    }
+}
+
 // ================================
 // GM OVERVIEW
 // ================================
@@ -321,18 +339,18 @@ function displayGMOverview() {
     const container = document.getElementById('all-roles-list');
     container.innerHTML = '';
 
-    gameState.players.forEach(player => {
-        const itemDiv = createElement('div', {
-            classes: ['player-role-item']
-        });
-
+    gameState.players.forEach((player, index) => {
         const roleData = getRoleData(player.role);
         const roleClass = player.role;
 
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'role-grid-item';
+
         itemDiv.innerHTML = `
-      <span class="player-name">${player.name}</span>
-      <span class="role-badge ${roleClass}">${roleData.name}</span>
-    `;
+            <div class="player-name-header">${player.name}</div>
+            <img src="${roleData.image}" alt="${roleData.name}" class="role-image-small">
+            <div class="role-name-badge ${roleClass}">${roleData.name}</div>
+        `;
 
         container.appendChild(itemDiv);
     });
