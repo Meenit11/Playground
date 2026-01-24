@@ -66,7 +66,7 @@ function setupEventListeners() {
 
     // Night/Day phases
     document.getElementById('start-day-btn').addEventListener('click', startDayPhase);
-    document.getElementById('eliminate-day-btn').addEventListener('click', showEliminationModal);
+    document.getElementById('confirm-elimination-btn').addEventListener('click', confirmEliminations);
     document.getElementById('skip-elimination-btn').addEventListener('click', skipElimination);
 
     // Modals
@@ -376,38 +376,49 @@ function displayNightInstructions() {
 
     const instructions = [];
 
-    // God opens eyes
-    instructions.push('Everyone close your eyes.');
-    instructions.push('<strong>God</strong>, open your eyes and observe.');
+    // 1. City goes to sleep
+    instructions.push('<strong>City goes to sleep:</strong> "Everyone close your eyes"');
 
-    // Mafia
+    // 2. Mafia wakes up
     const aliveMafia = gameState.players.filter(p => p.role === 'mafia' && p.isAlive);
     if (aliveMafia.length > 0) {
         const mafiaNames = aliveMafia.map(p => p.name).join(', ');
-        instructions.push(`<strong>Mafia</strong> (${mafiaNames}), open your eyes and silently agree on a target.`);
-        instructions.push('Mafia, close your eyes.');
+        instructions.push(`<strong>Mafia wakes up:</strong> "Mafia (${mafiaNames}), open your eyes"`);
+        instructions.push('<strong>Kill someone:</strong> Mafia silently agrees on a victim');
+        instructions.push('<strong>Mafia close your eyes</strong>');
     }
 
-    // Detective
+    // 3. God opens eyes (always present - one player has God role)
+    const god = gameState.players.find(p => p.role === 'god');
+    if (god) {
+        instructions.push(`<strong>God open your eyes:</strong> "${god.name}, open your eyes"`);
+        instructions.push('<strong>Save someone:</strong> God silently picks someone to save (self or other)');
+        instructions.push('<strong>God close your eyes</strong>');
+    }
+
+    // 4. Detective (if enabled)
     const detective = gameState.players.find(p => p.role === 'detective' && p.isAlive);
     if (detective) {
-        instructions.push(`<strong>Detective</strong> (${detective.name}), open your eyes and point to someone. God will nod if they are Mafia.`);
-        instructions.push('Detective, close your eyes.');
+        instructions.push(`<strong>Detective open your eyes:</strong> "${detective.name}, open your eyes"`);
+        instructions.push('<strong>Suspect someone:</strong> Detective points to someone');
+        instructions.push('<strong>Game Master nods Yes/No</strong> based on suspicion');
+        instructions.push('<strong>Detective close your eyes</strong>');
     }
 
-    // Lovers
-    if (gameState.currentRound === 1 && gameState.loverPair) {
-        const lovers = gameState.players.filter(p => p.role === 'lover' && p.isAlive);
-        if (lovers.length === 2) {
-            instructions.push(`<strong>Lovers</strong> (${lovers.map(p => p.name).join(', ')}), open your eyes and see each other.`);
-            instructions.push('Lovers, close your eyes.');
-        }
+    // 5. Lover (if enabled and Round 1 only)
+    const lover = gameState.players.find(p => p.role === 'lover' && p.isAlive);
+    if (lover && gameState.currentRound === 1) {
+        instructions.push(`<strong>Lover open your eyes:</strong> "${lover.name}, open your eyes"`);
+        instructions.push('<strong>Give someone a flying kiss:</strong> Lover picks target to protect (PERMANENT)');
+        instructions.push('<strong>Lover close your eyes</strong>');
     }
 
-    instructions.push('Everyone open your eyes. <strong>It is now day.</strong>');
+    // 6. Everyone wakes up
+    instructions.push('<strong>Click "Start Day Phase" when ready</strong>');
 
     instructions.forEach(instruction => {
-        const li = createElement('li', { html: instruction });
+        const li = document.createElement('li');
+        li.innerHTML = instruction;
         container.appendChild(li);
     });
 }
@@ -433,49 +444,53 @@ function displayDayPhase() {
     const container = document.getElementById('alive-players-container');
     container.innerHTML = '';
 
-    alivePlayers.forEach(player => {
-        const itemDiv = createElement('div', {
-            classes: ['alive-player-item']
-        });
-
-        const initial = player.name.charAt(0).toUpperCase();
-
+    alivePlayers.forEach((player, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'elimination-player-item';
         itemDiv.innerHTML = `
-      <div class="player-icon">${initial}</div>
-      <span class="player-name">${player.name}</span>
-    `;
-
+            <label class="elimination-label">
+                <input type="checkbox" class="elimination-checkbox" data-player-id="${player.id}">
+                <span class="player-name">${player.name}</span>
+            </label>
+        `;
         container.appendChild(itemDiv);
     });
-}
 
-function showEliminationModal() {
-    const modal = document.getElementById('elimination-modal');
-    const container = document.getElementById('elimination-player-list');
-    container.innerHTML = '';
-
-    const alivePlayers = gameState.players.filter(p => p.isAlive);
-
-    alivePlayers.forEach(player => {
-        const btn = createElement('button', {
-            classes: ['modal-player-btn'],
-            text: player.name,
-            attributes: { 'data-player-id': player.id }
-        });
-
-        btn.addEventListener('click', () => {
-            eliminatePlayer(player.id, 'day');
-            hideEliminationModal();
-        });
-
-        container.appendChild(btn);
+    // Add checkbox change listeners
+    document.querySelectorAll('.elimination-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateEliminationButton);
     });
 
-    modal.classList.remove('hidden');
+    updateEliminationButton();
 }
 
-function hideEliminationModal() {
-    document.getElementById('elimination-modal').classList.add('hidden');
+function updateEliminationButton() {
+    const checkedBoxes = document.querySelectorAll('.elimination-checkbox:checked');
+    const confirmBtn = document.getElementById('confirm-elimination-btn');
+    confirmBtn.disabled = checkedBoxes.length === 0;
+}
+
+function confirmEliminations() {
+    const checkedBoxes = document.querySelectorAll('.elimination-checkbox:checked');
+    const playerIds = Array.from(checkedBoxes).map(cb => cb.dataset.playerId);
+
+    if (playerIds.length === 0) {
+        return;
+    }
+
+    // Eliminate all selected players
+    playerIds.forEach(playerId => eliminatePlayer(playerId, 'day'));
+
+    // Check win conditions
+    if (!checkWinConditions()) {
+        nextRound();
+    }
+}
+
+function skipElimination() {
+    if (confirm('Skip elimination and go to next night?')) {
+        nextRound();
+    }
 }
 
 function eliminatePlayer(playerId, phase) {
@@ -489,7 +504,7 @@ function eliminatePlayer(playerId, phase) {
         return;
     }
 
-    // Check for Suicide Bomber (ONLY if voted out, not mafia-killed)
+    // Check for Bomber (ONLY if voted out, not mafia-killed)
     if (phase === 'day' && player.role === 'bomber') {
         showBomberModal();
         return;
@@ -510,7 +525,7 @@ function eliminatePlayer(playerId, phase) {
     }
 
     saveGame('mafia', gameState);
-    checkWinConditions();
+    // Note: Don't call checkWinConditions here since we're processing multiple eliminations
 }
 
 function showBomberModal() {

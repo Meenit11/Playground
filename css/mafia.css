@@ -336,13 +336,17 @@ input:checked+.toggle-slider:before {
 }
 
 /* Start Game button - match orange gradient */
-#start-game-btn {
+#start-game-btn,
+#reveal-role-btn,
+#done-viewing-btn {
     background: linear-gradient(135deg, #C2410C 0%, #FB923C 100%) !important;
     color: var(--light) !important;
     border: 2px solid rgba(251, 146, 60, 0.5) !important;
 }
 
-#start-game-btn:hover {
+#start-game-btn:hover,
+#reveal-role-btn:hover,
+#done-viewing-btn:hover {
     background: linear-gradient(135deg, #9A3412 0%, #F97316 100%) !important;
     transform: translateY(-2px);
 }
@@ -638,6 +642,46 @@ input:checked+.toggle-slider:before {
 .night-instructions strong {
     color: var(--light);
     font-weight: var(--font-weight-bold);
+}
+
+/* ================================
+   DAY PHASE - ELIMINATION CHECKBOXES
+   ================================ */
+.elimination-player-item {
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-sm);
+    transition: all var(--transition-base);
+}
+
+.elimination-player-item:hover {
+    background: var(--gray-100);
+    border-color: var(--danger);
+}
+
+.elimination-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    cursor: pointer;
+    user-select: none;
+}
+
+.elimination-checkbox {
+    width: 24px;
+    height: 24px;
+    min-height: auto;
+    cursor: pointer;
+    accent-color: var(--danger);
+}
+
+.elimination-label .player-name {
+    flex: 1;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--dark);
 }
 
 /* ================================
