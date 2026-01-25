@@ -538,19 +538,25 @@ function checkWinConditions() {
 
     // 1. Mr. White Guess (Handled in submitMrWhiteGuess)
 
-    // 2. Agent Victory Condition: Agents win when all Spies and Mr. White are eliminated.
+    // 2. Mr. White 1v1 Automatic Win: Wins if only 1 Mr. White and 1 other player (Agent or Spy) remain.
+    if (aliveMrWhites.length === 1 && alivePlayers.length === 2) {
+        showWinner('Mr. White');
+        return true;
+    }
+
+    // 3. Agent Victory Condition: Agents win when all Spies and Mr. White are eliminated.
     if (aliveSpies.length === 0 && aliveMrWhites.length === 0) {
         showWinner('Agents');
         return true;
     }
 
-    // 3. Spy Victory Condition: Spies win when Spies >= Agents. Mr. White must be dead.
+    // 4. Spy Victory Condition: Spies win when Spies >= Agents. Mr. White must be dead.
     if (aliveSpies.length >= aliveAgents.length && aliveMrWhites.length === 0 && aliveAgents.length > 0) {
         showWinner('Spies');
         return true;
     }
 
-    // 4. Special Endgame: Agents all die, handled via Mr. White guess (Rule 4)
+    // 5. Special Endgame: Agents all die, handled via Mr. White guess (Rule 4)
     // If Agents = 0 and Mr. White is eliminated (either before or as part of guessing), Spies win.
     if (aliveAgents.length === 0 && aliveMrWhites.length === 0 && aliveSpies.length > 0) {
         showWinner('Spies');

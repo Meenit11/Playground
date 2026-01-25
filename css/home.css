@@ -96,26 +96,30 @@ body {
    ================================ */
 .hero {
     text-align: center;
-    margin-bottom: var(--spacing-3xl);
+    margin-bottom: var(--spacing-lg);
+    /* Reduced from 3xl */
     opacity: 0;
 }
 
 .logo-container {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-sm);
+    /* Reduced from xl */
     animation: float 4s ease-in-out infinite;
 }
 
 .main-logo {
-    width: 180px;
+    width: 140px;
+    /* Slightly smaller logo */
     height: auto;
     filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3));
 }
 
 .hero-title {
     color: var(--light);
-    font-size: var(--font-size-4xl);
+    font-size: var(--font-size-3xl);
+    /* Slightly smaller */
     font-weight: var(--font-weight-extrabold);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 0;
     text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     background: linear-gradient(135deg, #FFFFFF 0%, #E0C3FC 100%);
     -webkit-background-clip: text;
@@ -123,26 +127,23 @@ body {
     background-clip: text;
 }
 
-.hero-subtitle {
-    color: var(--gray-200);
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-medium);
-    margin-bottom: 0;
-}
-
 /* ================================
    GAMES SECTION
    ================================ */
 .games-section {
-    margin-bottom: var(--spacing-3xl);
+    margin-bottom: var(--spacing-xl);
 }
 
 .section-title {
     color: var(--light);
     text-align: center;
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-lg);
+    /* Smaller and more subtle */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.7;
     font-weight: var(--font-weight-bold);
-    margin-bottom: var(--spacing-2xl);
+    margin-bottom: var(--spacing-xl);
 }
 
 .games-grid {
@@ -152,116 +153,159 @@ body {
 }
 
 /* ================================
-   GAME CARDS
+   GAME CARDS - REDESIGNED
    ================================ */
 .game-card {
+    position: relative;
     opacity: 0;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-2xl);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
     transition: all var(--transition-base);
     cursor: pointer;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm);
+}
+
+.game-card-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, var(--glow-color, rgba(255, 255, 255, 0.1)) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.game-card[data-game="odd-one-in"] {
+    --glow-color: rgba(139, 92, 246, 0.15);
+}
+
+.game-card[data-game="undercover"] {
+    --glow-color: rgba(236, 72, 153, 0.15);
+}
+
+.game-card[data-game="mafia"] {
+    --glow-color: rgba(249, 115, 22, 0.15);
 }
 
 .game-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
-    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
-.game-card:active {
-    transform: translateY(-4px);
+.game-card:hover .game-card-glow {
+    opacity: 1;
 }
 
-.game-card-inner {
+.game-card-content {
+    position: relative;
+    z-index: 1;
+}
+
+.game-card-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    text-align: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
 }
 
-.game-icon {
-    width: 100px;
-    height: 100px;
-    margin-bottom: var(--spacing-lg);
+.game-icon-small {
+    width: 50px;
+    height: 50px;
+    padding: var(--spacing-xs);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-md);
-    transition: transform var(--transition-base);
 }
 
-.game-card:hover .game-icon {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.game-icon img {
+.game-icon-small img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
 }
 
 .game-title {
     color: var(--light);
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
-    margin-bottom: var(--spacing-sm);
+    margin: 0;
 }
 
 .game-description {
-    color: var(--gray-200);
-    font-size: var(--font-size-base);
-    line-height: 1.6;
-    margin-bottom: var(--spacing-lg);
-    min-height: 50px;
+    color: var(--gray-300);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    margin-bottom: var(--spacing-md);
+    text-align: left;
+}
+
+.game-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .game-meta {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-lg);
-    margin-bottom: var(--spacing-xl);
-    flex-wrap: wrap;
+    gap: var(--spacing-sm);
 }
 
 .game-meta span {
-    color: var(--gray-300);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gray-400);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.play-link {
+    color: var(--light);
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    padding: var(--spacing-xs) var(--spacing-md);
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-bold);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    opacity: 0.8;
+    transition: all var(--transition-fast);
 }
 
-.play-btn {
-    position: relative;
-    overflow: hidden;
+.play-link .arrow {
+    transition: transform var(--transition-fast);
 }
 
-/* Game-specific gradients */
-.game-card[data-game="odd-one-in"] .play-btn {
-    background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+.game-card:hover .play-link {
+    opacity: 1;
+    color: var(--secondary-light);
 }
 
-.game-card[data-game="undercover"] .play-btn {
-    background: linear-gradient(135deg, #EC4899 0%, #F43F5E 100%);
+.game-card:hover .play-link .arrow {
+    transform: translateX(4px);
 }
 
-.game-card[data-game="mafia"] .play-btn {
-    background: linear-gradient(135deg, #4B5563 0%, #1F2937 100%);
+/* Specific theme refinements */
+.game-card[data-game="odd-one-in"]:hover .play-link {
+    color: #A78BFA;
 }
 
-.game-card[data-game="mafia"] .play-btn:hover {
-    background: linear-gradient(135deg, #374151 0%, #111827 100%);
+.game-card[data-game="undercover"]:hover .play-link {
+    color: #F472B6;
+}
+
+.game-card[data-game="mafia"]:hover .play-link {
+    color: #FB923C;
 }
 
 /* ================================
