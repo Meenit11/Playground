@@ -29,7 +29,8 @@ let gameState = {
 // INITIALIZATION
 // ================================
 
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
+    console.log('Mafia initializing...');
     // Ensure total players matches input value
     const playerInput = document.getElementById('player-count-input');
     if (playerInput) {
@@ -39,7 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     generatePlayerInputs(gameState.totalPlayers);
     updateRoleDistribution();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 // ================================
 // EVENT LISTENERS

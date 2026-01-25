@@ -150,14 +150,17 @@ function createGame() {
 }
 
 function joinGame() {
-    const name = document.getElementById('player-name').value.trim();
+    console.log('Join Game clicked');
+    const input = document.getElementById('player-name');
+    const name = input ? input.value.trim() : '';
+
     if (!name) {
-        shakeElement(document.getElementById('player-name'));
+        console.warn('Empty name, shaking input');
+        if (input) shakeElement(input);
         return;
     }
 
-    // In a real multiplayer app, we'd send this to a server.
-    // Here we simulate joining by adding to local state.
+    console.log(`Joining as: ${name}`);
     const player = { id: generateId(), name: name, isGM: false };
     gameState.players.push(player);
     gameState.isGM = false;
@@ -191,7 +194,9 @@ function updateLobbyView() {
     if (countGM) countGM.textContent = gameState.players.length;
 
     const renderPlayer = (player) => {
-        const isSelf = (gameState.isGM && player.isGM) || (!gameState.isGM && player.name === document.getElementById('player-name').value.trim());
+        const nameInput = document.getElementById('player-name') || document.getElementById('entry-name');
+        const currentUserName = nameInput ? nameInput.value.trim() : '';
+        const isSelf = (gameState.isGM && player.isGM) || (!gameState.isGM && player.name === currentUserName);
         const item = createElement('div', {
             classes: ['lobby-player-card', player.isGM ? 'gm-card' : '']
         });
