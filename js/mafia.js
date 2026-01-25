@@ -30,6 +30,12 @@ let gameState = {
 // ================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Ensure total players matches input value
+    const playerInput = document.getElementById('player-count-input');
+    if (playerInput) {
+        gameState.totalPlayers = parseInt(playerInput.value) || 5;
+    }
+
     setupEventListeners();
     generatePlayerInputs(gameState.totalPlayers);
     updateRoleDistribution();
@@ -273,7 +279,7 @@ function getRoleData(role) {
         god: {
             name: 'God',
             image: '../images/God.png',
-            description: 'You are the Game Master! You see everything and guide the game.'
+            description: 'God can save one life every night either self or any other player.'
         },
         mafia: {
             name: 'Mafia',
@@ -322,12 +328,12 @@ function updatePassPhoneButton() {
 
     if (nextIndex >= gameState.viewingOrder.length) {
         // Last player - pass to Game Master
-        nextPlayerSpan.textContent = 'Game Master';
+        nextPlayerSpan.textContent = ' Game Master';
     } else {
         // Get next player name
         const nextPlayerIndex = gameState.viewingOrder[nextIndex];
         const nextPlayer = gameState.players[nextPlayerIndex];
-        nextPlayerSpan.textContent = nextPlayer.name;
+        nextPlayerSpan.textContent = ' ' + nextPlayer.name;
     }
 }
 
@@ -478,12 +484,29 @@ function confirmEliminations() {
         return;
     }
 
+    let bomberTriggered = false;
+
     // Eliminate all selected players
-    playerIds.forEach(playerId => eliminatePlayer(playerId, 'day'));
+    let names = [];
+    playerIds.forEach(playerId => {
+        const player = gameState.players.find(p => p.id === playerId);
+        names.push(player.name);
+        if (player.role === 'bomber') {
+            bomberTriggered = true;
+        }
+        eliminatePlayer(playerId, 'day');
+    });
+
+    if (names.length > 0) {
+        alert('Eliminated: ' + names.join(', '));
+    }
 
     // Check win conditions
     if (!checkWinConditions()) {
-        nextRound();
+        // If a bomber was triggered, the bomber selection modal will handle nextRound()
+        if (!bomberTriggered) {
+            nextRound();
+        }
     }
 }
 
@@ -545,7 +568,11 @@ function showBomberModal() {
         btn.addEventListener('click', () => {
             eliminatePlayer(player.id, 'bomber');
             modal.classList.add('hidden');
-            checkWinConditions();
+
+            // After bomber selection, check if game should continue or end
+            if (!checkWinConditions()) {
+                nextRound();
+            }
         });
 
         container.appendChild(btn);

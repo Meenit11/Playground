@@ -140,6 +140,86 @@ body {
 }
 
 /* ================================
+   PLAYER NAMES SETUP
+   ================================ */
+#player-names-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-height: 300px;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.player-name-input {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--gray-200);
+    transition: all var(--transition-base);
+}
+
+.player-name-input .player-number {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #C2410C 0%, #FB923C 100%);
+    color: var(--light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xs);
+    flex-shrink: 0;
+}
+
+.player-name-input input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: var(--font-size-base);
+    min-height: 40px;
+    padding: var(--spacing-xs);
+    color: var(--dark);
+}
+
+.player-name-input input:focus {
+    outline: none;
+}
+
+.player-name-input input::placeholder {
+    color: var(--gray-400);
+}
+
+/* Custom Focus States (Replace Blue) */
+input:focus,
+button:focus,
+.btn:focus,
+select:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3) !important;
+    outline: none !important;
+}
+
+#player-names-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#player-names-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-full);
+}
+
+#player-names-container::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: var(--radius-full);
+}
+
+/* ================================
    ROLE CONFIGURATION
    ================================ */
 .role-distribution {
@@ -518,28 +598,28 @@ input:checked+.toggle-slider:before {
 }
 
 .role-name-badge.detective {
-    background: #DBEAFE;
-    color: #1E40AF;
+    background: #E2E8F0;
+    color: #1E293B;
 }
 
 .role-name-badge.jester {
-    background: #E9D5FF;
-    color: #6B21A8;
+    background: #FAE8FF;
+    color: #701A75;
 }
 
 .role-name-badge.bomber {
-    background: #FED7AA;
+    background: #FFEDD5;
     color: #9A3412;
 }
 
 .role-name-badge.lover {
-    background: #FBCFE8;
-    color: #9F1239;
+    background: #FCE7F3;
+    color: #9D174D;
 }
 
 .role-name-badge.civilian {
-    background: #D1FAE5;
-    color: #065F46;
+    background: #DCFCE7;
+    color: #166534;
 }
 
 @media (max-width: 600px) {
