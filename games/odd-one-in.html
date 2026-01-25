@@ -15,8 +15,8 @@
 <body>
     <div class="game-container">
 
-        <!-- SCREEN 1: GM Name Entry -->
-        <div id="screen-gm-entry" class="screen">
+        <!-- SCREEN 1: Entry Screen (Name + Action) -->
+        <div id="screen-entry" class="screen">
             <div class="screen-header">
                 <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo">
                 <h1>Odd One In</h1>
@@ -24,50 +24,98 @@
             </div>
 
             <div class="content-card">
-                <h2>Create Game</h2>
                 <div class="form-group">
-                    <label for="gm-name">Game Master Name</label>
-                    <input type="text" id="gm-name" placeholder="Enter your name" autocomplete="off">
+                    <label for="entry-name">Your Name</label>
+                    <input type="text" id="entry-name" placeholder="Enter your name" autocomplete="off">
                 </div>
-                <button class="btn btn-primary btn-full" id="create-room-btn">Create Room</button>
+                <button class="btn btn-primary btn-full btn-lg" id="create-game-btn">Create Game</button>
             </div>
 
-            <a href="../index.html" class="back-link">← Back to Games</a>
+            <a href="../index.html" class="back-link" id="entry-back-home">← Back to Home</a>
         </div>
 
         <!-- SCREEN 2: Lobby (GM View) -->
-        <div id="screen-lobby" class="screen hidden">
+        <div id="screen-lobby-gm" class="screen hidden">
             <div class="screen-header">
-                <h1>Waiting Room</h1>
-                <p class="subtitle">Share the room code with players</p>
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo-small">
+                <h1>Game Lobby</h1>
+                <p class="subtitle">You are the Game Master 👑</p>
             </div>
 
             <div class="content-card">
                 <div class="room-code-container">
-                    <p class="label">Room Code</p>
-                    <div class="room-code" id="room-code">XXXX</div>
-                    <button class="btn btn-sm btn-outline" id="copy-code-btn">📋 Copy Code</button>
+                    <div class="room-code-display">
+                        <span class="label">Invite Link</span>
+                        <div class="invite-actions">
+                            <button class="btn btn-sm btn-success" id="share-whatsapp-btn">🟢 Share on WhatsApp</button>
+                            <button class="btn btn-sm btn-outline" id="copy-link-btn">📋 Copy Link</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="players-list">
-                    <h3>Players (<span id="player-count">1</span>)</h3>
-                    <div id="players-container">
+                    <h3>Players (<span id="player-count-gm">1</span>)</h3>
+                    <div id="players-container-gm" class="lobby-player-grid">
                         <!-- Players will be added here -->
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-full" id="add-player-btn">➕ Add Player</button>
-                <button class="btn btn-success btn-full mt-md" id="start-game-btn">Start Game</button>
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="start-game-btn-gm">Start Game</button>
+                <a href="../index.html" class="btn btn-ghost btn-full mt-md">Back to Home</a>
             </div>
 
-            <button class="btn btn-danger btn-full mt-lg" id="cancel-game-btn">Cancel Game</button>
+            <!-- Rules in Lobby -->
+            <div class="lobby-rules mt-xl">
+                <h3>🎮 Game Rules</h3>
+                <ul>
+                    <li>1️⃣ Everyone gets a question</li>
+                    <li>2️⃣ You have 10 seconds to answer</li>
+                    <li>3️⃣ Find the "Odd One In" (the answer that doesn't fit)</li>
+                    <li>4️⃣ Last player standing wins!</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SCREEN 2.5: Lobby (Player View) -->
+        <div id="screen-lobby-player" class="screen hidden">
+            <div class="screen-header">
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo-small">
+                <h1>Waiting Room</h1>
+                <p class="subtitle">Waiting for Game Master to start...</p>
+            </div>
+
+            <div class="content-card">
+                <div class="players-list">
+                    <h3>Confirmed Players</h3>
+                    <div id="players-container-player" class="lobby-player-grid">
+                        <!-- Players will be added here -->
+                    </div>
+                </div>
+
+                <div class="waiting-pulse mt-xl">
+                    <div class="pulse-icon">⏳</div>
+                    <p>The Game Master will start the game soon.</p>
+                </div>
+            </div>
+
+            <!-- Rules in Lobby -->
+            <div class="lobby-rules mt-xl">
+                <h3>🎮 Game Rules</h3>
+                <ul>
+                    <li>1️⃣ Everyone gets a question</li>
+                    <li>2️⃣ You have 10 seconds to answer</li>
+                    <li>3️⃣ Find the "Odd One In" (the answer that doesn't fit)</li>
+                    <li>4️⃣ Last player standing wins!</li>
+                </ul>
+            </div>
         </div>
 
         <!-- SCREEN 3: Player Join -->
         <div id="screen-player-join" class="screen hidden">
             <div class="screen-header">
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo">
                 <h1>Join Game</h1>
-                <p class="subtitle">Enter your name to join</p>
+                <p class="subtitle">Enter your name to join the playground</p>
             </div>
 
             <div class="content-card">
@@ -75,9 +123,10 @@
                     <label for="player-name">Your Name</label>
                     <input type="text" id="player-name" placeholder="Enter your name" autocomplete="off">
                 </div>
-                <button class="btn btn-primary btn-full" id="join-game-btn">Join Game</button>
-                <button class="btn btn-ghost btn-full mt-sm" id="back-to-lobby-btn">Back to Lobby</button>
+                <button class="btn btn-primary btn-full btn-lg" id="join-game-btn">Join Game</button>
             </div>
+
+            <a href="../index.html" class="back-link" id="join-back-home">← Back to Home</a>
         </div>
 
         <!-- SCREEN 4: Game Playing (Question & Answer) -->

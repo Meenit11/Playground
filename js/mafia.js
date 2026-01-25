@@ -100,6 +100,12 @@ function adjustPlayerCount(delta) {
 
 function generatePlayerInputs(count) {
     const container = document.getElementById('player-names-container');
+    if (!container) return;
+
+    // Save existing names
+    const existingInputs = container.querySelectorAll('input');
+    const savedNames = Array.from(existingInputs).map(input => input.value);
+
     container.innerHTML = '';
 
     for (let i = 0; i < count; i++) {
@@ -109,7 +115,7 @@ function generatePlayerInputs(count) {
 
         playerDiv.innerHTML = `
       <div class="player-number">${i + 1}</div>
-      <input type="text" placeholder="Player ${i + 1}" data-player-index="${i}">
+      <input type="text" placeholder="Player ${i + 1}" data-player-index="${i}" value="${savedNames[i] || ''}">
     `;
 
         container.appendChild(playerDiv);
