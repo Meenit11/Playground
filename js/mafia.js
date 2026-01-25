@@ -328,12 +328,12 @@ function updatePassPhoneButton() {
 
     if (nextIndex >= gameState.viewingOrder.length) {
         // Last player - pass to Game Master
-        nextPlayerSpan.textContent = ' Game Master';
+        nextPlayerSpan.textContent = 'Game Master';
     } else {
         // Get next player name
         const nextPlayerIndex = gameState.viewingOrder[nextIndex];
         const nextPlayer = gameState.players[nextPlayerIndex];
-        nextPlayerSpan.textContent = ' ' + nextPlayer.name;
+        nextPlayerSpan.textContent = nextPlayer.name;
     }
 }
 

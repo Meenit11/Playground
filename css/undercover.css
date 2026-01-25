@@ -27,11 +27,17 @@ body {
 }
 
 /* ================================
-   WHITE LABELS FOR BETTER VISIBILITY
+   LABELS FOR BETTER VISIBILITY
    ================================ */
 .label-white {
-    color: var(--light) !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    color: var(--dark) !important;
+    text-shadow: none;
+    font-weight: var(--font-weight-semibold);
+}
+
+.form-group label {
+    color: var(--dark);
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Back link visibility override */
@@ -375,7 +381,8 @@ body {
     max-width: 350px;
     text-align: center;
     padding: var(--spacing-2xl);
-    background: var(--gradient-secondary);
+    background: var(--gradient-primary);
+    /* Changed from secondary (orange) to primary (purple-pink) */
     border-radius: var(--radius-xl);
     margin-bottom: var(--spacing-2xl);
     box-shadow: var(--shadow-2xl);

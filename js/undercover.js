@@ -306,9 +306,9 @@ function showRoleCard() {
     const nextIndex = gameState.currentViewIndex + 1;
     if (nextIndex < gameState.viewingOrder.length) {
         const nextPlayer = gameState.players[gameState.viewingOrder[nextIndex]];
-        document.getElementById('next-player-name').textContent = ' ' + nextPlayer.name;
+        document.getElementById('next-player-name').textContent = nextPlayer.name;
     } else {
-        document.getElementById('next-player-name').textContent = ' Game Master';
+        document.getElementById('next-player-name').textContent = 'Game Master';
     }
 
     showScreen('screen-role-card');
