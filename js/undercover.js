@@ -21,7 +21,8 @@ let gameState = {
     currentViewIndex: 0,
     speakingOrder: [],
     allWordPairs: null,
-    selectedEliminationId: null
+    selectedEliminationId: null,
+    targetWordToGuess: null // 'agent' or 'spy'
 };
 
 // ================================
@@ -420,10 +421,34 @@ function confirmElimination() {
     // Show role reveal with image
     showRoleReveal(player);
 
-    // Check if Mr. White was eliminated
+    // Check for Mr. White elimination
     if (player.role === 'mrwhite') {
-        // Wait for user to see the reveal, then show guess screen
+        gameState.targetWordToGuess = 'agent';
+        // Special case: if this was the last Agent, but Mr. White is still in, 
+        // they get to guess the Spy word. But here Mr. White IS the one being eliminated.
+        // If Agents are all dead, and Mr. White is eliminated, they should guess the Spy word?
+        // Rule 4: If all Agents eliminated and only Spies and Mr. White remain: Mr. White must guess the Spy word.
+        const aliveAgents = gameState.players.filter(p => !p.isEliminated && p.role === 'agent');
+        if (aliveAgents.length === 0) {
+            gameState.targetWordToGuess = 'spy';
+        }
+
         setTimeout(() => {
+            prepareGuessScreen();
+            showScreen('screen-mrwhite-guess');
+        }, 2000);
+        return;
+    }
+
+    // Special case: if last Agent eliminated but Mr. White is still alive
+    const aliveAgents = gameState.players.filter(p => !p.isEliminated && p.role === 'agent');
+    const aliveMrWhites = gameState.players.filter(p => !p.isEliminated && p.role === 'mrwhite');
+
+    if (aliveAgents.length === 0 && aliveMrWhites.length > 0) {
+        // Special Endgame: Spy + Mr. White vs Agents (Agents all gone)
+        gameState.targetWordToGuess = 'spy';
+        setTimeout(() => {
+            prepareGuessScreen();
             showScreen('screen-mrwhite-guess');
         }, 2000);
         return;
@@ -511,19 +536,44 @@ function checkWinConditions() {
     const aliveSpies = alivePlayers.filter(p => p.role === 'spy');
     const aliveMrWhites = alivePlayers.filter(p => p.role === 'mrwhite');
 
-    // Agents win: All Spies and Mr. Whites eliminated
+    // 1. Mr. White Guess (Handled in submitMrWhiteGuess)
+
+    // 2. Agent Victory Condition: Agents win when all Spies and Mr. White are eliminated.
     if (aliveSpies.length === 0 && aliveMrWhites.length === 0) {
         showWinner('Agents');
         return true;
     }
 
-    // Spies/Mr. White win: (Spies + Mr. Whites) >= Agents
-    if (aliveSpies.length + aliveMrWhites.length >= aliveAgents.length) {
-        showWinner('Spies & Mr. White');
+    // 3. Spy Victory Condition: Spies win when Spies >= Agents. Mr. White must be dead.
+    if (aliveSpies.length >= aliveAgents.length && aliveMrWhites.length === 0 && aliveAgents.length > 0) {
+        showWinner('Spies');
+        return true;
+    }
+
+    // 4. Special Endgame: Agents all die, handled via Mr. White guess (Rule 4)
+    // If Agents = 0 and Mr. White is eliminated (either before or as part of guessing), Spies win.
+    if (aliveAgents.length === 0 && aliveMrWhites.length === 0 && aliveSpies.length > 0) {
+        showWinner('Spies');
         return true;
     }
 
     return false;
+}
+
+function prepareGuessScreen() {
+    const label = document.getElementById('guess-label');
+    const subtitle = document.querySelector('#screen-mrwhite-guess .subtitle');
+    const infoText = document.querySelector('#screen-mrwhite-guess .info-text');
+
+    if (gameState.targetWordToGuess === 'spy') {
+        label.textContent = "Guess the Spy's word";
+        subtitle.textContent = "All Agents are gone! Guess the Spy word to win.";
+        infoText.textContent = "Mr. White must guess the Spy word correctly to win. Otherwise, Spies win.";
+    } else {
+        label.textContent = "Guess the Agent's word";
+        subtitle.textContent = "Guess the Agent word correctly to win!";
+        infoText.textContent = "Mr. White has been eliminated. They can guess the Agent word to win!";
+    }
 }
 
 // ================================
@@ -531,21 +581,30 @@ function checkWinConditions() {
 // ================================
 
 function submitMrWhiteGuess() {
-    const guess1 = document.getElementById('guess-word1').value.trim().toLowerCase();
-    const guess2 = document.getElementById('guess-word2').value.trim().toLowerCase();
+    const guess = document.getElementById('guess-word').value.trim().toLowerCase();
 
-    if (!guess1 || !guess2) {
-        alert('Please enter both word guesses!');
+    if (!guess) {
+        alert('Please enter a word guess!');
         return;
     }
 
-    const correct1 = guess1 === gameState.words.word1.toLowerCase() || guess1 === gameState.words.word2.toLowerCase();
-    const correct2 = guess2 === gameState.words.word1.toLowerCase() || guess2 === gameState.words.word2.toLowerCase();
+    const correctWord = (gameState.targetWordToGuess === 'agent' ? gameState.words.word1 : gameState.words.word2).toLowerCase();
 
-    if (correct1 && correct2 && guess1 !== guess2) {
-        showWinner('Mr. White (Solo Win!)');
+    if (guess === correctWord) {
+        showWinner('Mr. White');
     } else {
-        alert(`Wrong guess! The words were: ${gameState.words.word1} and ${gameState.words.word2}`);
+        alert(`Wrong guess! The correct word was: ${correctWord}`);
+
+        // If it was the Special Endgame (Agents for elimination), Mr. White is now eliminated
+        // "Mr. White must guess the Spy word. Wrong guess -> Mr. White is eliminated, and Spies win."
+        const aliveAgents = gameState.players.filter(p => !p.isEliminated && p.role === 'agent');
+        if (aliveAgents.length === 0) {
+            // Rule 4: Mr. White is eliminated, Spies win
+            gameState.players.forEach(p => { if (p.role === 'mrwhite') p.isEliminated = true; });
+            showWinner('Spies');
+            return;
+        }
+
         skipMrWhiteGuess();
     }
 }

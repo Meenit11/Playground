@@ -105,9 +105,12 @@
 
                     <p><strong>🏆 Win Conditions:</strong></p>
                     <ul>
-                        <li>✅ Agents win: All Spies + Mr. Whites eliminated</li>
-                        <li>✅ Spies/Mr. White win: (Spies + Mr. Whites) ≥ Agents</li>
-                        <li>✅ Mr. White solo win: If eliminated, guess BOTH words correctly</li>
+                        <li>✅ <strong>Agents Win:</strong> All Spies + Mr. White eliminated.</li>
+                        <li>✅ <strong>Spies Win:</strong> Spies ≥ Agents. (Mr. White must be dead).</li>
+                        <li>✅ <strong>Mr. White Win:</strong> If eliminated, guess the <strong>Agent Word</strong>
+                            correctly.</li>
+                        <li>✅ <strong>Special Win:</strong> If all Agents die, Mr. White must guess the <strong>Spy
+                                Word</strong> to win; otherwise Spies win.</li>
                     </ul>
 
                     <p><strong>💡 Pro Tips:</strong></p>
@@ -184,14 +187,9 @@
             <div class="content-card">
                 <p class="info-text">Mr. White has been eliminated. They can guess both words to win!</p>
 
-                <div class="form-group">
-                    <label>Guess Word 1</label>
-                    <input type="text" id="guess-word1" placeholder="Enter first word" autocomplete="off">
-                </div>
-
-                <div class="form-group">
-                    <label>Guess Word 2</label>
-                    <input type="text" id="guess-word2" placeholder="Enter second word" autocomplete="off">
+                <div class="form-group" id="guess-input-group">
+                    <label id="guess-label">Guess the word</label>
+                    <input type="text" id="guess-word" placeholder="Enter word" autocomplete="off">
                 </div>
 
                 <button class="btn btn-primary btn-full" id="submit-guess-btn">Submit Guess</button>
@@ -269,10 +267,10 @@
             <div class="rules-section">
                 <h3>🏆 Win Conditions</h3>
                 <ul class="rules-list">
-                    <li><strong>Agents Win:</strong> All Spies + Mr. Whites eliminated</li>
-                    <li><strong>Spies/Mr. White Win:</strong> (Spies + Mr. Whites) ≥ Agents<br><small>Example: 2 Spies +
-                            1 Mr. White = 3, Agents = 2 → Spies win!</small></li>
-                    <li><strong>Mr. White Solo Win:</strong> Both words guessed correctly after elimination</li>
+                    <li><strong>Agents Win:</strong> All Spies + Mr. White eliminated.</li>
+                    <li><strong>Spies Win:</strong> Spies ≥ Agents. Mr. White must be eliminated for Spies to win.</li>
+                    <li><strong>Mr. White Win:</strong> Guess the correct word after elimination. Guess <strong>Agent
+                            Word</strong> if Agents are alive, or <strong>Spy Word</strong> if only Spies remain.</li>
                 </ul>
             </div>
         </div>
