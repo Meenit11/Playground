@@ -237,7 +237,42 @@
                     <ol id="night-order-list"></ol>
                 </div>
 
-                <button class="btn btn-primary btn-full btn-lg mt-xl" id="start-day-btn">Start Day Phase</button>
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="end-night-btn">Complete Night Phase</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5.5: Night Results (GM Only) -->
+        <div id="screen-night-results" class="screen hidden">
+            <div class="screen-header">
+                <h1>⚖️ Night Results</h1>
+                <p class="subtitle">Game Master: Process the night's events</p>
+            </div>
+
+            <div class="content-card">
+                <div class="form-group">
+                    <label>Who did the Mafia target?</label>
+                    <select id="mafia-target-select" class="btn btn-outline btn-full text-left">
+                        <option value="">Select Victim...</option>
+                    </select>
+                </div>
+
+                <div class="form-group mt-lg">
+                    <label>Who did the God save?</label>
+                    <select id="god-target-select" class="btn btn-outline btn-full text-left">
+                        <option value="">Select Player...</option>
+                    </select>
+                </div>
+
+                <div id="night-calc-result" class="mt-xl text-center hidden">
+                    <div class="result-box p-lg bg-gray-100 rounded-lg">
+                        <p id="night-result-text" class="h3 mb-0"></p>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="calc-night-btn">Calculate Night
+                    Result</button>
+                <button class="btn btn-success btn-full btn-lg mt-md hidden" id="proceed-to-day-btn">Proceed to Day
+                    Phase</button>
             </div>
         </div>
 
@@ -249,16 +284,16 @@
             </div>
 
             <div class="content-card">
-                <p class="info-text">Players discuss and vote to eliminate someone.</p>
+                <p class="info-text">Discuss and vote! GM can eliminate up to 2 players.</p>
 
                 <div class="alive-players-list">
-                    <h3>Eliminate Players (<span id="alive-count">7</span> alive)</h3>
+                    <h3>Select Players to Eliminate (<span id="alive-count">7</span> alive)</h3>
                     <div id="alive-players-container"></div>
                 </div>
 
-                <button class="btn btn-danger btn-full btn-lg mt-xl" id="confirm-elimination-btn" disabled>Confirm
-                    Elimination</button>
-                <button class="btn btn-ghost btn-full mt-md" id="skip-elimination-btn">Skip (No Elimination)</button>
+                <button class="btn btn-danger btn-full btn-lg mt-xl" id="confirm-elimination-btn" disabled>Eliminate
+                    Selected Players</button>
+                <button class="btn btn-ghost btn-full mt-md" id="skip-elimination-btn">Skip Voting / End Day</button>
             </div>
         </div>
 
@@ -288,6 +323,19 @@
             <h3>Select Player to Eliminate</h3>
             <div id="elimination-player-list"></div>
             <button class="btn btn-ghost btn-full mt-md" id="cancel-elimination-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Role Reveal Modal -->
+    <div id="reveal-modal" class="modal hidden">
+        <div class="modal-content text-center">
+            <h2 id="reveal-player-name" class="mb-lg">Player Name</h2>
+            <div class="reveal-card p-xl bg-white rounded-2xl shadow-xl inline-block mb-xl">
+                <img id="reveal-role-img" src="../images/Civilian.png" alt="Role" class="role-image mx-auto mb-md">
+                <h3 id="reveal-role-name" class="role-name h2 mb-0">Role Name</h3>
+            </div>
+            <p class="text-gray-600 mb-xl">has been eliminated!</p>
+            <button class="btn btn-primary btn-full btn-lg" id="close-reveal-btn">Continue</button>
         </div>
     </div>
 
