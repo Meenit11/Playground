@@ -241,17 +241,23 @@
             </div>
         </div>
 
-        <!-- SCREEN 5.5: Night Results (GM Manual Selection) -->
-        <div id="screen-night-results" class="screen hidden">
+        <!-- SCREEN 5.5: Morning Phase (Outcome Selection) -->
+        <div id="screen-morning-results" class="screen hidden">
             <div class="screen-header">
-                <h1>⚖️ Night Results</h1>
-                <p class="subtitle">Who was killed last night?</p>
+                <h1>🌤️ Morning Phase</h1>
+                <p id="morning-announcement" class="info-text"
+                    style="font-size: var(--font-size-xl); color: var(--light); text-align: center; margin-bottom: var(--spacing-lg); min-height: 2em;">
+                </p>
+                <p class="subtitle">Who was found dead?</p>
             </div>
 
             <div class="content-card">
                 <div id="night-outcome-list" class="alive-players-list">
-                    <!-- Dynamic: "No one was killed" button + Alive players list -->
+                    <!-- Dynamic: "No one was found dead" button + Alive players list -->
                 </div>
+
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="start-discussion-btn" disabled>Start
+                    Discussion and Voting</button>
             </div>
         </div>
 
