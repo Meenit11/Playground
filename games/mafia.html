@@ -237,6 +237,13 @@
                     <ol id="night-order-list"></ol>
                 </div>
 
+                <div id="lover-selection-container" class="hidden mt-lg p-md border-accent rounded-lg"
+                    style="border: 1px solid var(--accent);">
+                    <p class="subtitle text-accent" style="color: var(--accent); margin-bottom: 10px;">💖 Who did the
+                        Lover kiss?</p>
+                    <div id="lover-target-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+                </div>
+
                 <button class="btn btn-primary btn-full btn-lg mt-xl" id="end-night-btn">Complete Night Phase</button>
             </div>
         </div>
@@ -332,8 +339,10 @@
         <div class="modal-content">
             <h3>💣 Bomber Activated!</h3>
             <p class="modal-text">The Bomber takes someone with them. Select target:</p>
-            <div id="bomber-target-list"></div>
+            <div id="bomber-target-list" class="mb-lg"></div>
+            <button class="btn btn-danger btn-full btn-lg" id="confirm-bomber-target" disabled>Eliminate Target</button>
         </div>
+    </div>
     </div>
 
     <!-- Scripts -->

@@ -23,7 +23,9 @@ let gameState = {
     gameEnded: false,
     pendingPhaseTransition: null,
     nightVictimId: null,
-    votingQueue: []
+    votingQueue: [],
+    loverTargetId: null, // ID of player simplified by Lover
+    bomberTargetId: null // ID of player targeted by Bomber
 };
 
 // ================================
@@ -91,6 +93,7 @@ function setupEventListeners() {
     const confirmElimBtn = document.getElementById('confirm-elimination-btn');
     const skipDayBtn = document.getElementById('skip-elimination-btn');
     const playAgainBtn = document.getElementById('play-again-btn');
+    const confirmBomberBtn = document.getElementById('confirm-bomber-target');
 
     if (startBtn) startBtn.onclick = startGame;
     if (revealBtn) revealBtn.onclick = showRoleCard;
@@ -101,6 +104,20 @@ function setupEventListeners() {
     if (confirmElimBtn) confirmElimBtn.onclick = confirmEliminations;
     if (skipDayBtn) skipDayBtn.onclick = skipElimination;
     if (playAgainBtn) playAgainBtn.onclick = playAgain;
+
+    if (confirmBomberBtn) {
+        confirmBomberBtn.onclick = () => {
+            if (gameState.bomberTargetId) {
+                hideElement('bomber-modal');
+                const targetId = gameState.bomberTargetId;
+                gameState.bomberTargetId = null;
+                eliminatePlayer(targetId, 'bomber');
+                if (!gameState.gameEnded) {
+                    nextRound();
+                }
+            }
+        };
+    }
 }
 
 // ================================
@@ -335,8 +352,14 @@ function displayNightInstructions() {
     }
 
     const aliveLover = gameState.players.find(p => p.role === 'lover' && p.isAlive);
+    const lovContainer = document.getElementById('lover-selection-container');
+
     if (aliveLover && gameState.currentRound === 1) {
         instructions.push('💖 Lover wake up! Blow a flying kiss... Lover, go to sleep.');
+        showElement(lovContainer);
+        displayLoverSelection();
+    } else {
+        hideElement(lovContainer);
     }
 
     instructions.forEach(ins => {
@@ -344,6 +367,39 @@ function displayNightInstructions() {
         li.textContent = ins;
         container.appendChild(li);
     });
+}
+
+function displayLoverSelection() {
+    const container = document.getElementById('lover-target-list');
+    container.innerHTML = '';
+
+    // Lover can kiss anyone EXCEPT themselves
+    const lover = gameState.players.find(p => p.role === 'lover');
+
+    gameState.players.filter(p => p.id !== lover.id).forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline btn-sm';
+        btn.textContent = p.name;
+        btn.onclick = () => {
+            gameState.loverTargetId = p.id;
+            updateLoverSelectionHighlight(btn, container);
+        };
+        // Reset highlight if already selected
+        if (gameState.loverTargetId === p.id) {
+            btn.classList.add('btn-primary');
+            btn.classList.remove('btn-outline');
+        }
+        container.appendChild(btn);
+    });
+}
+
+function updateLoverSelectionHighlight(activeBtn, container) {
+    container.querySelectorAll('button').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline');
+    });
+    activeBtn.classList.remove('btn-outline');
+    activeBtn.classList.add('btn-primary');
 }
 
 function showMorningPhase() {
@@ -372,8 +428,7 @@ function showMorningPhase() {
     // List of alive players
     gameState.players.filter(p => p.isAlive).forEach(p => {
         const pBtn = document.createElement('button');
-        pBtn.className = 'btn btn-ghost btn-full mb-sm text-left';
-        pBtn.style.textAlign = 'center';
+        pBtn.className = 'btn btn-ghost btn-full mb-sm text-center';
         pBtn.textContent = p.name;
         pBtn.onclick = () => {
             announcement.textContent = `the city wakes up finding ${p.name} dead`;
@@ -474,7 +529,17 @@ function skipElimination() {
 }
 
 function eliminatePlayer(id, phase) {
-    const player = gameState.players.find(p => p.id === id);
+    let finalId = id;
+    const lover = gameState.players.find(p => p.role === 'lover');
+
+    // LOVER SACRIFICE LOGIC
+    // If target is kissed AND lover is alive, lover dies instead
+    if (id === gameState.loverTargetId && lover && lover.isAlive) {
+        console.log(`Lover ${lover.name} sacrificed for ${gameState.players.find(p => p.id === id).name}`);
+        finalId = lover.id;
+    }
+
+    const player = gameState.players.find(p => p.id === finalId);
     if (!player || !player.isAlive) return;
 
     player.isAlive = false;
@@ -496,18 +561,20 @@ function eliminatePlayer(id, phase) {
 function showBomberModal() {
     const modal = document.getElementById('bomber-modal');
     const container = document.getElementById('bomber-target-list');
+    const confirmBtn = document.getElementById('confirm-bomber-target');
+
     container.innerHTML = '';
+    gameState.bomberTargetId = null;
+    confirmBtn.disabled = true;
 
     gameState.players.filter(p => p.isAlive).forEach(player => {
         const btn = document.createElement('button');
-        btn.className = 'modal-player-btn';
+        btn.className = 'btn btn-outline btn-full mb-sm text-center';
         btn.textContent = player.name;
         btn.onclick = () => {
-            hideElement('bomber-modal');
-            eliminatePlayer(player.id, 'bomber');
-            if (!gameState.gameEnded) {
-                nextRound();
-            }
+            gameState.bomberTargetId = player.id;
+            confirmBtn.disabled = false;
+            highlightSelection(btn, container);
         };
         container.appendChild(btn);
     });
