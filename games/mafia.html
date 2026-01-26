@@ -249,18 +249,10 @@
             </div>
 
             <div class="content-card">
-                <div class="form-group">
-                    <label>Who did the Mafia target?</label>
-                    <select id="mafia-target-select" class="btn btn-outline btn-full text-left">
-                        <option value="">Select Victim...</option>
-                    </select>
-                </div>
+                <h3 class="text-center mb-xl">Who was killed last night?</h3>
 
-                <div class="form-group mt-lg">
-                    <label>Who did the God save?</label>
-                    <select id="god-target-select" class="btn btn-outline btn-full text-left">
-                        <option value="">Select Player...</option>
-                    </select>
+                <div id="night-death-selection-list" class="flex flex-col gap-sm mb-xl">
+                    <!-- List will be generated in JS -->
                 </div>
 
                 <div id="night-calc-result" class="mt-xl text-center hidden">
@@ -269,7 +261,7 @@
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-full btn-lg mt-xl" id="calc-night-btn">Calculate Night
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="confirm-night-death-btn" disabled>Confirm
                     Result</button>
                 <button class="btn btn-success btn-full btn-lg mt-md hidden" id="proceed-to-day-btn">Proceed to Day
                     Phase</button>
@@ -284,16 +276,16 @@
             </div>
 
             <div class="content-card">
-                <p class="info-text">Discuss and vote! GM can eliminate up to 2 players.</p>
+                <h3 class="text-center mb-xl">Voting & Elimination</h3>
+                <p class="info-text text-center text-gray-600 mb-xl">GM: Select up to 2 players for elimination</p>
 
                 <div class="alive-players-list">
-                    <h3>Select Players to Eliminate (<span id="alive-count">7</span> alive)</h3>
-                    <div id="alive-players-container"></div>
+                    <div id="day-voting-selection-list" class="flex flex-col gap-sm"></div>
                 </div>
 
-                <button class="btn btn-danger btn-full btn-lg mt-xl" id="confirm-elimination-btn" disabled>Eliminate
+                <button class="btn btn-danger btn-full btn-lg mt-xl" id="confirm-day-elimination-btn" disabled>Eliminate
                     Selected Players</button>
-                <button class="btn btn-ghost btn-full mt-md" id="skip-elimination-btn">Skip Voting / End Day</button>
+                <button class="btn btn-ghost btn-full mt-md" id="skip-day-voting-btn">No Elimination / Skip</button>
             </div>
         </div>
 
