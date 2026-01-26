@@ -20,13 +20,10 @@ let gameState = {
     currentPhase: 'night',
     viewingOrder: [],
     currentViewIndex: 0,
-    deadPlayers: [],
-    loverPair: null,
     gameEnded: false,
-    nightActions: {
-        mafiaTarget: null,
-        godTarget: null
-    }
+    pendingPhaseTransition: null,
+    nightVictimId: null,
+    votingQueue: []
 };
 
 // ================================
@@ -48,7 +45,6 @@ function init() {
     setupEventListeners();
     generatePlayerInputs(gameState.totalPlayers);
     updateRoleDistribution();
-    console.log('Mafia setup complete');
 }
 
 // Run init immediately and on DOMContentLoaded
@@ -89,10 +85,9 @@ function setupEventListeners() {
     const startBtn = document.getElementById('start-game-btn');
     const revealBtn = document.getElementById('reveal-role-btn');
     const doneBtn = document.getElementById('done-viewing-btn');
-    const endNightBtn = document.getElementById('end-night-btn');
     const startNightBtn = document.getElementById('start-night-btn');
-    const calcBtn = document.getElementById('calc-night-btn');
-    const proceedBtn = document.getElementById('proceed-to-day-btn');
+    const endNightBtn = document.getElementById('end-night-btn');
+    const startDiscussionBtn = document.getElementById('start-discussion-btn');
     const confirmElimBtn = document.getElementById('confirm-elimination-btn');
     const skipDayBtn = document.getElementById('skip-elimination-btn');
     const playAgainBtn = document.getElementById('play-again-btn');
@@ -102,13 +97,13 @@ function setupEventListeners() {
     if (revealBtn) revealBtn.onclick = showRoleCard;
     if (doneBtn) doneBtn.onclick = nextViewer;
     if (startNightBtn) startNightBtn.onclick = startNightPhase;
-    if (endNightBtn) endNightBtn.onclick = showNightResults;
-    if (calcBtn) calcBtn.onclick = processNightResult;
-    if (proceedBtn) proceedBtn.onclick = startDayPhase;
+    if (endNightBtn) endNightBtn.onclick = showMorningPhase;
+    if (startDiscussionBtn) startDiscussionBtn.onclick = startDayPhase;
     if (confirmElimBtn) confirmElimBtn.onclick = confirmEliminations;
     if (skipDayBtn) skipDayBtn.onclick = skipElimination;
     if (playAgainBtn) playAgainBtn.onclick = playAgain;
-    if (closeRevealBtn) closeRevealBtn.onclick = () => hideElement('reveal-modal');
+
+    // closeRevealBtn logic is handled in revealPlayerRole to allow dynamic targeting
 }
 
 // ================================
@@ -128,14 +123,9 @@ function adjustPlayerCount(delta) {
 }
 
 function generatePlayerInputs(count) {
-    console.log('Generating inputs for', count, 'players');
     const container = document.getElementById('player-names-container');
-    if (!container) {
-        console.error('Container not found!');
-        return;
-    }
+    if (!container) return;
 
-    // Save existing names
     const existingInputs = container.querySelectorAll('input');
     const savedNames = Array.from(existingInputs).map(input => input.value);
 
@@ -217,7 +207,6 @@ function startGame() {
 
     assignRoles(names);
 
-    // Random viewing order
     const randomStartIndex = getRandomInt(0, gameState.totalPlayers - 1);
     gameState.viewingOrder = [];
     for (let i = 0; i < gameState.totalPlayers; i++) {
@@ -251,8 +240,7 @@ function assignRoles(names) {
             id: generateId(),
             name: name,
             role: shuffledRoles[index],
-            isAlive: true,
-            loverProtectedTarget: null
+            isAlive: true
         });
     });
 }
@@ -294,7 +282,6 @@ function updatePassPhoneButton() {
     if (nextIndex >= gameState.viewingOrder.length) {
         nextPlayerSpan.textContent = 'Game Master';
     } else {
-        const nextPlayerIndex = gameState.viewingOrder[nextPlayerSpan.textContent === 'Game Master' ? 0 : nextIndex]; // Fallback
         const nextPlayerIdx = gameState.viewingOrder[nextIndex];
         const nextPlayer = gameState.players[nextPlayerIdx];
         nextPlayerSpan.textContent = nextPlayer.name;
@@ -341,87 +328,88 @@ function displayNightInstructions() {
     container.innerHTML = '';
 
     const instructions = [];
-    instructions.push('<strong>City goes to sleep:</strong> "Everyone close your eyes"');
-
-    const aliveMafia = gameState.players.filter(p => p.role === 'mafia' && p.isAlive);
-    if (aliveMafia.length > 0) {
-        instructions.push(`<strong>Mafia wakes up:</strong> "Mafia, open your eyes"`);
-        instructions.push('<strong>Kill someone:</strong> Mafia silently agrees on a victim');
-        instructions.push('<strong>Mafia close your eyes</strong>');
-    }
-
-    instructions.push('<strong>God open your eyes:</strong> God silently picks someone to save');
-    instructions.push('<strong>God close your eyes</strong>');
+    instructions.push('city goes to sleep');
+    instructions.push('mafia wakes up, kill some one, mafia goes to sleep');
+    instructions.push('god wakes up, save someone, god goes to sleep');
 
     const aliveDetective = gameState.players.find(p => p.role === 'detective' && p.isAlive);
     if (aliveDetective) {
-        instructions.push('<strong>Detective open your eyes:</strong> Detective points to someone');
-        instructions.push('<strong>GM nods Yes/No</strong>');
-        instructions.push('<strong>Detective close your eyes</strong>');
+        instructions.push('detective wakes up, suspect someone, detective goes to sleep');
+    }
+
+    const aliveLover = gameState.players.find(p => p.role === 'lover' && p.isAlive);
+    if (aliveLover && gameState.currentRound === 1) {
+        instructions.push('lover wakes up, give someone a flying kiss, lover goes to sleep');
     }
 
     instructions.forEach(ins => {
         const li = document.createElement('li');
-        li.innerHTML = ins;
+        li.textContent = ins;
         container.appendChild(li);
     });
 }
 
-function showNightResults() {
-    showScreen('screen-night-results');
+function showMorningPhase() {
+    showScreen('screen-morning-results');
+    const container = document.getElementById('night-outcome-list');
+    const announcement = document.getElementById('morning-announcement');
+    const startDiscussionBtn = document.getElementById('start-discussion-btn');
 
-    const mSelect = document.getElementById('mafia-target-select');
-    const gSelect = document.getElementById('god-target-select');
+    container.innerHTML = '';
+    announcement.textContent = 'the city wakes up finding ...';
+    startDiscussionBtn.disabled = true;
+    gameState.nightVictimId = null;
 
-    mSelect.innerHTML = '<option value="">Select Victim...</option>';
-    gSelect.innerHTML = '<option value="">Select Player...</option>';
+    // "No one was found dead" option
+    const noneBtn = document.createElement('button');
+    noneBtn.className = 'btn btn-outline btn-full btn-lg mb-md';
+    noneBtn.textContent = '🛡️ no one was found dead';
+    noneBtn.onclick = () => {
+        announcement.textContent = 'the city wakes up finding no one was found dead';
+        gameState.nightVictimId = 'none';
+        startDiscussionBtn.disabled = false;
+        highlightSelection(noneBtn, container);
+    };
+    container.appendChild(noneBtn);
 
+    // List of alive players
     gameState.players.filter(p => p.isAlive).forEach(p => {
-        mSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-        gSelect.innerHTML += `<option value="${p.id}">${p.name} (God Save)</option>`;
+        const pBtn = document.createElement('button');
+        pBtn.className = 'btn btn-ghost btn-full mb-sm text-left';
+        pBtn.style.textAlign = 'center';
+        pBtn.textContent = p.name;
+        pBtn.onclick = () => {
+            announcement.textContent = `the city wakes up finding ${p.name} dead`;
+            gameState.nightVictimId = p.id;
+            startDiscussionBtn.disabled = false;
+            highlightSelection(pBtn, container);
+        };
+        container.appendChild(pBtn);
     });
-
-    hideElement('night-calc-result');
-    hideElement('proceed-to-day-btn');
-    showElement('calc-night-btn');
 }
 
-function processNightResult() {
-    const mId = document.getElementById('mafia-target-select').value;
-    const gId = document.getElementById('god-target-select').value;
-
-    if (!mId || !gId) {
-        alert('Please select both targets!');
-        return;
-    }
-
-    const resBox = document.getElementById('night-calc-result');
-    const resText = document.getElementById('night-result-text');
-
-    showElement(resBox);
-
-    if (mId === gId) {
-        resText.textContent = "🛡️ No one was killed! (God saved the target)";
-    } else {
-        const victim = gameState.players.find(p => p.id === mId);
-        resText.textContent = `💀 ${victim.name} was killed by Mafia!`;
-        eliminatePlayer(victim.id, 'night');
-    }
-
-    hideElement('calc-night-btn');
-    showElement('proceed-to-day-btn');
+function highlightSelection(activeBtn, container) {
+    container.querySelectorAll('button').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline');
+    });
+    activeBtn.classList.remove('btn-outline');
+    activeBtn.classList.add('btn-primary');
 }
 
 function startDayPhase() {
-    showScreen('screen-day');
-    displayDayPhase();
+    const victimId = gameState.nightVictimId;
+    if (victimId && victimId !== 'none') {
+        gameState.pendingPhaseTransition = 'discussion';
+        eliminatePlayer(victimId, 'night');
+    } else {
+        showScreen('screen-day');
+        displayDayPhase();
+    }
 }
 
 function displayDayPhase() {
     document.getElementById('day-round-number').textContent = gameState.currentRound;
-    const aliveCount = gameState.players.filter(p => p.isAlive).length;
-    document.getElementById('alive-count').textContent = aliveCount;
-
     const container = document.getElementById('alive-players-container');
     container.innerHTML = '';
 
@@ -446,29 +434,45 @@ function displayDayPhase() {
 function updateEliminationButton() {
     const checked = document.querySelectorAll('.elimination-checkbox:checked');
     const btn = document.getElementById('confirm-elimination-btn');
-    btn.disabled = checked.length === 0;
+    btn.disabled = checked.length === 0 || checked.length > 2;
 }
 
 function confirmEliminations() {
     const checked = document.querySelectorAll('.elimination-checkbox:checked');
     const ids = Array.from(checked).map(cb => cb.dataset.playerId);
 
-    if (ids.length > 2) {
-        alert('You can only eliminate up to 2 players per round!');
+    if (ids.length < 1 || ids.length > 2) {
+        alert('You must eliminate either 1 or max 2 players!');
         return;
     }
 
     if (!confirm(`Eliminate ${ids.length} player(s)?`)) return;
 
-    ids.forEach(id => eliminatePlayer(id, 'day'));
+    const runElimination = (index) => {
+        if (index >= ids.length) {
+            if (!gameState.gameEnded) {
+                gameState.pendingPhaseTransition = 'night';
+            }
+            return;
+        }
 
-    if (!gameState.gameEnded) {
-        nextRound();
-    }
+        const nextId = ids[index];
+        if (index < ids.length - 1) {
+            gameState.pendingPhaseTransition = 'voting-queue';
+            gameState.votingQueue = ids.slice(index + 1);
+        } else {
+            gameState.pendingPhaseTransition = 'night';
+            gameState.votingQueue = [];
+        }
+
+        eliminatePlayer(nextId, 'day');
+    };
+
+    runElimination(0);
 }
 
 function skipElimination() {
-    if (confirm('End day phase without further voting?')) {
+    if (confirm('End day phase without elimination?')) {
         nextRound();
     }
 }
@@ -493,6 +497,28 @@ function eliminatePlayer(id, phase) {
     checkWinConditions();
 }
 
+function showBomberModal() {
+    const modal = document.getElementById('bomber-modal');
+    const container = document.getElementById('bomber-target-list');
+    container.innerHTML = '';
+
+    gameState.players.filter(p => p.isAlive).forEach(player => {
+        const btn = document.createElement('button');
+        btn.className = 'modal-player-btn';
+        btn.textContent = player.name;
+        btn.onclick = () => {
+            hideElement('bomber-modal');
+            eliminatePlayer(player.id, 'bomber');
+            if (!gameState.gameEnded) {
+                nextRound();
+            }
+        };
+        container.appendChild(btn);
+    });
+
+    showElement(modal);
+}
+
 function revealPlayerRole(player) {
     const modal = document.getElementById('reveal-modal');
     const nameEl = document.getElementById('reveal-player-name');
@@ -503,6 +529,28 @@ function revealPlayerRole(player) {
     const data = getRoleData(player.role);
     imgEl.src = data.image;
     roleEl.textContent = data.name;
+
+    const closeBtn = document.getElementById('close-reveal-btn');
+    closeBtn.onclick = () => {
+        hideElement('reveal-modal');
+
+        if (gameState.pendingPhaseTransition === 'voting-queue') {
+            const nextId = gameState.votingQueue.shift();
+            if (gameState.votingQueue.length > 0) {
+                gameState.pendingPhaseTransition = 'voting-queue';
+            } else {
+                gameState.pendingPhaseTransition = 'night';
+            }
+            eliminatePlayer(nextId, 'day');
+        } else if (gameState.pendingPhaseTransition === 'discussion') {
+            gameState.pendingPhaseTransition = null;
+            showScreen('screen-day');
+            displayDayPhase();
+        } else if (gameState.pendingPhaseTransition === 'night') {
+            gameState.pendingPhaseTransition = null;
+            nextRound();
+        }
+    };
 
     showElement(modal);
 }
@@ -572,7 +620,7 @@ function getRoleData(role) {
 }
 
 function showScreen(id) {
-    const screens = ['screen-setup', 'screen-role-viewing', 'screen-role-card', 'screen-gm-overview', 'screen-night', 'screen-night-results', 'screen-day', 'screen-winner'];
+    const screens = ['screen-setup', 'screen-role-viewing', 'screen-role-card', 'screen-gm-overview', 'screen-night', 'screen-morning-results', 'screen-day', 'screen-winner'];
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) {
