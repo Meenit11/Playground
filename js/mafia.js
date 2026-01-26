@@ -90,6 +90,7 @@ function setupEventListeners() {
     const revealBtn = document.getElementById('reveal-role-btn');
     const doneBtn = document.getElementById('done-viewing-btn');
     const endNightBtn = document.getElementById('end-night-btn');
+    const startNightBtn = document.getElementById('start-night-btn');
     const calcBtn = document.getElementById('calc-night-btn');
     const proceedBtn = document.getElementById('proceed-to-day-btn');
     const confirmElimBtn = document.getElementById('confirm-elimination-btn');
@@ -100,6 +101,7 @@ function setupEventListeners() {
     if (startBtn) startBtn.onclick = startGame;
     if (revealBtn) revealBtn.onclick = showRoleCard;
     if (doneBtn) doneBtn.onclick = nextViewer;
+    if (startNightBtn) startNightBtn.onclick = startNightPhase;
     if (endNightBtn) endNightBtn.onclick = showNightResults;
     if (calcBtn) calcBtn.onclick = processNightResult;
     if (proceedBtn) proceedBtn.onclick = startDayPhase;
