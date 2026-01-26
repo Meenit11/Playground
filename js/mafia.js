@@ -531,11 +531,13 @@ function eliminatePlayer(id, phase) {
 
     player.isAlive = false;
 
+    // JESTER: Win if voted out in Day phase
     if (phase === 'day' && player.role === 'jester') {
         showWinner('Jester');
         return;
     }
 
+    // BOMBER: Only activate if voted out (Day phase)
     if (phase === 'day' && player.role === 'bomber') {
         gameState.bomberTriggered = true;
         showBomberModal();
