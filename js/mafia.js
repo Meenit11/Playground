@@ -328,18 +328,18 @@ function displayNightInstructions() {
     container.innerHTML = '';
 
     const instructions = [];
-    instructions.push('city goes to sleep');
-    instructions.push('mafia wakes up, kill some one, mafia goes to sleep');
-    instructions.push('god wakes up, save someone, god goes to sleep');
+    instructions.push('🏙️ City goes to sleep! Eyes shut, no peeking!');
+    instructions.push('🔪 Mafia wake up! Choose your victim... Mafia, go to sleep.');
+    instructions.push('😇 God wake up! Who are we saving tonight? God, go to sleep.');
 
     const aliveDetective = gameState.players.find(p => p.role === 'detective' && p.isAlive);
     if (aliveDetective) {
-        instructions.push('detective wakes up, suspect someone, detective goes to sleep');
+        instructions.push('🕵️ Detective wake up! Suspect someone... Detective, go to sleep.');
     }
 
     const aliveLover = gameState.players.find(p => p.role === 'lover' && p.isAlive);
     if (aliveLover && gameState.currentRound === 1) {
-        instructions.push('lover wakes up, give someone a flying kiss, lover goes to sleep');
+        instructions.push('💖 Lover wake up! Blow a flying kiss... Lover, go to sleep.');
     }
 
     instructions.forEach(ins => {
@@ -356,7 +356,7 @@ function showMorningPhase() {
     const startDiscussionBtn = document.getElementById('start-discussion-btn');
 
     container.innerHTML = '';
-    announcement.textContent = 'the city wakes up finding ...';
+    announcement.textContent = '☀️ EVERYONE wake up! Let’s see who survived the night...';
     startDiscussionBtn.disabled = true;
     gameState.nightVictimId = null;
 
@@ -531,7 +531,7 @@ function revealPlayerRole(player) {
     roleEl.textContent = data.name;
 
     const closeBtn = document.getElementById('close-reveal-btn');
-    closeBtn.onclick = () => {
+    const handleClose = () => {
         hideElement('reveal-modal');
 
         if (gameState.pendingPhaseTransition === 'voting-queue') {
@@ -551,6 +551,11 @@ function revealPlayerRole(player) {
             nextRound();
         }
     };
+
+    closeBtn.onclick = handleClose;
+
+    // Auto-dismiss after 2 seconds
+    setTimeout(handleClose, 2000);
 
     showElement(modal);
 }
