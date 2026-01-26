@@ -24,8 +24,9 @@ let gameState = {
     pendingPhaseTransition: null,
     nightVictimId: null,
     votingQueue: [],
-    loverTargetId: null, // ID of player simplified by Lover
-    bomberTargetId: null // ID of player targeted by Bomber
+    loverTargetId: null,
+    bomberTargetId: null,
+    bomberTriggered: false // Track if bomber modal is currently open
 };
 
 // ================================
@@ -108,10 +109,13 @@ function setupEventListeners() {
     if (confirmBomberBtn) {
         confirmBomberBtn.onclick = () => {
             if (gameState.bomberTargetId) {
-                hideElement('bomber-modal');
                 const targetId = gameState.bomberTargetId;
                 gameState.bomberTargetId = null;
+                gameState.bomberTriggered = false;
+                hideElement('bomber-modal');
+
                 eliminatePlayer(targetId, 'bomber');
+
                 if (!gameState.gameEnded) {
                     nextRound();
                 }
@@ -372,8 +376,6 @@ function displayNightInstructions() {
 function displayLoverSelection() {
     const container = document.getElementById('lover-target-list');
     container.innerHTML = '';
-
-    // Lover can kiss anyone EXCEPT themselves
     const lover = gameState.players.find(p => p.role === 'lover');
 
     gameState.players.filter(p => p.id !== lover.id).forEach(p => {
@@ -384,7 +386,6 @@ function displayLoverSelection() {
             gameState.loverTargetId = p.id;
             updateLoverSelectionHighlight(btn, container);
         };
-        // Reset highlight if already selected
         if (gameState.loverTargetId === p.id) {
             btn.classList.add('btn-primary');
             btn.classList.remove('btn-outline');
@@ -413,7 +414,6 @@ function showMorningPhase() {
     startDiscussionBtn.disabled = true;
     gameState.nightVictimId = null;
 
-    // "No one was found dead" option
     const noneBtn = document.createElement('button');
     noneBtn.className = 'btn btn-outline btn-full btn-lg mb-md';
     noneBtn.textContent = 'no one was found dead';
@@ -425,13 +425,17 @@ function showMorningPhase() {
     };
     container.appendChild(noneBtn);
 
-    // List of alive players
     gameState.players.filter(p => p.isAlive).forEach(p => {
         const pBtn = document.createElement('button');
         pBtn.className = 'btn btn-ghost btn-full mb-sm text-center';
         pBtn.textContent = p.name;
         pBtn.onclick = () => {
-            announcement.textContent = `the city wakes up finding ${p.name} dead`;
+            const lover = gameState.players.find(p => p.role === 'lover');
+            if (p.id === gameState.loverTargetId && lover && lover.isAlive) {
+                announcement.textContent = `The city wakes up finding ${lover.name} dead (Sacrificed for ${p.name})`;
+            } else {
+                announcement.textContent = `The city wakes up finding ${p.name} dead`;
+            }
             gameState.nightVictimId = p.id;
             startDiscussionBtn.disabled = false;
             highlightSelection(pBtn, container);
@@ -513,11 +517,12 @@ function confirmEliminations() {
 
     if (!confirm(`Eliminate ${ids.length} player(s)?`)) return;
 
+    gameState.bomberTriggered = false;
     ids.forEach((id) => {
         eliminatePlayer(id, 'day');
     });
 
-    if (!gameState.gameEnded) {
+    if (!gameState.gameEnded && !gameState.bomberTriggered) {
         nextRound();
     }
 }
@@ -532,10 +537,7 @@ function eliminatePlayer(id, phase) {
     let finalId = id;
     const lover = gameState.players.find(p => p.role === 'lover');
 
-    // LOVER SACRIFICE LOGIC
-    // If target is kissed AND lover is alive, lover dies instead
     if (id === gameState.loverTargetId && lover && lover.isAlive) {
-        console.log(`Lover ${lover.name} sacrificed for ${gameState.players.find(p => p.id === id).name}`);
         finalId = lover.id;
     }
 
@@ -543,7 +545,6 @@ function eliminatePlayer(id, phase) {
     if (!player || !player.isAlive) return;
 
     player.isAlive = false;
-    // Silent elimination - no Role Reveal popup as requested
 
     if (phase === 'day' && player.role === 'jester') {
         showWinner('Jester');
@@ -551,6 +552,7 @@ function eliminatePlayer(id, phase) {
     }
 
     if (phase === 'day' && player.role === 'bomber') {
+        gameState.bomberTriggered = true;
         showBomberModal();
         return;
     }
@@ -582,10 +584,6 @@ function showBomberModal() {
     showElement(modal);
 }
 
-function revealPlayerRole(player) {
-    // Deprecated for silent flow
-}
-
 function checkWinConditions() {
     const alive = gameState.players.filter(p => p.isAlive);
     const mafia = alive.filter(p => p.role === 'mafia');
@@ -607,7 +605,6 @@ function checkWinConditions() {
 function showWinner(team) {
     gameState.gameEnded = true;
     document.getElementById('winner-title').textContent = `${team} Wins!`;
-
     const list = document.getElementById('final-roles-list');
     list.innerHTML = '';
     gameState.players.forEach(p => {
@@ -619,7 +616,6 @@ function showWinner(team) {
             </div>
         `;
     });
-
     showScreen('screen-winner');
     showConfetti(document.getElementById('confetti-container'), 100);
 }
@@ -629,13 +625,7 @@ function nextRound() {
     startNightPhase();
 }
 
-function playAgain() {
-    location.reload();
-}
-
-// ================================
-// UTILS & DATA
-// ================================
+function playAgain() { location.reload(); }
 
 function getRoleData(role) {
     const roleMap = {
@@ -655,12 +645,8 @@ function showScreen(id) {
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) {
-            if (s === id) {
-                el.classList.remove('hidden');
-                el.classList.add('animate-fadeIn');
-            } else {
-                el.classList.add('hidden');
-            }
+            if (s === id) { el.classList.remove('hidden'); el.classList.add('animate-fadeIn'); }
+            else { el.classList.add('hidden'); }
         }
     });
 }
