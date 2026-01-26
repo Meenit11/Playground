@@ -522,7 +522,7 @@ function eliminatePlayer(id, phase) {
     // LOVER SACRIFICE LOGIC
     if (id === gameState.loverTargetId && lover && lover.isAlive) {
         const targetPlayer = gameState.players.find(p => p.id === id);
-        alert(`💖 SACRIFICE! ${lover.name} gave their life for ${targetPlayer.name}!`);
+        showBannerNotification(`💖 SACRIFICE! ${lover.name} died for ${targetPlayer.name}`, 2500);
         finalId = lover.id;
     }
 
@@ -562,8 +562,11 @@ function showBomberModal() {
 
         const killBtn = row.querySelector('.bomber-kill-btn');
         killBtn.onclick = () => {
+            // Immediate closure of modal
             hideElement('bomber-modal');
             gameState.bomberTriggered = false;
+
+            // Elimination logic
             eliminatePlayer(player.id, 'bomber');
 
             if (!gameState.gameEnded) {
@@ -575,6 +578,18 @@ function showBomberModal() {
     });
 
     showElement(modal);
+}
+
+function showBannerNotification(message, duration = 2000) {
+    const banner = document.getElementById('notification-banner');
+    if (!banner) return;
+
+    banner.textContent = message;
+    banner.classList.remove('hidden');
+
+    setTimeout(() => {
+        banner.classList.add('hidden');
+    }, duration);
 }
 
 function checkWinConditions() {
