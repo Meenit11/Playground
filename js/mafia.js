@@ -360,7 +360,7 @@ function displayLoverSelection() {
     container.innerHTML = '';
     const lover = gameState.players.find(p => p.role === 'lover');
 
-    gameState.players.filter(p => p.id !== lover.id).forEach(p => {
+    gameState.players.filter(p => !lover || p.id !== lover.id).forEach(p => {
         const btn = document.createElement('button');
         btn.className = 'btn btn-outline btn-sm';
         btn.textContent = p.name;
@@ -550,38 +550,29 @@ function eliminatePlayer(id, phase) {
 function showBomberModal() {
     const modal = document.getElementById('bomber-modal');
     const container = document.getElementById('bomber-target-list');
-    const confirmBtn = document.getElementById('confirm-bomber-target');
-
     container.innerHTML = '';
-    gameState.bomberTargetId = null;
-    confirmBtn.disabled = true;
 
     gameState.players.filter(p => p.isAlive).forEach(player => {
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-outline btn-full mb-sm text-center';
-        btn.textContent = player.name;
-        btn.onclick = () => {
-            gameState.bomberTargetId = player.id;
-            confirmBtn.disabled = false;
-            highlightSelection(btn, container);
-        };
-        container.appendChild(btn);
-    });
+        const row = document.createElement('div');
+        row.className = 'bomber-target-row';
+        row.innerHTML = `
+            <span class="player-name">${player.name}</span>
+            <button class="bomber-kill-btn" title="Eliminate ${player.name}">❌</button>
+        `;
 
-    confirmBtn.onclick = () => {
-        if (gameState.bomberTargetId) {
-            const targetId = gameState.bomberTargetId;
-            gameState.bomberTargetId = null;
-            gameState.bomberTriggered = false;
+        const killBtn = row.querySelector('.bomber-kill-btn');
+        killBtn.onclick = () => {
             hideElement('bomber-modal');
-
-            eliminatePlayer(targetId, 'bomber');
+            gameState.bomberTriggered = false;
+            eliminatePlayer(player.id, 'bomber');
 
             if (!gameState.gameEnded) {
                 nextRound();
             }
-        }
-    };
+        };
+
+        container.appendChild(row);
+    });
 
     showElement(modal);
 }

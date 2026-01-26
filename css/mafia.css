@@ -1005,3 +1005,41 @@ input:checked+.toggle-slider:before {
         font-size: var(--font-size-sm);
     }
 }
+
+/* Simplified Bomber UI */
+.bomber-target-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-sm);
+    transition: all 0.2s ease;
+}
+
+.bomber-target-row:hover {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: var(--danger);
+}
+
+.bomber-kill-btn {
+    background: var(--danger);
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+.bomber-kill-btn:hover {
+    transform: scale(1.1);
+    background: #DC2626;
+}
