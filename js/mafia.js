@@ -26,7 +26,7 @@ let gameState = {
     votingQueue: [],
     loverTargetId: null,
     bomberTargetId: null,
-    bomberTriggered: false // Track if bomber modal is currently open
+    bomberTriggered: false
 };
 
 // ================================
@@ -94,7 +94,6 @@ function setupEventListeners() {
     const confirmElimBtn = document.getElementById('confirm-elimination-btn');
     const skipDayBtn = document.getElementById('skip-elimination-btn');
     const playAgainBtn = document.getElementById('play-again-btn');
-    const confirmBomberBtn = document.getElementById('confirm-bomber-target');
 
     if (startBtn) startBtn.onclick = startGame;
     if (revealBtn) revealBtn.onclick = showRoleCard;
@@ -105,23 +104,6 @@ function setupEventListeners() {
     if (confirmElimBtn) confirmElimBtn.onclick = confirmEliminations;
     if (skipDayBtn) skipDayBtn.onclick = skipElimination;
     if (playAgainBtn) playAgainBtn.onclick = playAgain;
-
-    if (confirmBomberBtn) {
-        confirmBomberBtn.onclick = () => {
-            if (gameState.bomberTargetId) {
-                const targetId = gameState.bomberTargetId;
-                gameState.bomberTargetId = null;
-                gameState.bomberTriggered = false;
-                hideElement('bomber-modal');
-
-                eliminatePlayer(targetId, 'bomber');
-
-                if (!gameState.gameEnded) {
-                    nextRound();
-                }
-            }
-        };
-    }
 }
 
 // ================================
@@ -537,7 +519,10 @@ function eliminatePlayer(id, phase) {
     let finalId = id;
     const lover = gameState.players.find(p => p.role === 'lover');
 
+    // LOVER SACRIFICE LOGIC
     if (id === gameState.loverTargetId && lover && lover.isAlive) {
+        const targetPlayer = gameState.players.find(p => p.id === id);
+        alert(`💖 SACRIFICE! ${lover.name} gave their life for ${targetPlayer.name}!`);
         finalId = lover.id;
     }
 
@@ -580,6 +565,21 @@ function showBomberModal() {
         };
         container.appendChild(btn);
     });
+
+    confirmBtn.onclick = () => {
+        if (gameState.bomberTargetId) {
+            const targetId = gameState.bomberTargetId;
+            gameState.bomberTargetId = null;
+            gameState.bomberTriggered = false;
+            hideElement('bomber-modal');
+
+            eliminatePlayer(targetId, 'bomber');
+
+            if (!gameState.gameEnded) {
+                nextRound();
+            }
+        }
+    };
 
     showElement(modal);
 }
