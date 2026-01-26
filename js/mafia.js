@@ -91,7 +91,6 @@ function setupEventListeners() {
     const confirmElimBtn = document.getElementById('confirm-elimination-btn');
     const skipDayBtn = document.getElementById('skip-elimination-btn');
     const playAgainBtn = document.getElementById('play-again-btn');
-    const closeRevealBtn = document.getElementById('close-reveal-btn');
 
     if (startBtn) startBtn.onclick = startGame;
     if (revealBtn) revealBtn.onclick = showRoleCard;
@@ -102,8 +101,6 @@ function setupEventListeners() {
     if (confirmElimBtn) confirmElimBtn.onclick = confirmEliminations;
     if (skipDayBtn) skipDayBtn.onclick = skipElimination;
     if (playAgainBtn) playAgainBtn.onclick = playAgain;
-
-    // closeRevealBtn logic is handled in revealPlayerRole to allow dynamic targeting
 }
 
 // ================================
@@ -363,9 +360,9 @@ function showMorningPhase() {
     // "No one was found dead" option
     const noneBtn = document.createElement('button');
     noneBtn.className = 'btn btn-outline btn-full btn-lg mb-md';
-    noneBtn.textContent = '🛡️ no one was found dead';
+    noneBtn.textContent = 'no one was found dead';
     noneBtn.onclick = () => {
-        announcement.textContent = 'the city wakes up finding no one was found dead';
+        announcement.textContent = 'The city wakes up finding no one was found dead';
         gameState.nightVictimId = 'none';
         startDiscussionBtn.disabled = false;
         highlightSelection(noneBtn, container);
@@ -400,12 +397,10 @@ function highlightSelection(activeBtn, container) {
 function startDayPhase() {
     const victimId = gameState.nightVictimId;
     if (victimId && victimId !== 'none') {
-        gameState.pendingPhaseTransition = 'discussion';
         eliminatePlayer(victimId, 'night');
-    } else {
-        showScreen('screen-day');
-        displayDayPhase();
     }
+    showScreen('screen-day');
+    displayDayPhase();
 }
 
 function displayDayPhase() {
@@ -417,24 +412,39 @@ function displayDayPhase() {
         const item = document.createElement('div');
         item.className = 'elimination-player-item';
         item.innerHTML = `
-            <label class="elimination-label">
-                <input type="checkbox" class="elimination-checkbox" data-player-id="${p.id}">
+            <div class="player-selection-row" onclick="togglePlayerSelection('${p.id}')">
+                <input type="checkbox" class="elimination-checkbox" id="check-${p.id}" data-player-id="${p.id}" onclick="event.stopPropagation(); updateEliminationButton();">
                 <span class="player-name">${p.name}</span>
-            </label>
+            </div>
         `;
         container.appendChild(item);
     });
 
-    document.querySelectorAll('.elimination-checkbox').forEach(cb => {
-        cb.onchange = updateEliminationButton;
-    });
     updateEliminationButton();
+}
+
+function togglePlayerSelection(id) {
+    const cb = document.getElementById(`check-${id}`);
+    if (cb) {
+        cb.checked = !cb.checked;
+        updateRowHighlights();
+        updateEliminationButton();
+    }
+}
+
+function updateRowHighlights() {
+    document.querySelectorAll('.player-selection-row').forEach(row => {
+        const cb = row.querySelector('input');
+        if (cb.checked) row.classList.add('selected');
+        else row.classList.remove('selected');
+    });
 }
 
 function updateEliminationButton() {
     const checked = document.querySelectorAll('.elimination-checkbox:checked');
     const btn = document.getElementById('confirm-elimination-btn');
     btn.disabled = checked.length === 0 || checked.length > 2;
+    updateRowHighlights();
 }
 
 function confirmEliminations() {
@@ -448,27 +458,13 @@ function confirmEliminations() {
 
     if (!confirm(`Eliminate ${ids.length} player(s)?`)) return;
 
-    const runElimination = (index) => {
-        if (index >= ids.length) {
-            if (!gameState.gameEnded) {
-                gameState.pendingPhaseTransition = 'night';
-            }
-            return;
-        }
+    ids.forEach((id) => {
+        eliminatePlayer(id, 'day');
+    });
 
-        const nextId = ids[index];
-        if (index < ids.length - 1) {
-            gameState.pendingPhaseTransition = 'voting-queue';
-            gameState.votingQueue = ids.slice(index + 1);
-        } else {
-            gameState.pendingPhaseTransition = 'night';
-            gameState.votingQueue = [];
-        }
-
-        eliminatePlayer(nextId, 'day');
-    };
-
-    runElimination(0);
+    if (!gameState.gameEnded) {
+        nextRound();
+    }
 }
 
 function skipElimination() {
@@ -482,7 +478,7 @@ function eliminatePlayer(id, phase) {
     if (!player || !player.isAlive) return;
 
     player.isAlive = false;
-    revealPlayerRole(player);
+    // Silent elimination - no Role Reveal popup as requested
 
     if (phase === 'day' && player.role === 'jester') {
         showWinner('Jester');
@@ -520,44 +516,7 @@ function showBomberModal() {
 }
 
 function revealPlayerRole(player) {
-    const modal = document.getElementById('reveal-modal');
-    const nameEl = document.getElementById('reveal-player-name');
-    const imgEl = document.getElementById('reveal-role-img');
-    const roleEl = document.getElementById('reveal-role-name');
-
-    nameEl.textContent = player.name;
-    const data = getRoleData(player.role);
-    imgEl.src = data.image;
-    roleEl.textContent = data.name;
-
-    const closeBtn = document.getElementById('close-reveal-btn');
-    const handleClose = () => {
-        hideElement('reveal-modal');
-
-        if (gameState.pendingPhaseTransition === 'voting-queue') {
-            const nextId = gameState.votingQueue.shift();
-            if (gameState.votingQueue.length > 0) {
-                gameState.pendingPhaseTransition = 'voting-queue';
-            } else {
-                gameState.pendingPhaseTransition = 'night';
-            }
-            eliminatePlayer(nextId, 'day');
-        } else if (gameState.pendingPhaseTransition === 'discussion') {
-            gameState.pendingPhaseTransition = null;
-            showScreen('screen-day');
-            displayDayPhase();
-        } else if (gameState.pendingPhaseTransition === 'night') {
-            gameState.pendingPhaseTransition = null;
-            nextRound();
-        }
-    };
-
-    closeBtn.onclick = handleClose;
-
-    // Auto-dismiss after 2 seconds
-    setTimeout(handleClose, 2000);
-
-    showElement(modal);
+    // Deprecated for silent flow
 }
 
 function checkWinConditions() {
