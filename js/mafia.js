@@ -364,7 +364,7 @@ function displayLoverSelection() {
 
     gameState.players.filter(p => !lover || p.id !== lover.id).forEach(p => {
         const btn = document.createElement('button');
-        btn.className = 'btn btn-outline btn-sm';
+        btn.className = 'btn btn-outline btn-full';
         btn.textContent = p.name;
         btn.onclick = () => {
             gameState.loverTargetId = p.id;
@@ -411,7 +411,7 @@ function showMorningPhase() {
 
     gameState.players.filter(p => p.isAlive).forEach(p => {
         const pBtn = document.createElement('button');
-        pBtn.className = 'btn btn-ghost btn-full mb-sm text-center';
+        pBtn.className = 'btn btn-outline btn-full mb-sm';
         pBtn.textContent = p.name;
         pBtn.onclick = () => {
             const lover = gameState.players.find(p => p.role === 'lover');
@@ -567,7 +567,7 @@ function showBomberModal() {
         const killBtn = row.querySelector('.bomber-kill-btn');
         killBtn.onclick = () => {
             // Immediate closure of modal
-            hideElement('bomber-modal');
+            hideElement('#bomber-modal');
             gameState.bomberTriggered = false;
 
             // Elimination logic
