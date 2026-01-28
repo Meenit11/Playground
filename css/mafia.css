@@ -3,21 +3,61 @@
    ================================ */
 
 body {
-    background: radial-gradient(circle at top right, #1E1B4B 0%, #312E81 40%, #172554 100%);
+    background: #111;
     min-height: 100vh;
     color: var(--light);
+    transition: background 1s ease;
+    position: relative;
+    overflow-x: hidden;
 }
 
-body::before {
+/* Night Overlay (Stars) */
+body.night::before {
     content: '';
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
-    pointer-events: none;
-    z-index: 0;
+    background: radial-gradient(white, rgba(255, 255, 255, 0) 2px),
+        radial-gradient(white, rgba(255, 255, 255, 0) 1px),
+        radial-gradient(white, rgba(255, 255, 255, 0) 2px);
+    background-size: 550px 550px, 350px 350px, 250px 250px;
+    background-position: 0 0, 40px 60px, 130px 270px;
+    animation: stars 60s linear infinite;
+    z-index: -1;
+    opacity: 0.5;
+}
+
+@keyframes stars {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-550px);
+    }
+}
+
+body.night {
+    background: #000 !important;
+}
+
+body.day {
+    background: linear-gradient(135deg, #F97316 0%, #7C3AED 100%) !important;
+}
+
+body.day::after {
+    content: '';
+    position: fixed;
+    top: 50px;
+    right: 50px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #FDE047 30%, transparent 70%);
+    filter: blur(20px);
+    z-index: -1;
+    animation: pulse 4s ease-in-out infinite;
 }
 
 .game-container {
@@ -410,68 +450,61 @@ input:checked+.toggle-slider:before {
     transform: translateX(22px);
 }
 
-/* Number buttons for Mafia count */
-.number-btn-small {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #C2410C 0%, #FB923C 100%);
-    color: var(--light);
-    border: 2px solid rgba(251, 146, 60, 0.5);
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    cursor: pointer;
-    transition: all var(--transition-base);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.number-btn-small:hover:not(:disabled) {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, #9A3412 0%, #F97316 100%);
-}
-
-.number-btn-small:active:not(:disabled) {
-    transform: scale(0.95);
-}
-
-.number-btn-small:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: var(--gray-400);
-}
-
-.number-input-small {
+/* Vertical Number Input */
+.number-input-vertical {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 5px;
 }
 
-.number-input-small input {
-    width: 60px;
+.number-btn-mini {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.number-input-vertical input {
+    width: 40px;
     text-align: center;
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
-    border: 2px solid rgba(251, 146, 60, 0.5);
-    background: rgba(255, 255, 255, 0.95);
-    min-height: auto;
-    padding: var(--spacing-xs);
-    border-radius: var(--spacing-sm);
+    font-weight: bold;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    padding: 2px;
 }
 
 /* Start Game button - match orange gradient */
 #start-game-btn,
 #reveal-role-btn,
-#done-viewing-btn {
-    background: linear-gradient(135deg, #C2410C 0%, #FB923C 100%) !important;
+#done-viewing-btn,
+#end-night-btn,
+#start-night-btn,
+#start-discussion-btn,
+#confirm-elimination-btn {
+    background: linear-gradient(135deg, #F97316 0%, #C2410C 100%) !important;
     color: var(--light) !important;
-    border: 2px solid rgba(251, 146, 60, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    font-weight: bold !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 #start-game-btn:hover,
 #reveal-role-btn:hover,
-#done-viewing-btn:hover {
-    background: linear-gradient(135deg, #9A3412 0%, #F97316 100%) !important;
+#done-viewing-btn:hover,
+#end-night-btn:hover,
+#start-night-btn:hover,
+#start-discussion-btn:hover,
+#confirm-elimination-btn:hover {
+    background: linear-gradient(135deg, #C2410C 0%, #F97316 100%) !important;
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
 }
 
 /* Old role config styles - keep for backward compatibility */
@@ -542,7 +575,35 @@ input:checked+.toggle-slider:before {
     color: var(--dark);
 }
 
-/* ==================================== REST OF FILE CONTINUES UNCHANGED ==== */
+/* Notification Banner Update */
+.notification-banner {
+    background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    border-radius: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    animation: slideDownFade 0.5s ease-out;
+}
+
+@keyframes slideDownFade {
+    from {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
 /* ================================
    ROLE CARD
    ================================ */
@@ -603,18 +664,21 @@ input:checked+.toggle-slider:before {
 }
 
 .role-grid-item {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .player-name-header {
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-bold);
-    color: var(--dark);
+    color: var(--light);
     margin-bottom: var(--spacing-md);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .role-image-small {
@@ -634,9 +698,9 @@ input:checked+.toggle-slider:before {
 }
 
 /* Role badge colors */
-.role-name-badge.god {
-    background: #FEF3C7;
-    color: #92400E;
+.role-name-badge.doctor {
+    background: #DCFCE7;
+    color: #166534;
 }
 
 .role-name-badge.mafia {
@@ -705,9 +769,9 @@ input:checked+.toggle-slider:before {
     font-weight: var(--font-weight-semibold);
 }
 
-.role-badge.god {
-    background: #FEF3C7;
-    color: #92400E;
+.role-badge.doctor {
+    background: #DCFCE7;
+    color: #166534;
 }
 
 .role-badge.mafia {
@@ -775,16 +839,17 @@ input:checked+.toggle-slider:before {
    DAY PHASE - ELIMINATION CHECKBOXES
    ================================ */
 .elimination-player-item {
-    background: var(--gray-50);
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
     margin-bottom: var(--spacing-sm);
     transition: all var(--transition-base);
 }
 
 .elimination-player-item:hover {
-    background: var(--gray-100);
-    border-color: var(--danger);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
 }
 
 .elimination-label {
@@ -807,8 +872,9 @@ input:checked+.toggle-slider:before {
 .elimination-label .player-name {
     flex: 1;
     font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-    color: var(--dark);
+    font-weight: var(--font-weight-bold);
+    color: var(--light);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 /* ================================

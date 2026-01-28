@@ -7,7 +7,7 @@ let gameState = {
     gameId: null,
     totalPlayers: 5,
     roleConfig: {
-        god: 1,
+        doctor: 1,
         mafia: 1,
         detective: 0,
         jester: 0,
@@ -163,7 +163,7 @@ function toggleRole(role, isEnabled) {
 
 function updateRoleDistribution() {
     const total = gameState.totalPlayers;
-    const sum = gameState.roleConfig.god +
+    const sum = gameState.roleConfig.doctor +
         gameState.roleConfig.mafia +
         gameState.roleConfig.detective +
         gameState.roleConfig.jester +
@@ -225,7 +225,7 @@ function assignRoles(names) {
     gameState.players = [];
     const roles = [];
 
-    roles.push('god');
+    roles.push('doctor');
     for (let i = 0; i < gameState.roleConfig.mafia; i++) roles.push('mafia');
     if (gameState.roleConfig.detective) roles.push('detective');
     if (gameState.roleConfig.jester) roles.push('jester');
@@ -317,6 +317,8 @@ function displayGMOverview() {
 
 function startNightPhase() {
     gameState.currentPhase = 'night';
+    document.body.classList.remove('day');
+    document.body.classList.add('night');
     saveGame('mafia', gameState);
     showScreen('screen-night');
     displayNightInstructions();
@@ -330,7 +332,7 @@ function displayNightInstructions() {
     const instructions = [];
     instructions.push('🏙️ City goes to sleep! Eyes shut, no peeking!');
     instructions.push('🔪 Mafia wake up! Choose your victim... Mafia, go to sleep.');
-    instructions.push('😇 God wake up! Who are we saving tonight? God, go to sleep.');
+    instructions.push('😇 Doctor wake up! Who are we saving tonight? Doctor, go to sleep.');
 
     const aliveDetective = gameState.players.find(p => p.role === 'detective' && p.isAlive);
     if (aliveDetective) {
@@ -440,6 +442,8 @@ function startDayPhase() {
     if (victimId && victimId !== 'none') {
         eliminatePlayer(victimId, 'night');
     }
+    document.body.classList.remove('night');
+    document.body.classList.add('day');
     showScreen('screen-day');
     displayDayPhase();
 }
@@ -567,7 +571,7 @@ function showBomberModal() {
             gameState.bomberTriggered = false;
 
             // Elimination logic
-            eliminatePlayer(player.id, 'bomber');
+            eliminatePlayer(player.id, 'day'); // Treat as day elim to allow win check
 
             if (!gameState.gameEnded) {
                 nextRound();
@@ -624,6 +628,8 @@ function showWinner(team) {
             </div>
         `;
     });
+    document.body.classList.remove('night');
+    document.body.classList.add('day');
     showScreen('screen-winner');
     showConfetti(document.getElementById('confetti-container'), 100);
 }
@@ -637,7 +643,7 @@ function playAgain() { location.reload(); }
 
 function getRoleData(role) {
     const roleMap = {
-        god: { name: 'God', image: '../images/God.png', description: 'Can save one life every night.' },
+        doctor: { name: 'Doctor', image: '../images/Doctor.png', description: 'Can save one life every night.' },
         mafia: { name: 'Mafia', image: '../images/Mafia.png', description: 'Eliminate civilians at night.' },
         detective: { name: 'Detective', image: '../images/Detective.png', description: 'Suspect players to find Mafia.' },
         jester: { name: 'Jester', image: '../images/Jester.png', description: 'Try to get voted out to win!' },
