@@ -147,8 +147,9 @@
       const cards = document.querySelectorAll('.game-card');
       cards.forEach((card, index) => {
         setTimeout(() => {
-          card.classList.add('animate-fadeIn');
-        }, 100 * (index + 1));
+          card.style.opacity = '1';
+          card.classList.add('animate-slideIn'); // Using slideIn from global.css
+        }, 150 * (index + 1));
       });
     });
   </script>
