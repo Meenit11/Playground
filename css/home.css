@@ -4,22 +4,34 @@
 
 body {
     min-height: 100vh;
-    background: linear-gradient(135deg,
-            #FEF3C7 0%,
-            /* Warm yellow */
-            #DBEAFE 25%,
-            /* Sky blue */
-            #D1FAE5 50%,
-            /* Mint green */
-            #FCE7F3 75%,
-            /* Soft pink */
-            #FEF3C7 100%
-            /* Back to yellow */
+    background: linear-gradient(-45deg,
+            #EEF2FF,
+            /* Very light indigo */
+            #FFF7ED,
+            /* Very light orange */
+            #F0FDF4,
+            /* Very light green */
+            #FDF2F8
+            /* Very light pink */
         );
     background-size: 400% 400%;
-    animation: rainbowShift 25s ease infinite;
+    animation: gradientFlow 15s ease infinite;
     position: relative;
     overflow-x: hidden;
+}
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 @keyframes rainbowShift {
@@ -259,10 +271,24 @@ body::after {
 }
 
 .main-logo {
-    width: 160px;
+    width: 220px;
     height: auto;
-    filter: drop-shadow(0 6px 20px rgba(251, 146, 60, 0.25));
-    animation: logoRainbow 6s ease-in-out infinite;
+    filter: drop-shadow(0 12px 30px rgba(139, 92, 246, 0.25));
+    animation: logoPulse 4s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 12px 30px rgba(139, 92, 246, 0.25));
+    }
+
+    50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 15px 40px rgba(139, 92, 246, 0.4));
+    }
 }
 
 @keyframes logoRainbow {
@@ -552,10 +578,11 @@ body::after {
 }
 
 .mafia-icon {
-    width: 195px;
-    height: 195px;
-    margin-top: -15px;
-    margin-bottom: -10px;
+    width: 240px;
+    height: 240px;
+    margin-top: -30px;
+    margin-bottom: -15px;
+    filter: drop-shadow(0 10px 20px rgba(251, 146, 60, 0.2));
 }
 
 @keyframes iconFloat {

@@ -296,8 +296,8 @@ function showRoleDisplay() {
         wordDisplay.style.display = 'none';
     } else {
         roleImage.src = '../images/Spy Agent.png';
-        roleNameDisplay.textContent = "Spy / Agent";
-        roleDescription.textContent = "You may be Spy or Agent. Be clever!";
+        roleNameDisplay.textContent = "Agent / Spy";
+        roleDescription.textContent = "You may be Agent or Spy. Be clever!";
         wordDisplay.style.display = 'block';
         playerWord.textContent = currentPlayer.word;
     }
@@ -451,19 +451,19 @@ function checkWinConditions() {
 
     // Agents win: All Mr. White + All Spy eliminated
     if (aliveSpies.length === 0 && aliveMrWhite.length === 0) {
-        showGameOver('🎊 Agents Win! 🎊', 'All Spies and Mr. White have been eliminated!');
+        showGameOver('🎊🕵️ Agents Win! 🕵️🎊', 'All Spies and Mr. White have been eliminated!');
         return;
     }
 
     // Spy wins: All Mr. White eliminated AND Spy > Agents
     if (aliveMrWhite.length === 0 && aliveSpies.length > aliveAgents.length) {
-        showGameOver('🕵️ Spy Wins! 🕵️', 'Spies outnumber the Agents!');
+        showGameOver('🎊🕵️ Spy Wins! 🕵️🎊', 'Spies outnumber the Agents!');
         return;
     }
 
     // Mr. White wins: Mr. White > (Spy + Agents)
     if (aliveMrWhite.length > (aliveSpies.length + aliveAgents.length)) {
-        showGameOver('⚪ Mr. White Wins! ⚪', 'Mr. White outnumbers everyone!');
+        showGameOver('🎊⚪ Mr. White Wins! ⚪🎊', 'Mr. White outnumbers everyone!');
         return;
     }
 
