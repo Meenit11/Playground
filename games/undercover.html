@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Undercover - Social deduction party game">
-    <meta name="theme-color" content="#EC4899">
+    <meta name="theme-color" content="#8B5CF6">
     <title>Undercover - Meenit's Playground</title>
 
     <link rel="stylesheet" href="../css/global.css">
@@ -17,267 +17,182 @@
 
         <!-- SCREEN 1: Setup -->
         <div id="screen-setup" class="screen">
+            <!-- Header: Logo, Name, Tagline -->
             <div class="screen-header">
                 <img src="../images/Undercover Logo.png" alt="Undercover" class="game-logo">
+                <h1 class="game-title">Undercover</h1>
+                <p class="game-tagline">One word can save you, one word can end you!</p>
             </div>
 
             <div class="content-card">
                 <h2>Game Setup</h2>
 
-                <!-- Player Count -->
-                <div class="form-group">
-                    <label class="label-white">Total Players</label>
-                    <div class="number-input">
-                        <button class="number-btn" id="decrease-players">−</button>
-                        <input type="number" id="player-count-input" value="4" min="4" max="15" readonly>
-                        <button class="number-btn" id="increase-players">+</button>
+                <!-- Total Players -->
+                <div class="setup-box">
+                    <label>Total Players</label>
+                    <div class="counter-control">
+                        <button class="counter-btn" id="decrease-players">−</button>
+                        <span class="counter-value" id="player-count-display">4</span>
+                        <button class="counter-btn" id="increase-players">+</button>
                     </div>
                 </div>
 
-                <!-- Player Names -->
-                <div class="form-group">
-                    <label class="label-white">Player Names</label>
-                    <div id="player-names-container"></div>
+                <!-- Player Name Input -->
+                <div class="setup-box">
+                    <label>Enter Player Name</label>
+                    <input type="text" id="player-name-input" class="name-input"
+                        placeholder="Type name and press Enter">
+                    <div id="player-list" class="player-chips"></div>
                 </div>
 
-                <!-- Role Distribution -->
-                <div class="role-distribution">
-                    <h3>Role Distribution</h3>
+                <!-- Role Selection -->
+                <h3 class="section-title">Role Selection</h3>
 
-                    <div class="role-row-with-img">
-                        <img src="../images/Mr. White.png" alt="Mr. White" class="role-icon">
-                        <div class="role-info">
-                            <span class="role-label">Mr. White</span>
-                            <p class="role-desc">No word, must blend in</p>
-                        </div>
-                        <div class="number-input-small">
-                            <button class="number-btn-small" id="decrease-mrwhite">−</button>
-                            <input type="number" id="mrwhite-count" value="0" min="0" max="3" readonly>
-                            <button class="number-btn-small" id="increase-mrwhite">+</button>
-                        </div>
+                <!-- Mr. White Role -->
+                <div class="role-card-horizontal">
+                    <img src="../images/Mr. White.png" alt="Mr. White" class="role-img">
+                    <div class="role-details">
+                        <h4>Mr. White</h4>
+                        <p>Doesn't know the word</p>
                     </div>
-
-                    <div class="role-row-with-img">
-                        <img src="../images/Spy.png" alt="Spy" class="role-icon">
-                        <div class="role-info">
-                            <span class="role-label">Spy</span>
-                            <p class="role-desc">Gets different word</p>
-                        </div>
-                        <div class="number-input-small">
-                            <button class="number-btn-small" id="decrease-spies">−</button>
-                            <input type="number" id="spies-count" value="1" min="0" max="5" readonly>
-                            <button class="number-btn-small" id="increase-spies">+</button>
-                        </div>
-                    </div>
-
-                    <div class="role-row-with-img">
-                        <img src="../images/Agent.png" alt="Agent" class="role-icon">
-                        <div class="role-info">
-                            <span class="role-label">Agent</span>
-                            <p class="role-desc">Majority with main word</p>
-                        </div>
-                        <span class="role-value" id="agents-count">3</span>
+                    <div class="counter-control">
+                        <button class="counter-btn" id="decrease-mrwhite">−</button>
+                        <span class="counter-value" id="mrwhite-count">1</span>
+                        <button class="counter-btn" id="increase-mrwhite">+</button>
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-full btn-lg mt-xl" id="start-game-btn">Start Game</button>
+                <!-- Spy Role -->
+                <div class="role-card-horizontal">
+                    <img src="../images/Spy.png" alt="Spy" class="role-img">
+                    <div class="role-details">
+                        <h4>Spy</h4>
+                        <p>Gets different word</p>
+                    </div>
+                    <div class="counter-control">
+                        <button class="counter-btn" id="decrease-spies">−</button>
+                        <span class="counter-value" id="spies-count">1</span>
+                        <button class="counter-btn" id="increase-spies">+</button>
+                    </div>
+                </div>
+
+                <!-- Agents (Auto-calculated) -->
+                <div class="role-card-horizontal agents-card">
+                    <img src="../images/Agent.png" alt="Agent" class="role-img">
+                    <div class="role-details">
+                        <h4>Agents</h4>
+                        <p>Majority with main word</p>
+                    </div>
+                    <span class="counter-value agents-value" id="agents-count">2</span>
+                </div>
+
+                <!-- Action Buttons -->
+                <button class="btn btn-primary btn-full" id="start-game-btn">Start Game</button>
+                <button class="btn btn-outline btn-full" id="rules-btn">Rules</button>
+                <a href="../index.html" class="btn btn-ghost btn-full">Back to Home</a>
             </div>
-
-            <!-- Rules Section -->
-            <div class="rules-section-footer">
-                <h3>🎮 How to Play</h3>
-                <div class="rules-content">
-                    <p><strong>🎯 Game Flow:</strong></p>
-                    <ol>
-                        <li>👁️ Each player views their secret role & word</li>
-                        <li>💬 Each round, players speak in order about their word</li>
-                        <li>🗳️ Vote to eliminate ONE suspicious player</li>
-                        <li>🔍 Their role is revealed (but NOT their word!)</li>
-                        <li>🔄 Repeat until a team wins</li>
-                    </ol>
-
-                    <p><strong>👥 Roles:</strong></p>
-                    <ul>
-                        <li><strong>🛡️ Agents:</strong> Get Word 1. Work together to find Spies & Mr. White</li>
-                        <li><strong>🕵️ Spies:</strong> Get Word 2. Pretend you have Word 1 and survive</li>
-                        <li><strong>👤 Mr. White:</strong> Gets NO word! Blend in without knowing either word</li>
-                    </ul>
-
-                    <p><strong>🏆 Win Conditions:</strong></p>
-                    <ul>
-                        <li>✅ <strong>Agents Win:</strong> All Spies + Mr. White eliminated.</li>
-                        <li>✅ <strong>Spies Win:</strong> Spies ≥ Agents. (Mr. White must be dead).</li>
-                        <li>✅ <strong>Mr. White Win:</strong> WIN automatically if only 2 players left (including Mr.
-                            White). Also wins by guessing the correct word after elimination.</li>
-                        <li>✅ <strong>Special Win:</strong> If all Agents die, Mr. White must guess the <strong>Spy
-                                Word</strong> to win; otherwise Spies win.</li>
-                    </ul>
-
-                    <p><strong>💡 Pro Tips:</strong></p>
-                    <ul>
-                        <li>🎭 Agents & Spies don't know their role - only their word!</li>
-                        <li>🤫 Mr. White knows they're Mr. White but has no word</li>
-                        <li>💭 Listen carefully to spot who has a different word</li>
-                    </ul>
-                </div>
-            </div>
-
-            <a href="../index.html" class="back-link">← Back to Games</a>
         </div>
 
-        <!-- SCREEN 2: Pass-Phone Role Viewing -->
+        <!-- Rules Modal -->
+        <div id="rules-modal" class="modal hidden">
+            <div class="modal-overlay" id="modal-overlay"></div>
+            <div class="modal-content">
+                <button class="modal-close" id="close-rules">×</button>
+                <h2>How to Play Undercover</h2>
+
+                <div class="rules-scroll">
+                    <div class="rule-section">
+                        <h3>🎯 Game Flow</h3>
+                        <ol>
+                            <li><strong>View Roles:</strong> Each player secretly views their role and word</li>
+                            <li><strong>Describe:</strong> Players take turns describing their word (1 sentence)</li>
+                            <li><strong>Vote:</strong> Everyone votes to eliminate ONE suspicious player</li>
+                            <li><strong>Reveal:</strong> Eliminated player's role is revealed (NOT their word!)</li>
+                            <li><strong>Repeat:</strong> Continue until a team wins</li>
+                        </ol>
+                    </div>
+
+                    <div class="rule-section">
+                        <h3>👥 Roles</h3>
+                        <div class="role-explanation">
+                            <strong>🕵️ Agents:</strong> Get the main word. Must find and eliminate Spy + Mr. White.
+                        </div>
+                        <div class="role-explanation">
+                            <strong>🎭 Spy:</strong> Gets a similar (but different) word. Must blend in and survive.
+                        </div>
+                        <div class="role-explanation">
+                            <strong>⚪ Mr. White:</strong> Gets NO word at all! Must guess the word when eliminated to
+                            win.
+                        </div>
+                    </div>
+
+                    <div class="rule-section">
+                        <h3>🏆 Win Conditions</h3>
+                        <div class="win-condition">
+                            <strong>Agents Win:</strong> Eliminate all Spy + Mr. White
+                        </div>
+                        <div class="win-condition">
+                            <strong>Spy Wins:</strong> Survive until the end
+                        </div>
+                        <div class="win-condition">
+                            <strong>Mr. White Wins:</strong> Correctly guess the word when eliminated
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: Role Viewing -->
         <div id="screen-role-viewing" class="screen hidden">
             <div class="role-viewing-center">
                 <h1 class="centered-title">Role Assignment</h1>
 
                 <div class="pass-phone-box">
                     <p class="player-name-large" id="next-viewer-name">Player Name</p>
+                    <p class="pass-instruction">Pass the phone to this player</p>
                 </div>
 
                 <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">👁️ Reveal My Role</button>
             </div>
         </div>
 
-        <!-- SCREEN 3: Role Card Display -->
-        <div id="screen-role-card" class="screen hidden">
-            <div class="role-card-container">
-                <h1 class="centered-title">Your Role</h1>
-
-                <div class="role-card">
-                    <img src="../images/Agent.png" alt="Role" class="role-image" id="role-image">
-                    <div class="word-display" id="word-display-card">
-                        <p class="word-text" id="word-text">Escalator</p>
+        <!-- SCREEN 3: Role Display -->
+        <div id="screen-role-display" class="screen hidden">
+            <div class="role-display-center">
+                <div class="role-card-large">
+                    <img id="role-image" src="" alt="Role" class="role-image-large">
+                    <h2 id="role-name-display" class="role-name-large"></h2>
+                    <div id="word-display" class="word-box">
+                        <p class="word-label">Your Word:</p>
+                        <h1 id="player-word" class="word-large"></h1>
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-full mt-2xl" id="done-viewing-btn">Pass Phone to&nbsp;<span
-                        id="next-player-name">Next Player</span></button>
+                <button class="btn btn-primary btn-full btn-lg" id="next-player-btn">Pass to Next →</button>
             </div>
         </div>
 
-        <!-- SCREEN 4: Word Rounds -->
-        <div id="screen-word-round" class="screen hidden">
-            <div class="game-round-header">
-                <h1 class="centered-title">Round <span id="word-round-number">1</span></h1>
+        <!-- SCREEN 4: Game Start -->
+        <div id="screen-game-start" class="screen hidden">
+            <div class="game-start-center">
+                <h1 class="game-start-title">🎮 Game Begins!</h1>
 
-                <div class="speaking-order-section">
-                    <h3>Speaking Order</h3>
-                    <div id="speaking-order-list"></div>
-                </div>
-            </div>
-
-            <div class="content-card">
-                <div class="elimination-section">
-                    <h3>Eliminate Player (Vote 1)</h3>
-                    <div id="elimination-list"></div>
+                <div class="speaker-box">
+                    <p class="speaker-label">First Speaker:</p>
+                    <h2 id="first-speaker-name" class="speaker-name"></h2>
                 </div>
 
-                <button class="btn btn-success btn-full btn-lg mt-lg" id="next-word-round-btn" disabled>Confirm
-                    Elimination</button>
-            </div>
-        </div>
-
-        <!-- SCREEN 5: Mr. White Guess -->
-        <div id="screen-mrwhite-guess" class="screen hidden">
-            <div class="screen-header">
-                <h1>Mr. White's Guess</h1>
-                <p class="subtitle">Guess both words correctly to win!</p>
-            </div>
-
-            <div class="content-card">
-                <p class="info-text">Mr. White has been eliminated. They can guess both words to win!</p>
-
-                <div class="form-group" id="guess-input-group">
-                    <label id="guess-label">Guess the word</label>
-                    <input type="text" id="guess-word" placeholder="Enter word" autocomplete="off">
+                <div class="instructions-box">
+                    <p>Each player describes their word in one sentence.</p>
+                    <p>After everyone speaks, vote to eliminate ONE suspicious player.</p>
                 </div>
 
-                <button class="btn btn-primary btn-full" id="submit-guess-btn">Submit Guess</button>
-                <button class="btn btn-ghost btn-full mt-sm" id="skip-guess-btn">Skip (Wrong Guess)</button>
-            </div>
-        </div>
-
-        <!-- SCREEN 6: Winner Screen -->
-        <div id="screen-winner" class="screen hidden">
-            <div class="confetti-container" id="confetti-container"></div>
-
-            <div class="winner-content">
-                <div class="trophy-icon">🏆</div>
-                <h1 class="winner-title" id="winner-title">Agents Win!</h1>
-                <div class="winner-details">
-                    <h3>Final Roles</h3>
-                    <div id="role-reveals-list"></div>
-                </div>
-
-                <button class="btn btn-primary btn-lg mt-2xl" id="play-again-btn">Play Again</button>
-                <a href="../index.html" class="btn btn-ghost btn-lg mt-md">Back to Games</a>
+                <button class="btn btn-primary btn-full" id="end-game-btn">End Game</button>
             </div>
         </div>
 
     </div>
 
-    <!-- Rules Modal -->
-    <div id="rules-modal" class="modal hidden">
-        <div class="modal-content-rules">
-
-            <h2>How to Play Undercover</h2>
-
-            <div class="rules-section">
-                <h3>🎯 Objective</h3>
-                <ul class="rules-list">
-                    <li><strong>Agents:</strong> Find and eliminate all Spies and Mr. Whites</li>
-                    <li><strong>Spies:</strong> Blend in with Agents and survive</li>
-                    <li><strong>Mr. White:</strong> Survive without knowing any word, OR guess both words if eliminated
-                    </li>
-                </ul>
-            </div>
-
-            <div class="rules-section">
-                <h3>👥 Roles Explained</h3>
-
-                <div class="role-explain">
-                    <div class="role-explain-header">
-                        <img src="../images/Agent.png" alt="Agent" class="role-explain-icon">
-                        <strong>Agent (Majority)</strong>
-                    </div>
-                    <p>You get Word 1. You DON'T know you're an Agent! Find the Spies and Mr. Whites by listening to
-                        clues.</p>
-                </div>
-
-                <div class="role-explain">
-                    <div class="role-explain-header">
-                        <img src="../images/Spy.png" alt="Spy" class="role-explain-icon">
-                        <strong>Spy (Minority)</strong>
-                    </div>
-                    <p>You get Word 2. You DON'T know you're a Spy! Blend in and pretend you have the same word as the
-                        majority.</p>
-                </div>
-
-                <div class="role-explain">
-                    <div class="role-explain-header">
-                        <img src="../images/Mr. White.png" alt="Mr. White" class="role-explain-icon">
-                        <strong>Mr. White (Wildcard)</strong>
-                    </div>
-                    <p>You get NO WORD at all. You KNOW you are Mr. White. Blend in without knowing either word, or win
-                        by guessing both if eliminated. You can volunteer to be eliminated if you figure out the words!
-                    </p>
-                </div>
-            </div>
-
-            <div class="rules-section">
-                <h3>🏆 Win Conditions</h3>
-                <ul class="rules-list">
-                    <li><strong>Agents Win:</strong> All Spies + Mr. White eliminated.</li>
-                    <li><strong>Spies Win:</strong> Spies ≥ Agents. Mr. White must be eliminated for Spies to win.</li>
-                    <li><strong>Mr. White Win:</strong> Automatic win if only 1 Mr. White and 1 other player remain.
-                        Also wins by guessing the correct word after elimination.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="../js/utils.js"></script>
     <script src="../js/undercover.js"></script>
 </body>
 

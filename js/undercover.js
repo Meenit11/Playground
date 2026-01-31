@@ -1,681 +1,308 @@
 // ================================
-// UNDERCOVER - GAME LOGIC (REDESIGNED)
+// UNDERCOVER - COMPLETE REDESIGN
 // ================================
 
 // Game State
 let gameState = {
-    gameId: null,
     totalPlayers: 4,
-    roles: {
-        mrWhite: 0,
-        spies: 1,
-        agents: 3
-    },
-    words: {
-        word1: '', // Agents' word
-        word2: ''  // Spies' word
-    },
     players: [],
-    currentRound: 1,
-    viewingOrder: [],
-    currentViewIndex: 0,
-    speakingOrder: [],
-    allWordPairs: null,
-    selectedEliminationId: null,
-    targetWordToGuess: null // 'agent' or 'spy'
+    mrWhiteCount: 1,
+    spiesCount: 1,
+    agentsCount: 2,
+    currentPlayerIndex: 0,
+    agentWord: '',
+    spyWord: ''
 };
 
-// ================================
-// INITIALIZATION
-// ================================
+// Word Pairs
+const wordPairs = [
+    { agent: "Coffee", spy: "Tea" },
+    { agent: "Cat", spy: "Dog" },
+    { agent: "Pizza", spy: "Burger" },
+    { agent: "Summer", spy: "Winter" },
+    { agent: "Book", spy: "Movie" },
+    { agent: "Ocean", spy: "Lake" },
+    { agent: "Guitar", spy: "Piano" },
+    { agent: "Apple", spy: "Orange" },
+    { agent: "Car", spy: "Bike" },
+    { agent: "Doctor", spy: "Nurse" }
+];
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadWordPairs();
-    setupEventListeners();
-    generatePlayerInputs(gameState.totalPlayers);
-    updateRoleDistribution();
+// DOM Elements
+const playerCountDisplay = document.getElementById('player-count-display');
+const playerNameInput = document.getElementById('player-name-input');
+const playerList = document.getElementById('player-list');
+const mrWhiteCountEl = document.getElementById('mrwhite-count');
+const spiesCountEl = document.getElementById('spies-count');
+const agentsCountEl = document.getElementById('agents-count');
+
+const startGameBtn = document.getElementById('start-game-btn');
+const rulesBtn = document.getElementById('rules-btn');
+const rulesModal = document.getElementById('rules-modal');
+const closeRulesBtn = document.getElementById('close-rules');
+const modalOverlay = document.getElementById('modal-overlay');
+
+const screenSetup = document.getElementById('screen-setup');
+const screenRoleViewing = document.getElementById('screen-role-viewing');
+const screenRoleDisplay = document.getElementById('screen-role-display');
+const screenGameStart = document.getElementById('screen-game-start');
+
+// ================================
+// PLAYER COUNT CONTROLS
+// ================================
+document.getElementById('decrease-players').addEventListener('click', () => {
+    if (gameState.totalPlayers > 4) {
+        gameState.totalPlayers--;
+        updatePlayerCount();
+        calculateAgents();
+    }
 });
 
-// Load word pairs from JSON
-async function loadWordPairs() {
-    try {
-        const response = await fetch('../words.json');
-        const data = await response.json();
-        gameState.allWordPairs = data.word_pairs;
-        console.log('Word pairs loaded:', gameState.allWordPairs.length);
-    } catch (error) {
-        console.error('Error loading word pairs:', error);
-        alert('Failed to load word pairs. Please refresh the page.');
-    }
+document.getElementById('increase-players').addEventListener('click', () => {
+    gameState.totalPlayers++;
+    updatePlayerCount();
+    calculateAgents();
+});
+
+function updatePlayerCount() {
+    playerCountDisplay.textContent = gameState.totalPlayers;
 }
 
 // ================================
-// EVENT LISTENERS
+// PLAYER NAME INPUT
 // ================================
+playerNameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && playerNameInput.value.trim()) {
+        addPlayer(playerNameInput.value.trim());
+        playerNameInput.value = '';
+    }
+});
 
-function setupEventListeners() {
-    // Player count adjustment
-    document.getElementById('decrease-players').addEventListener('click', () => adjustPlayerCount(-1));
-    document.getElementById('increase-players').addEventListener('click', () => adjustPlayerCount(1));
-
-    // Role count adjustment
-    document.getElementById('decrease-mrwhite').addEventListener('click', () => adjustRoleCount('mrWhite', -1));
-    document.getElementById('increase-mrwhite').addEventListener('click', () => adjustRoleCount('mrWhite', 1));
-    document.getElementById('decrease-spies').addEventListener('click', () => adjustRoleCount('spies', -1));
-    document.getElementById('increase-spies').addEventListener('click', () => adjustRoleCount('spies', 1));
-
-    // Start game
-    document.getElementById('start-game-btn').addEventListener('click', startGame);
-
-    // Role viewing
-    document.getElementById('reveal-role-btn').addEventListener('click', showRoleCard);
-    document.getElementById('done-viewing-btn').addEventListener('click', nextViewer);
-
-    // Word rounds
-    document.getElementById('next-word-round-btn').addEventListener('click', confirmElimination);
-
-    // Mr. White guess
-    document.getElementById('submit-guess-btn').addEventListener('click', submitMrWhiteGuess);
-    document.getElementById('skip-guess-btn').addEventListener('click', skipMrWhiteGuess);
-
-    // Play again
-    document.getElementById('play-again-btn').addEventListener('click', playAgain);
-}
-
-
-
-// ================================
-// SETUP SCREEN
-// ================================
-
-function adjustPlayerCount(delta) {
-    const input = document.getElementById('player-count-input');
-    let newValue = parseInt(input.value) + delta;
-    newValue = Math.max(4, Math.min(15, newValue));
-
-    input.value = newValue;
-    gameState.totalPlayers = newValue;
-
-    // Update button states
-    document.getElementById('decrease-players').disabled = (newValue <= 4);
-    document.getElementById('increase-players').disabled = (newValue >= 15);
-
-    generatePlayerInputs(newValue);
-    updateRoleDistribution();
-}
-
-function generatePlayerInputs(count) {
-    const container = document.getElementById('player-names-container');
-    container.innerHTML = '';
-
-    for (let i = 0; i < count; i++) {
-        const playerDiv = createElement('div', {
-            classes: ['player-name-input']
-        });
-
-        playerDiv.innerHTML = `
-      <div class="player-number">${i + 1}</div>
-      <input type="text" placeholder="Player ${i + 1}" data-player-index="${i}">
-    `;
-
-        container.appendChild(playerDiv);
+function addPlayer(name) {
+    if (gameState.players.length < gameState.totalPlayers) {
+        gameState.players.push(name);
+        renderPlayerList();
     }
 }
 
-function adjustRoleCount(role, delta) {
-    const input = document.getElementById(`${role === 'mrWhite' ? 'mrwhite' : role}-count`);
-    let newValue = parseInt(input.value) + delta;
-
-    if (role === 'mrWhite') {
-        newValue = Math.max(0, Math.min(3, newValue));
-    } else if (role === 'spies') {
-        newValue = Math.max(0, Math.min(5, newValue));
-    }
-
-    input.value = newValue;
-    gameState.roles[role] = newValue;
-
-    // Update button states
-    if (role === 'mrWhite') {
-        document.getElementById('decrease-mrwhite').disabled = (newValue <= 0);
-        document.getElementById('increase-mrwhite').disabled = (newValue >= 3);
-    } else if (role === 'spies') {
-        document.getElementById('decrease-spies').disabled = (newValue <= 0);
-        document.getElementById('increase-spies').disabled = (newValue >= 5);
-    }
-
-    updateRoleDistribution();
+function removePlayer(index) {
+    gameState.players.splice(index, 1);
+    renderPlayerList();
 }
 
-function updateRoleDistribution() {
-    const total = gameState.totalPlayers;
-    const mrWhite = gameState.roles.mrWhite;
-    const spies = gameState.roles.spies;
-    const agents = total - mrWhite - spies;
-
-    gameState.roles.agents = agents;
-    document.getElementById('agents-count').textContent = agents;
-
-    // Validate
-    const startBtn = document.getElementById('start-game-btn');
-    if (agents < 1) {
-        startBtn.disabled = true;
-        document.getElementById('agents-count').style.color = 'var(--danger)';
-    } else {
-        startBtn.disabled = false;
-        document.getElementById('agents-count').style.color = 'var(--primary)';
-    }
-}
-
-function startGame() {
-    // Validate players
-    const playerInputs = document.querySelectorAll('.player-name-input input');
-    const names = Array.from(playerInputs).map(input => input.value.trim()).filter(name => name !== '');
-
-    if (names.length < gameState.totalPlayers) {
-        alert('Please enter all player names!');
-        return;
-    }
-
-    const validation = validatePlayerNames(names);
-    if (!validation.valid) {
-        alert(validation.error);
-        return;
-    }
-
-    // Validate roles
-    if (gameState.roles.agents < 1) {
-        alert('Must have at least 1 Agent! Reduce other roles.');
-        return;
-    }
-
-    // Auto-select random words (GM doesn't see them)
-    if (!gameState.allWordPairs || gameState.allWordPairs.length === 0) {
-        alert('Word pairs not loaded yet. Please wait...');
-        return;
-    }
-
-    const pair = getRandomItem(gameState.allWordPairs);
-    gameState.words.word1 = pair[0];
-    gameState.words.word2 = pair[1];
-
-    // Create players with roles
-    assignRoles(names);
-
-    // Generate RANDOM viewing order (not sequential)
-    const randomStartIndex = getRandomInt(0, gameState.totalPlayers - 1);
-    gameState.viewingOrder = [];
-    for (let i = 0; i < gameState.totalPlayers; i++) {
-        gameState.viewingOrder.push((randomStartIndex + i) % gameState.totalPlayers);
-    }
-    gameState.currentViewIndex = 0;
-
-    gameState.gameId = generateId().slice(0, 8).toUpperCase();
-    gameState.currentRound = 1;
-    saveGame('undercover', gameState);
-
-    showScreen('screen-role-viewing');
-    showNextViewer();
-}
-
-function assignRoles(names) {
-    gameState.players = [];
-    const roles = [];
-
-    // Build roles array
-    for (let i = 0; i < gameState.roles.mrWhite; i++) {
-        roles.push('mrwhite');
-    }
-    for (let i = 0; i < gameState.roles.spies; i++) {
-        roles.push('spy');
-    }
-    for (let i = 0; i < gameState.roles.agents; i++) {
-        roles.push('agent');
-    }
-
-    // Shuffle roles
-    const shuffledRoles = shuffleArray(roles);
-
-    // Assign to players
-    names.forEach((name, index) => {
-        const role = shuffledRoles[index];
-        let word = null;
-
-        if (role === 'agent') {
-            word = gameState.words.word1;
-        } else if (role === 'spy') {
-            word = gameState.words.word2;
-        }
-        // mrwhite gets no word
-
-        gameState.players.push({
-            id: generateId(),
-            name: name,
-            role: role,
-            word: word,
-            isEliminated: false,
-            originalIndex: index + 1
-        });
+function renderPlayerList() {
+    playerList.innerHTML = '';
+    gameState.players.forEach((name, index) => {
+        const chip = document.createElement('div');
+        chip.className = 'player-chip';
+        chip.innerHTML = `
+            ${name}
+            <button class="remove-player" onclick="removePlayer(${index})">×</button>
+        `;
+        playerList.appendChild(chip);
     });
 }
 
-// ================================
-// ROLE VIEWING
-// ================================
+// Make removePlayer globally accessible
+window.removePlayer = removePlayer;
 
-function showNextViewer() {
-    if (gameState.currentViewIndex >= gameState.viewingOrder.length) {
-        // All players have viewed, start word rounds
-        startWordRounds();
+// ================================
+// ROLE COUNT CONTROLS
+// ================================
+document.getElementById('decrease-mrwhite').addEventListener('click', () => {
+    if (gameState.mrWhiteCount > 0) {
+        gameState.mrWhiteCount--;
+        updateRoleCounts();
+        calculateAgents();
+    }
+});
+
+document.getElementById('increase-mrwhite').addEventListener('click', () => {
+    if (gameState.mrWhiteCount + gameState.spiesCount < gameState.totalPlayers - 1) {
+        gameState.mrWhiteCount++;
+        updateRoleCounts();
+        calculateAgents();
+    }
+});
+
+document.getElementById('decrease-spies').addEventListener('click', () => {
+    if (gameState.spiesCount > 0) {
+        gameState.spiesCount--;
+        updateRoleCounts();
+        calculateAgents();
+    }
+});
+
+document.getElementById('increase-spies').addEventListener('click', () => {
+    if (gameState.mrWhiteCount + gameState.spiesCount < gameState.totalPlayers - 1) {
+        gameState.spiesCount++;
+        updateRoleCounts();
+        calculateAgents();
+    }
+});
+
+function updateRoleCounts() {
+    mrWhiteCountEl.textContent = gameState.mrWhiteCount;
+    spiesCountEl.textContent = gameState.spiesCount;
+}
+
+function calculateAgents() {
+    gameState.agentsCount = gameState.totalPlayers - gameState.mrWhiteCount - gameState.spiesCount;
+    agentsCountEl.textContent = gameState.agentsCount;
+
+    // Ensure agents > (spy + mr white)
+    if (gameState.agentsCount <= (gameState.mrWhiteCount + gameState.spiesCount)) {
+        // Auto-adjust to maintain valid state
+        const minAgents = gameState.mrWhiteCount + gameState.spiesCount + 1;
+        gameState.totalPlayers = minAgents + gameState.mrWhiteCount + gameState.spiesCount;
+        updatePlayerCount();
+        calculateAgents();
+    }
+}
+
+// ================================
+// RULES MODAL
+// ================================
+rulesBtn.addEventListener('click', () => {
+    rulesModal.classList.remove('hidden');
+});
+
+closeRulesBtn.addEventListener('click', () => {
+    rulesModal.classList.add('hidden');
+});
+
+modalOverlay.addEventListener('click', () => {
+    rulesModal.classList.add('hidden');
+});
+
+// ================================
+// START GAME
+// ================================
+startGameBtn.addEventListener('click', () => {
+    // Validation
+    if (gameState.players.length !== gameState.totalPlayers) {
+        alert(`Please add exactly ${gameState.totalPlayers} player names!`);
         return;
     }
 
-    const playerIndex = gameState.viewingOrder[gameState.currentViewIndex];
-    const player = gameState.players[playerIndex];
-
-    document.getElementById('next-viewer-name').textContent = player.name;
-    showScreen('screen-role-viewing');
-}
-
-function showRoleCard() {
-    const playerIndex = gameState.viewingOrder[gameState.currentViewIndex];
-    const player = gameState.players[playerIndex];
-
-    // Use Spy Agent.png for both Agents and Spies, Mr. White gets different image
-    let imageSrc = '../images/Spy Agent.png'; // Both Agent and Spy use this image
-
-    if (player.role === 'mrwhite') {
-        imageSrc = '../images/Mr. White.png';
-    }
-
-    document.getElementById('role-image').src = imageSrc;
-
-    // Set word
-    const wordDisplay = document.getElementById('word-display-card');
-    const wordText = document.getElementById('word-text');
-
-    if (player.word) {
-        wordText.textContent = player.word;
-        wordDisplay.classList.remove('no-word');
-    } else {
-        // Mr. White sees this
-        wordText.textContent = 'You are Mr. White!';
-        wordDisplay.classList.add('no-word');
-    }
-
-    // Update button text for next player
-    const nextIndex = gameState.currentViewIndex + 1;
-    if (nextIndex < gameState.viewingOrder.length) {
-        const nextPlayer = gameState.players[gameState.viewingOrder[nextIndex]];
-        document.getElementById('next-player-name').textContent = nextPlayer.name;
-    } else {
-        document.getElementById('next-player-name').textContent = 'Game Master';
-    }
-
-    showScreen('screen-role-card');
-}
-
-function nextViewer() {
-    gameState.currentViewIndex++;
-    saveGame('undercover', gameState);
-    showNextViewer();
-}
-
-// ================================
-// WORD ROUNDS
-// ================================
-
-function startWordRounds() {
-    generateSpeakingOrder();
-    showScreen('screen-word-round');
-    displayWordRound();
-}
-
-function generateSpeakingOrder() {
-    const alivePlayers = gameState.players.filter(p => !p.isEliminated);
-
-    // Random starting player
-    const randomStartIndex = getRandomInt(0, alivePlayers.length - 1);
-    gameState.speakingOrder = [];
-
-    for (let i = 0; i < alivePlayers.length; i++) {
-        gameState.speakingOrder.push((randomStartIndex + i) % alivePlayers.length);
-    }
-}
-
-function displayWordRound() {
-    document.getElementById('word-round-number').textContent = gameState.currentRound;
-
-    // Display speaking order (by player names)
-    const orderContainer = document.getElementById('speaking-order-list');
-    orderContainer.innerHTML = '';
-
-    const alivePlayers = gameState.players.filter(p => !p.isEliminated);
-    gameState.speakingOrder.forEach((index) => {
-        const player = alivePlayers[index];
-        const orderDiv = createElement('div', {
-            classes: ['speaking-order-item'],
-            text: player.name
-        });
-        orderContainer.appendChild(orderDiv);
-    });
-
-    // Display elimination list (ALL players in original fixed order)
-    displayEliminationList();
-}
-
-function displayEliminationList() {
-    const container = document.getElementById('elimination-list');
-    container.innerHTML = '';
-
-    console.log('Displaying elimination list, players:', gameState.players.length);
-
-    gameState.players.forEach(player => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = `elimination-item ${player.isEliminated ? 'eliminated' : ''}`;
-
-        itemDiv.innerHTML = `
-      <div class="player-info">
-        <div class="player-number">${player.originalIndex}</div>
-        <span class="player-name">${player.name}</span>
-      </div>
-      <button class="eliminate-btn" data-player-id="${player.id}" ${player.isEliminated ? 'disabled' : ''}>✕</button>
-    `;
-
-        if (!player.isEliminated) {
-            const btn = itemDiv.querySelector('.eliminate-btn');
-            btn.addEventListener('click', () => selectForElimination(player.id));
-        }
-
-        container.appendChild(itemDiv);
-    });
-
-    // Reset selection
-    gameState.selectedEliminationId = null;
-    document.getElementById('next-word-round-btn').disabled = true;
-}
-
-function selectForElimination(playerId) {
-    // Deselect all
-    document.querySelectorAll('.elimination-item').forEach(item => {
-        item.classList.remove('selected');
-    });
-
-    // Select this one
-    const selectedItem = document.querySelector(`[data-player-id="${playerId}"]`).closest('.elimination-item');
-    selectedItem.classList.add('selected');
-
-    gameState.selectedEliminationId = playerId;
-    document.getElementById('next-word-round-btn').disabled = false;
-}
-
-function confirmElimination() {
-    if (!gameState.selectedEliminationId) {
-        alert('Please select a player to eliminate!');
+    if (gameState.mrWhiteCount === 0 && gameState.spiesCount === 0) {
+        alert('You need at least 1 Mr. White OR 1 Spy!');
         return;
     }
 
-    const player = gameState.players.find(p => p.id === gameState.selectedEliminationId);
-    player.isEliminated = true;
-
-    // Show role reveal with image
-    showRoleReveal(player);
-
-    // Check for Mr. White elimination
-    if (player.role === 'mrwhite') {
-        gameState.targetWordToGuess = 'agent';
-        // Special case: if this was the last Agent, but Mr. White is still in, 
-        // they get to guess the Spy word. But here Mr. White IS the one being eliminated.
-        // If Agents are all dead, and Mr. White is eliminated, they should guess the Spy word?
-        // Rule 4: If all Agents eliminated and only Spies and Mr. White remain: Mr. White must guess the Spy word.
-        const aliveAgents = gameState.players.filter(p => !p.isEliminated && p.role === 'agent');
-        if (aliveAgents.length === 0) {
-            gameState.targetWordToGuess = 'spy';
-        }
-
-        setTimeout(() => {
-            prepareGuessScreen();
-            showScreen('screen-mrwhite-guess');
-        }, 2000);
+    if (gameState.agentsCount <= (gameState.mrWhiteCount + gameState.spiesCount)) {
+        alert('Agents must be greater than Spy + Mr. White combined!');
         return;
     }
 
-    // Special case: if last Agent eliminated but Mr. White is still alive
-    const aliveAgents = gameState.players.filter(p => !p.isEliminated && p.role === 'agent');
-    const aliveMrWhites = gameState.players.filter(p => !p.isEliminated && p.role === 'mrwhite');
-
-    if (aliveAgents.length === 0 && aliveMrWhites.length > 0) {
-        // Special Endgame: Spy + Mr. White vs Agents (Agents all gone)
-        gameState.targetWordToGuess = 'spy';
-        setTimeout(() => {
-            prepareGuessScreen();
-            showScreen('screen-mrwhite-guess');
-        }, 2000);
-        return;
-    }
-
-    saveGame('undercover', gameState);
-
-    if (checkWinConditions()) {
-        return;
-    }
-
-    gameState.currentRound++;
-    generateSpeakingOrder();
-    saveGame('undercover', gameState);
-
-    // Wait a bit before showing next round
-    setTimeout(() => {
-        displayWordRound();
-    }, 2000);
-}
-
-// Show role reveal when player is eliminated
-function showRoleReveal(player) {
-    let roleText = player.role === 'agent' ? 'Agent' : player.role === 'spy' ? 'Spy' : 'Mr. White';
-    let imageSrc = '../images/Mr. White.png'; // Default
-
-    // Use specific image for each role
-    if (player.role === 'agent') {
-        imageSrc = '../images/Agent.png';
-    } else if (player.role === 'spy') {
-        imageSrc = '../images/Spy.png';
-    }
-
-    // Create modal overlay
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    animation: fadeIn 0.3s ease-out;
-  `;
-
-    overlay.innerHTML = `
-    <div style="
-      background: white;
-      padding: 40px;
-      border-radius: 24px;
-      text-align: center;
-      max-width: 350px;
-      width: 90%;
-      animation: flipCard 0.6s ease-out;
-    ">
-      <img src="${imageSrc}" alt="${roleText}" style="
-        width: 150px;
-        height: 150px;
-        object-fit: contain;
-        margin-bottom: 20px;
-      ">
-      <h2 style="color: #1f2937; font-size: 28px; margin-bottom: 10px;">${player.name}</h2>
-      <p style="color: #6b7280; font-size: 18px; margin-bottom: 10px;">was a</p>
-      <h1 style="color: #8B5CF6; font-size: 36px; font-weight: bold; margin: 0;">${roleText}!</h1>
-    </div>
-  `;
-
-    document.body.appendChild(overlay);
-
-    // Auto-remove after 2 seconds
-    setTimeout(() => {
-        overlay.style.opacity = '0';
-        overlay.style.transition = 'opacity 0.3s';
-        setTimeout(() => overlay.remove(), 300);
-    }, 1700);
-}
-
-function checkWinConditions() {
-    const alivePlayers = gameState.players.filter(p => !p.isEliminated);
-    const aliveAgents = alivePlayers.filter(p => p.role === 'agent');
-    const aliveSpies = alivePlayers.filter(p => p.role === 'spy');
-    const aliveMrWhites = alivePlayers.filter(p => p.role === 'mrwhite');
-
-    // 1. Mr. White Guess (Handled in submitMrWhiteGuess)
-
-    // 2. Mr. White 1v1 Automatic Win: Wins if only 1 Mr. White and 1 other player (Agent or Spy) remain.
-    if (aliveMrWhites.length === 1 && alivePlayers.length === 2) {
-        showWinner('Mr. White');
-        return true;
-    }
-
-    // 3. Agent Victory Condition: Agents win when all Spies and Mr. White are eliminated.
-    if (aliveSpies.length === 0 && aliveMrWhites.length === 0) {
-        showWinner('Agents');
-        return true;
-    }
-
-    // 4. Spy Victory Condition: Spies win when Spies >= Agents. Mr. White must be dead.
-    if (aliveSpies.length >= aliveAgents.length && aliveMrWhites.length === 0 && aliveAgents.length > 0) {
-        showWinner('Spies');
-        return true;
-    }
-
-    // 5. Special Endgame: Agents all die, handled via Mr. White guess (Rule 4)
-    // If Agents = 0 and Mr. White is eliminated (either before or as part of guessing), Spies win.
-    if (aliveAgents.length === 0 && aliveMrWhites.length === 0 && aliveSpies.length > 0) {
-        showWinner('Spies');
-        return true;
-    }
-
-    return false;
-}
-
-function prepareGuessScreen() {
-    const label = document.getElementById('guess-label');
-    const subtitle = document.querySelector('#screen-mrwhite-guess .subtitle');
-    const infoText = document.querySelector('#screen-mrwhite-guess .info-text');
-
-    if (gameState.targetWordToGuess === 'spy') {
-        label.textContent = "Guess the Spy's word";
-        subtitle.textContent = "All Agents are gone! Guess the Spy word to win.";
-        infoText.textContent = "Mr. White must guess the Spy word correctly to win. Otherwise, Spies win.";
-    } else {
-        label.textContent = "Guess the Agent's word";
-        subtitle.textContent = "Guess the Agent word correctly to win!";
-        infoText.textContent = "Mr. White has been eliminated. They can guess the Agent word to win!";
-    }
-}
+    assignRoles();
+    showRoleViewing();
+});
 
 // ================================
-// MR. WHITE GUESS
+// ROLE ASSIGNMENT
 // ================================
+function assignRoles() {
+    // Select random word pair
+    const wordPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+    gameState.agentWord = wordPair.agent;
+    gameState.spyWord = wordPair.spy;
 
-function submitMrWhiteGuess() {
-    const guess = document.getElementById('guess-word').value.trim().toLowerCase();
+    // Shuffle players
+    const shuffled = [...gameState.players].sort(() => Math.random() - 0.5);
 
-    if (!guess) {
-        alert('Please enter a word guess!');
-        return;
-    }
+    // Assign roles
+    gameState.playerRoles = shuffled.map((name, index) => {
+        let role, word;
 
-    const correctWord = (gameState.targetWordToGuess === 'agent' ? gameState.words.word1 : gameState.words.word2).toLowerCase();
-
-    if (guess === correctWord) {
-        showWinner('Mr. White');
-    } else {
-        alert(`Wrong guess! The correct word was: ${correctWord}`);
-
-        // If it was the Special Endgame (Agents for elimination), Mr. White is now eliminated
-        // "Mr. White must guess the Spy word. Wrong guess -> Mr. White is eliminated, and Spies win."
-        const aliveAgents = gameState.players.filter(p => !p.isEliminated && p.role === 'agent');
-        if (aliveAgents.length === 0) {
-            // Rule 4: Mr. White is eliminated, Spies win
-            gameState.players.forEach(p => { if (p.role === 'mrwhite') p.isEliminated = true; });
-            showWinner('Spies');
-            return;
-        }
-
-        skipMrWhiteGuess();
-    }
-}
-
-function skipMrWhiteGuess() {
-    if (checkWinConditions()) {
-        return;
-    }
-
-    gameState.currentRound++;
-    generateSpeakingOrder();
-    saveGame('undercover', gameState);
-    showScreen('screen-word-round');
-    displayWordRound();
-}
-
-// ================================
-// WINNER
-// ================================
-
-function showWinner(winnerTeam) {
-    document.getElementById('winner-title').textContent = `${winnerTeam} Win!`;
-
-    // Display role reveals
-    const container = document.getElementById('role-reveals-list');
-    container.innerHTML = '';
-
-    gameState.players.forEach(player => {
-        const itemDiv = createElement('div', {
-            classes: ['role-reveal-item']
-        });
-
-        let roleText = player.role === 'agent' ? 'Agent' : player.role === 'spy' ? 'Spy' : 'Mr. White';
-        let roleClass = player.role === 'agent' ? 'agent' : player.role === 'spy' ? 'spy' : 'mrwhite';
-
-        itemDiv.innerHTML = `
-      <span class="player-name">${player.name}</span>
-      <span class="role-badge ${roleClass}">${roleText}</span>
-    `;
-
-        container.appendChild(itemDiv);
-    });
-
-    showScreen('screen-winner');
-    showConfetti(document.getElementById('confetti-container'), 80);
-}
-
-function playAgain() {
-    clearGame('undercover');
-    location.reload();
-}
-
-// ================================
-// SCREEN NAVIGATION
-// ================================
-
-function showScreen(screenId) {
-    const screens = ['screen-setup', 'screen-role-viewing', 'screen-role-card', 'screen-word-round', 'screen-mrwhite-guess', 'screen-winner'];
-    screens.forEach(id => {
-        const screen = document.getElementById(id);
-        if (id === screenId) {
-            screen.classList.remove('hidden');
-            screen.classList.add('animate-fadeIn');
+        if (index < gameState.mrWhiteCount) {
+            role = 'Mr. White';
+            word = null;
+        } else if (index < gameState.mrWhiteCount + gameState.spiesCount) {
+            role = 'Spy';
+            word = gameState.spyWord;
         } else {
-            screen.classList.add('hidden');
+            role = 'Agent';
+            word = gameState.agentWord;
         }
+
+        return { name, role, word };
     });
+
+    gameState.currentPlayerIndex = 0;
 }
+
+// ================================
+// ROLE VIEWING FLOW
+// ================================
+function showRoleViewing() {
+    screenSetup.classList.add('hidden');
+    screenRoleViewing.classList.remove('hidden');
+
+    const nextViewerName = document.getElementById('next-viewer-name');
+    nextViewerName.textContent = gameState.playerRoles[gameState.currentPlayerIndex].name;
+}
+
+document.getElementById('reveal-role-btn').addEventListener('click', () => {
+    showRoleDisplay();
+});
+
+function showRoleDisplay() {
+    screenRoleViewing.classList.add('hidden');
+    screenRoleDisplay.classList.remove('hidden');
+
+    const currentPlayer = gameState.playerRoles[gameState.currentPlayerIndex];
+
+    // Set role image
+    const roleImage = document.getElementById('role-image');
+    const roleNameDisplay = document.getElementById('role-name-display');
+    const wordDisplay = document.getElementById('word-display');
+    const playerWord = document.getElementById('player-word');
+
+    roleImage.src = `../images/${currentPlayer.role}.png`;
+    roleNameDisplay.textContent = currentPlayer.role;
+
+    if (currentPlayer.word) {
+        wordDisplay.style.display = 'block';
+        playerWord.textContent = currentPlayer.word;
+    } else {
+        wordDisplay.style.display = 'none';
+    }
+}
+
+document.getElementById('next-player-btn').addEventListener('click', () => {
+    gameState.currentPlayerIndex++;
+
+    if (gameState.currentPlayerIndex < gameState.playerRoles.length) {
+        showRoleViewing();
+    } else {
+        showGameStart();
+    }
+});
+
+// ================================
+// GAME START - SINGLE SPEAKER
+// ================================
+function showGameStart() {
+    screenRoleDisplay.classList.add('hidden');
+    screenGameStart.classList.remove('hidden');
+
+    // Select ONE random player to start
+    const randomIndex = Math.floor(Math.random() * gameState.playerRoles.length);
+    const firstSpeaker = gameState.playerRoles[randomIndex].name;
+
+    document.getElementById('first-speaker-name').textContent = firstSpeaker;
+}
+
+document.getElementById('end-game-btn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to end the game?')) {
+        location.reload();
+    }
+});
+
+// ================================
+// INITIALIZE
+// ================================
+updatePlayerCount();
+updateRoleCounts();
+calculateAgents();
