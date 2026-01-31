@@ -822,10 +822,14 @@ h3 {
     transition: all 0.2s ease;
 }
 
+.elimination-player.selected {
+    border-color: var(--pink);
+    background: linear-gradient(135deg, rgba(244, 114, 182, 0.15), rgba(168, 85, 247, 0.15));
+    transform: scale(1.02);
+}
+
 .elimination-player:active {
     transform: scale(0.98);
-    border-color: var(--pink);
-    background: rgba(244, 114, 182, 0.1);
 }
 
 .elimination-player-name {

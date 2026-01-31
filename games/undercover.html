@@ -199,6 +199,9 @@
                 <p class="elimination-instruction">Game Master: Select ONE player to eliminate</p>
 
                 <div id="player-elimination-list" class="elimination-list"></div>
+
+                <button class="btn btn-danger btn-full btn-lg" id="confirm-eliminate-btn" disabled>Eliminate Selected
+                    Player</button>
             </div>
         </div>
 
@@ -232,24 +235,30 @@
         <!-- SCREEN 8: Game Over -->
         <div id="screen-game-over" class="screen hidden">
             <div class="game-over-center">
-                <h1 id="winner-title" class="winner-title"></h1>
+                <div class="confetti-container" id="confetti-container"></div>
+
+                <div class="winner-celebration">
+                    <div class="celebration-emoji">🎉</div>
+                    <h1 id="winner-title" class="winner-title"></h1>
+                    <div class="celebration-emoji">🎊</div>
+                </div>
 
                 <div class="winner-card">
                     <p id="winner-message" class="winner-message"></p>
                 </div>
 
                 <div class="reveal-words">
-                    <div class="word-reveal-box">
+                    <div class="word-reveal-box agent-word-box">
                         <p class="word-reveal-label">Agent Word:</p>
                         <h2 id="reveal-agent-word" class="word-reveal"></h2>
                     </div>
-                    <div class="word-reveal-box">
+                    <div class="word-reveal-box spy-word-box">
                         <p class="word-reveal-label">Spy Word:</p>
                         <h2 id="reveal-spy-word" class="word-reveal"></h2>
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-full btn-lg" id="play-again-btn">Play Again</button>
+                <button class="btn btn-primary btn-full btn-lg" id="play-again-btn">🔄 Play Again</button>
             </div>
         </div>
 

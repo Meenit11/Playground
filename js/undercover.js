@@ -2,7 +2,6 @@
 // UNDERCOVER - COMPLETE GAME LOGIC
 // ================================
 
-// Game State
 let gameState = {
     totalPlayers: 4,
     players: [],
@@ -16,7 +15,8 @@ let gameState = {
     playerRoles: [],
     alivePlayers: [],
     startPlayerIndex: 0,
-    eliminatedMrWhite: null
+    eliminatedMrWhite: null,
+    selectedPlayerIndex: null
 };
 
 // Load words from JSON
@@ -209,30 +209,35 @@ startGameBtn.addEventListener('click', () => {
 });
 
 // ================================
-// ROLE ASSIGNMENT - SEQUENTIAL
+// ROLE ASSIGNMENT
 // ================================
 function assignRoles() {
     const randomPair = gameState.wordPairs[Math.floor(Math.random() * gameState.wordPairs.length)];
     gameState.agentWord = randomPair[0];
     gameState.spyWord = randomPair[1];
 
-    // Shuffle players
-    const shuffled = [...gameState.players].sort(() => Math.random() - 0.5);
+    // Create roles array WITHOUT shuffling players
+    // Players stay in order: 1,2,3,4,5,6
+    const roles = [];
+    for (let i = 0; i < gameState.mrWhiteCount; i++) roles.push('Mr. White');
+    for (let i = 0; i < gameState.spiesCount; i++) roles.push('Spy');
+    for (let i = 0; i < gameState.agentsCount; i++) roles.push('Agent');
 
-    // Assign roles
-    gameState.playerRoles = shuffled.map((name, index) => {
-        let actualRole, word, displayRole;
+    // Shuffle ONLY the roles
+    const shuffledRoles = roles.sort(() => Math.random() - 0.5);
 
-        if (index < gameState.mrWhiteCount) {
-            actualRole = 'Mr. White';
+    // Assign shuffled roles to players in order
+    gameState.playerRoles = gameState.players.map((name, index) => {
+        const actualRole = shuffledRoles[index];
+        let word, displayRole;
+
+        if (actualRole === 'Mr. White') {
             displayRole = 'Mr. White';
             word = null;
-        } else if (index < gameState.mrWhiteCount + gameState.spiesCount) {
-            actualRole = 'Spy';
+        } else if (actualRole === 'Spy') {
             displayRole = 'Spy / Agent';
             word = gameState.spyWord;
         } else {
-            actualRole = 'Agent';
             displayRole = 'Spy / Agent';
             word = gameState.agentWord;
         }
@@ -240,9 +245,9 @@ function assignRoles() {
         return { name, actualRole, displayRole, word, isAlive: true };
     });
 
-    // Select random starting player
+    // Select random starting player (0-5 if 6 players)
     gameState.startPlayerIndex = Math.floor(Math.random() * gameState.playerRoles.length);
-    gameState.currentPlayerIndex = gameState.startPlayerIndex;
+    gameState.currentPlayerIndex = 0; // Counter for sequential viewing
     gameState.alivePlayers = [...gameState.playerRoles];
 }
 
@@ -253,12 +258,15 @@ function showRoleViewing() {
     hideAllScreens();
     screenRoleViewing.classList.remove('hidden');
 
-    const currentIndex = gameState.currentPlayerIndex;
+    // Calculate actual player index in sequential order
+    // If startPlayerIndex = 3 (player 4) and currentPlayerIndex = 0, show player 4
+    // If startPlayerIndex = 3 and currentPlayerIndex = 1, show player 5
+    // If startPlayerIndex = 3 and currentPlayerIndex = 3, show player 1 (wraps around)
     const totalPlayers = gameState.playerRoles.length;
-    const sequentialIndex = (gameState.startPlayerIndex + currentIndex) % totalPlayers;
+    const actualIndex = (gameState.startPlayerIndex + gameState.currentPlayerIndex) % totalPlayers;
 
     const nextViewerName = document.getElementById('next-viewer-name');
-    nextViewerName.textContent = gameState.playerRoles[sequentialIndex].name;
+    nextViewerName.textContent = gameState.playerRoles[actualIndex].name;
 }
 
 document.getElementById('reveal-role-btn').addEventListener('click', () => {
@@ -270,8 +278,8 @@ function showRoleDisplay() {
     screenRoleDisplay.classList.remove('hidden');
 
     const totalPlayers = gameState.playerRoles.length;
-    const sequentialIndex = (gameState.startPlayerIndex + gameState.currentPlayerIndex) % totalPlayers;
-    const currentPlayer = gameState.playerRoles[sequentialIndex];
+    const actualIndex = (gameState.startPlayerIndex + gameState.currentPlayerIndex) % totalPlayers;
+    const currentPlayer = gameState.playerRoles[actualIndex];
 
     const roleImage = document.getElementById('role-image');
     const roleNameDisplay = document.getElementById('role-name-display');
@@ -320,15 +328,14 @@ function showGameStart() {
     hideAllScreens();
     screenGameStart.classList.remove('hidden');
 
-    const aliveIndexes = gameState.alivePlayers.map((p, i) => i);
-    const randomIndex = aliveIndexes[Math.floor(Math.random() * aliveIndexes.length)];
+    const randomIndex = Math.floor(Math.random() * gameState.alivePlayers.length);
     const currentSpeaker = gameState.alivePlayers[randomIndex].name;
 
     document.getElementById('current-speaker-name').textContent = currentSpeaker;
 }
 
 // ================================
-// ELIMINATION
+// ELIMINATION - SELECT THEN ELIMINATE
 // ================================
 document.getElementById('eliminate-btn').addEventListener('click', () => {
     showEliminationScreen();
@@ -337,8 +344,12 @@ document.getElementById('eliminate-btn').addEventListener('click', () => {
 function showEliminationScreen() {
     hideAllScreens();
     screenElimination.classList.remove('hidden');
+    gameState.selectedPlayerIndex = null;
 
     const eliminationList = document.getElementById('player-elimination-list');
+    const confirmBtn = document.getElementById('confirm-eliminate-btn');
+    confirmBtn.disabled = true;
+
     eliminationList.innerHTML = '';
 
     gameState.alivePlayers.forEach((player, index) => {
@@ -348,16 +359,35 @@ function showEliminationScreen() {
             <span class="elimination-player-name">${player.name}</span>
             <span class="elimination-player-status">Alive</span>
         `;
-        playerDiv.addEventListener('click', () => eliminatePlayer(index));
+        playerDiv.addEventListener('click', () => selectPlayerForElimination(index, playerDiv));
         eliminationList.appendChild(playerDiv);
     });
 }
+
+function selectPlayerForElimination(index, element) {
+    // Remove previous selection
+    document.querySelectorAll('.elimination-player').forEach(el => {
+        el.classList.remove('selected');
+    });
+
+    // Select this player
+    element.classList.add('selected');
+    gameState.selectedPlayerIndex = index;
+
+    // Enable eliminate button
+    document.getElementById('confirm-eliminate-btn').disabled = false;
+}
+
+document.getElementById('confirm-eliminate-btn').addEventListener('click', () => {
+    if (gameState.selectedPlayerIndex !== null) {
+        eliminatePlayer(gameState.selectedPlayerIndex);
+    }
+});
 
 function eliminatePlayer(index) {
     const eliminatedPlayer = gameState.alivePlayers[index];
     gameState.alivePlayers.splice(index, 1);
 
-    // Show role reveal
     showRoleReveal(eliminatedPlayer);
 }
 
@@ -372,20 +402,17 @@ function showRoleReveal(player) {
     document.getElementById('eliminated-role-image').src = `../images/${player.actualRole}.png`;
     document.getElementById('eliminated-role-name').textContent = player.actualRole;
 
-    // Store if Mr. White was eliminated
     if (player.actualRole === 'Mr. White') {
         gameState.eliminatedMrWhite = player;
     }
 }
 
 document.getElementById('continue-after-elimination-btn').addEventListener('click', () => {
-    // Check if Mr. White was just eliminated
     if (gameState.eliminatedMrWhite) {
         showMrWhiteGuess();
         return;
     }
 
-    // Check win conditions
     checkWinConditions();
 });
 
@@ -407,7 +434,7 @@ document.getElementById('submit-guess-btn').addEventListener('click', () => {
     const wordToGuess = aliveAgents.length === 0 ? gameState.spyWord : gameState.agentWord;
 
     if (guess === wordToGuess.toLowerCase()) {
-        showGameOver('Mr. White Wins!', 'Mr. White correctly guessed the word!');
+        showGameOver('🎉 Mr. White Wins! 🎉', 'Mr. White correctly guessed the word!');
     } else {
         gameState.eliminatedMrWhite = null;
         checkWinConditions();
@@ -422,15 +449,21 @@ function checkWinConditions() {
     const aliveSpies = gameState.alivePlayers.filter(p => p.actualRole === 'Spy');
     const aliveMrWhite = gameState.alivePlayers.filter(p => p.actualRole === 'Mr. White');
 
-    // Agents win: All Spy + Mr. White eliminated
+    // Agents win: All Mr. White + All Spy eliminated
     if (aliveSpies.length === 0 && aliveMrWhite.length === 0) {
-        showGameOver('Agents Win!', 'All Spies and Mr. White have been eliminated!');
+        showGameOver('🎊 Agents Win! 🎊', 'All Spies and Mr. White have been eliminated!');
         return;
     }
 
-    // Spy wins: Mr. White eliminated AND Spy >= Agents
-    if (aliveMrWhite.length === 0 && aliveSpies.length >= aliveAgents.length) {
-        showGameOver('Spy Wins!', 'Spies outnumber the Agents!');
+    // Spy wins: All Mr. White eliminated AND Spy > Agents
+    if (aliveMrWhite.length === 0 && aliveSpies.length > aliveAgents.length) {
+        showGameOver('🕵️ Spy Wins! 🕵️', 'Spies outnumber the Agents!');
+        return;
+    }
+
+    // Mr. White wins: Mr. White > (Spy + Agents)
+    if (aliveMrWhite.length > (aliveSpies.length + aliveAgents.length)) {
+        showGameOver('⚪ Mr. White Wins! ⚪', 'Mr. White outnumbers everyone!');
         return;
     }
 
@@ -440,7 +473,7 @@ function checkWinConditions() {
 }
 
 // ================================
-// GAME OVER
+// GAME OVER WITH CONFETTI
 // ================================
 function showGameOver(title, message) {
     hideAllScreens();
@@ -450,6 +483,26 @@ function showGameOver(title, message) {
     document.getElementById('winner-message').textContent = message;
     document.getElementById('reveal-agent-word').textContent = gameState.agentWord;
     document.getElementById('reveal-spy-word').textContent = gameState.spyWord;
+
+    // Create confetti
+    createConfetti();
+}
+
+function createConfetti() {
+    const container = document.getElementById('confetti-container');
+    container.innerHTML = '';
+
+    const colors = ['#FCD34D', '#14B8A6', '#F472B6', '#A855F7', '#FB923C', '#10B981'];
+
+    for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() * 3 + 's';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        container.appendChild(confetti);
+    }
 }
 
 document.getElementById('play-again-btn').addEventListener('click', () => {
