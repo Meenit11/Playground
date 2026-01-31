@@ -44,20 +44,6 @@ body {
     }
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 50% -20%, rgba(168, 85, 247, 0.15), transparent 70%),
-        radial-gradient(circle at 0% 100%, rgba(20, 184, 166, 0.1), transparent 50%),
-        radial-gradient(circle at 100% 100%, rgba(244, 114, 182, 0.1), transparent 50%);
-    pointer-events: none;
-    z-index: -1;
-}
-
 body::after {
     content: '';
     position: fixed;
@@ -415,14 +401,12 @@ body::after {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 3px solid;
+    border-radius: 28px;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    overflow: hidden;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
     animation: cardFadeIn 0.7s ease-out forwards;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.game-card:hover {
-    transform: translateY(-12px) scale(1.02);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+    transition: transform 0.2s ease;
 }
 
 .game-card:nth-child(1) {
@@ -568,8 +552,8 @@ body::after {
 }
 
 .mafia-icon {
-    width: 195px;
-    height: 195px;
+    width: 500px;
+    height: 500px;
     margin-top: -15px;
     margin-bottom: -10px;
 }
