@@ -492,15 +492,36 @@ function createConfetti() {
     const container = document.getElementById('confetti-container');
     container.innerHTML = '';
 
-    const colors = ['#FCD34D', '#14B8A6', '#F472B6', '#A855F7', '#FB923C', '#10B981'];
+    // Create central burst sparkle
+    const spark = document.createElement('div');
+    spark.className = 'popper-spark';
+    spark.style.left = '50%';
+    spark.style.top = '50%';
+    spark.style.transform = 'translate(-50%, -50%)';
+    container.appendChild(spark);
 
-    for (let i = 0; i < 50; i++) {
+    const colors = ['#A855F7', '#9333EA', '#7E22CE', '#C084FC', '#E9D5FF'];
+
+    const count = 60;
+    for (let i = 0; i < count; i++) {
         const confetti = document.createElement('div');
         confetti.className = 'confetti';
-        confetti.style.left = Math.random() * 100 + '%';
+
+        // Random trajectory for burst
+        const angle = (i / count) * 360 + (Math.random() * 20 - 10);
+        const distance = 100 + Math.random() * 250;
+        const tx = Math.cos(angle * Math.PI / 180) * distance;
+        const ty = Math.sin(angle * Math.PI / 180) * distance;
+        const rot = Math.random() * 720;
+
+        confetti.style.setProperty('--tx', `${tx}px`);
+        confetti.style.setProperty('--ty', `${ty}px`);
+        confetti.style.setProperty('--rot', `${rot}deg`);
+
         confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.animationDelay = Math.random() * 3 + 's';
-        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        confetti.style.top = '50%';
+        confetti.style.left = '50%';
+
         container.appendChild(confetti);
     }
 }

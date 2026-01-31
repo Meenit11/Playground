@@ -223,7 +223,8 @@ body::after {
    ================================ */
 .hero {
     text-align: center;
-    margin-bottom: var(--spacing-2xl);
+    margin-bottom: var(--spacing-xl);
+    padding-top: var(--spacing-xl);
     opacity: 0;
     animation: fadeInUp 1s ease-out 0.2s forwards;
 }
@@ -359,11 +360,11 @@ body::after {
 .section-title {
     color: #1E293B;
     text-align: center;
-    font-size: clamp(0.9rem, 4vw, 1.25rem);
+    font-size: clamp(0.95rem, 4.5vw, 1.4rem);
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 4px;
     font-weight: var(--font-weight-extrabold);
-    margin-bottom: var(--spacing-xl);
+    margin: var(--spacing-md) 0 0 0;
     animation: titlePulse 4.5s ease-in-out infinite;
 }
 
@@ -548,6 +549,13 @@ body::after {
     object-fit: contain;
     animation: iconFloat 4.5s ease-in-out infinite;
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
+}
+
+.mafia-icon {
+    width: 195px;
+    height: 195px;
+    margin-top: -15px;
+    margin-bottom: -10px;
 }
 
 @keyframes iconFloat {
