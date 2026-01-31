@@ -1,5 +1,5 @@
 // ================================
-// UNDERCOVER - COMPLETE GAME
+// UNDERCOVER - COMPLETE GAME LOGIC
 // ================================
 
 // Game State
@@ -12,7 +12,11 @@ let gameState = {
     currentPlayerIndex: 0,
     agentWord: '',
     spyWord: '',
-    wordPairs: []
+    wordPairs: [],
+    playerRoles: [],
+    alivePlayers: [],
+    startPlayerIndex: 0,
+    eliminatedMrWhite: null
 };
 
 // Load words from JSON
@@ -23,7 +27,6 @@ async function loadWords() {
         gameState.wordPairs = data.word_pairs;
     } catch (error) {
         console.error('Error loading words:', error);
-        // Fallback word pairs
         gameState.wordPairs = [
             ["Coffee", "Tea"],
             ["Cat", "Dog"],
@@ -32,7 +35,6 @@ async function loadWords() {
     }
 }
 
-// Initialize
 loadWords();
 
 // DOM Elements
@@ -53,6 +55,10 @@ const screenSetup = document.getElementById('screen-setup');
 const screenRoleViewing = document.getElementById('screen-role-viewing');
 const screenRoleDisplay = document.getElementById('screen-role-display');
 const screenGameStart = document.getElementById('screen-game-start');
+const screenElimination = document.getElementById('screen-elimination');
+const screenRoleReveal = document.getElementById('screen-role-reveal');
+const screenMrWhiteGuess = document.getElementById('screen-mrwhite-guess');
+const screenGameOver = document.getElementById('screen-game-over');
 
 // ================================
 // PLAYER COUNT CONTROLS
@@ -110,7 +116,6 @@ function renderPlayerList() {
     });
 }
 
-// Make removePlayer globally accessible
 window.removePlayer = removePlayer;
 
 // ================================
@@ -157,9 +162,7 @@ function calculateAgents() {
     gameState.agentsCount = gameState.totalPlayers - gameState.mrWhiteCount - gameState.spiesCount;
     agentsCountEl.textContent = gameState.agentsCount;
 
-    // Ensure agents > (spy + mr white)
     if (gameState.agentsCount <= (gameState.mrWhiteCount + gameState.spiesCount)) {
-        // Auto-adjust to maintain valid state
         const minAgents = gameState.mrWhiteCount + gameState.spiesCount + 1;
         gameState.totalPlayers = minAgents + gameState.mrWhiteCount + gameState.spiesCount;
         updatePlayerCount();
@@ -186,7 +189,6 @@ modalOverlay.addEventListener('click', () => {
 // START GAME
 // ================================
 startGameBtn.addEventListener('click', () => {
-    // Validation
     if (gameState.players.length !== gameState.totalPlayers) {
         alert(`Please add exactly ${gameState.totalPlayers} player names!`);
         return;
@@ -207,10 +209,9 @@ startGameBtn.addEventListener('click', () => {
 });
 
 // ================================
-// ROLE ASSIGNMENT
+// ROLE ASSIGNMENT - SEQUENTIAL
 // ================================
 function assignRoles() {
-    // Select random word pair from words.json
     const randomPair = gameState.wordPairs[Math.floor(Math.random() * gameState.wordPairs.length)];
     gameState.agentWord = randomPair[0];
     gameState.spyWord = randomPair[1];
@@ -228,29 +229,36 @@ function assignRoles() {
             word = null;
         } else if (index < gameState.mrWhiteCount + gameState.spiesCount) {
             actualRole = 'Spy';
-            displayRole = 'Spy / Agent'; // Ambiguous
+            displayRole = 'Spy / Agent';
             word = gameState.spyWord;
         } else {
             actualRole = 'Agent';
-            displayRole = 'Spy / Agent'; // Ambiguous
+            displayRole = 'Spy / Agent';
             word = gameState.agentWord;
         }
 
-        return { name, actualRole, displayRole, word };
+        return { name, actualRole, displayRole, word, isAlive: true };
     });
 
-    gameState.currentPlayerIndex = 0;
+    // Select random starting player
+    gameState.startPlayerIndex = Math.floor(Math.random() * gameState.playerRoles.length);
+    gameState.currentPlayerIndex = gameState.startPlayerIndex;
+    gameState.alivePlayers = [...gameState.playerRoles];
 }
 
 // ================================
-// ROLE VIEWING FLOW
+// SEQUENTIAL ROLE VIEWING
 // ================================
 function showRoleViewing() {
-    screenSetup.classList.add('hidden');
+    hideAllScreens();
     screenRoleViewing.classList.remove('hidden');
 
+    const currentIndex = gameState.currentPlayerIndex;
+    const totalPlayers = gameState.playerRoles.length;
+    const sequentialIndex = (gameState.startPlayerIndex + currentIndex) % totalPlayers;
+
     const nextViewerName = document.getElementById('next-viewer-name');
-    nextViewerName.textContent = gameState.playerRoles[gameState.currentPlayerIndex].name;
+    nextViewerName.textContent = gameState.playerRoles[sequentialIndex].name;
 }
 
 document.getElementById('reveal-role-btn').addEventListener('click', () => {
@@ -258,12 +266,13 @@ document.getElementById('reveal-role-btn').addEventListener('click', () => {
 });
 
 function showRoleDisplay() {
-    screenRoleViewing.classList.add('hidden');
+    hideAllScreens();
     screenRoleDisplay.classList.remove('hidden');
 
-    const currentPlayer = gameState.playerRoles[gameState.currentPlayerIndex];
+    const totalPlayers = gameState.playerRoles.length;
+    const sequentialIndex = (gameState.startPlayerIndex + gameState.currentPlayerIndex) % totalPlayers;
+    const currentPlayer = gameState.playerRoles[sequentialIndex];
 
-    // Set role image and display
     const roleImage = document.getElementById('role-image');
     const roleNameDisplay = document.getElementById('role-name-display');
     const roleDescription = document.getElementById('role-description');
@@ -273,13 +282,11 @@ function showRoleDisplay() {
     const nextPlayerName = document.getElementById('next-player-name');
 
     if (currentPlayer.actualRole === 'Mr. White') {
-        // Mr. White knows they are Mr. White
         roleImage.src = '../images/Mr. White.png';
         roleNameDisplay.textContent = "You're Mr. White";
         roleDescription.textContent = "You are Mr. White. Blend in and guess the word!";
         wordDisplay.style.display = 'none';
     } else {
-        // Spy and Agent see the same image and ambiguous role
         roleImage.src = '../images/Spy Agent.png';
         roleNameDisplay.textContent = "Spy / Agent";
         roleDescription.textContent = "You may be Spy or Agent. Be clever!";
@@ -289,9 +296,10 @@ function showRoleDisplay() {
 
     // Update next button
     if (gameState.currentPlayerIndex < gameState.playerRoles.length - 1) {
-        nextPlayerName.textContent = gameState.playerRoles[gameState.currentPlayerIndex + 1].name;
+        const nextIndex = (gameState.startPlayerIndex + gameState.currentPlayerIndex + 1) % totalPlayers;
+        nextPlayerName.textContent = gameState.playerRoles[nextIndex].name;
     } else {
-        nextPlayerName.textContent = 'Start Game';
+        nextPlayerName.textContent = 'Game Master';
     }
 }
 
@@ -306,24 +314,163 @@ document.getElementById('next-player-btn').addEventListener('click', () => {
 });
 
 // ================================
-// GAME START - SINGLE SPEAKER
+// GAME START - RANDOM SPEAKER
 // ================================
 function showGameStart() {
-    screenRoleDisplay.classList.add('hidden');
+    hideAllScreens();
     screenGameStart.classList.remove('hidden');
 
-    // Select ONE random player to start
-    const randomIndex = Math.floor(Math.random() * gameState.playerRoles.length);
-    const firstSpeaker = gameState.playerRoles[randomIndex].name;
+    const aliveIndexes = gameState.alivePlayers.map((p, i) => i);
+    const randomIndex = aliveIndexes[Math.floor(Math.random() * aliveIndexes.length)];
+    const currentSpeaker = gameState.alivePlayers[randomIndex].name;
 
-    document.getElementById('first-speaker-name').textContent = firstSpeaker;
+    document.getElementById('current-speaker-name').textContent = currentSpeaker;
 }
+
+// ================================
+// ELIMINATION
+// ================================
+document.getElementById('eliminate-btn').addEventListener('click', () => {
+    showEliminationScreen();
+});
+
+function showEliminationScreen() {
+    hideAllScreens();
+    screenElimination.classList.remove('hidden');
+
+    const eliminationList = document.getElementById('player-elimination-list');
+    eliminationList.innerHTML = '';
+
+    gameState.alivePlayers.forEach((player, index) => {
+        const playerDiv = document.createElement('div');
+        playerDiv.className = 'elimination-player';
+        playerDiv.innerHTML = `
+            <span class="elimination-player-name">${player.name}</span>
+            <span class="elimination-player-status">Alive</span>
+        `;
+        playerDiv.addEventListener('click', () => eliminatePlayer(index));
+        eliminationList.appendChild(playerDiv);
+    });
+}
+
+function eliminatePlayer(index) {
+    const eliminatedPlayer = gameState.alivePlayers[index];
+    gameState.alivePlayers.splice(index, 1);
+
+    // Show role reveal
+    showRoleReveal(eliminatedPlayer);
+}
+
+// ================================
+// ROLE REVEAL AFTER ELIMINATION
+// ================================
+function showRoleReveal(player) {
+    hideAllScreens();
+    screenRoleReveal.classList.remove('hidden');
+
+    document.getElementById('eliminated-player-name').textContent = player.name;
+    document.getElementById('eliminated-role-image').src = `../images/${player.actualRole}.png`;
+    document.getElementById('eliminated-role-name').textContent = player.actualRole;
+
+    // Store if Mr. White was eliminated
+    if (player.actualRole === 'Mr. White') {
+        gameState.eliminatedMrWhite = player;
+    }
+}
+
+document.getElementById('continue-after-elimination-btn').addEventListener('click', () => {
+    // Check if Mr. White was just eliminated
+    if (gameState.eliminatedMrWhite) {
+        showMrWhiteGuess();
+        return;
+    }
+
+    // Check win conditions
+    checkWinConditions();
+});
+
+// ================================
+// MR. WHITE GUESS
+// ================================
+function showMrWhiteGuess() {
+    hideAllScreens();
+    screenMrWhiteGuess.classList.remove('hidden');
+
+    document.getElementById('mrwhite-guess-input').value = '';
+}
+
+document.getElementById('submit-guess-btn').addEventListener('click', () => {
+    const guess = document.getElementById('mrwhite-guess-input').value.trim().toLowerCase();
+
+    // Check if all agents are dead
+    const aliveAgents = gameState.alivePlayers.filter(p => p.actualRole === 'Agent');
+    const wordToGuess = aliveAgents.length === 0 ? gameState.spyWord : gameState.agentWord;
+
+    if (guess === wordToGuess.toLowerCase()) {
+        showGameOver('Mr. White Wins!', 'Mr. White correctly guessed the word!');
+    } else {
+        gameState.eliminatedMrWhite = null;
+        checkWinConditions();
+    }
+});
+
+// ================================
+// WIN CONDITIONS
+// ================================
+function checkWinConditions() {
+    const aliveAgents = gameState.alivePlayers.filter(p => p.actualRole === 'Agent');
+    const aliveSpies = gameState.alivePlayers.filter(p => p.actualRole === 'Spy');
+    const aliveMrWhite = gameState.alivePlayers.filter(p => p.actualRole === 'Mr. White');
+
+    // Agents win: All Spy + Mr. White eliminated
+    if (aliveSpies.length === 0 && aliveMrWhite.length === 0) {
+        showGameOver('Agents Win!', 'All Spies and Mr. White have been eliminated!');
+        return;
+    }
+
+    // Spy wins: Mr. White eliminated AND Spy >= Agents
+    if (aliveMrWhite.length === 0 && aliveSpies.length >= aliveAgents.length) {
+        showGameOver('Spy Wins!', 'Spies outnumber the Agents!');
+        return;
+    }
+
+    // Continue game
+    gameState.eliminatedMrWhite = null;
+    showGameStart();
+}
+
+// ================================
+// GAME OVER
+// ================================
+function showGameOver(title, message) {
+    hideAllScreens();
+    screenGameOver.classList.remove('hidden');
+
+    document.getElementById('winner-title').textContent = title;
+    document.getElementById('winner-message').textContent = message;
+    document.getElementById('reveal-agent-word').textContent = gameState.agentWord;
+    document.getElementById('reveal-spy-word').textContent = gameState.spyWord;
+}
+
+document.getElementById('play-again-btn').addEventListener('click', () => {
+    location.reload();
+});
 
 document.getElementById('end-game-btn').addEventListener('click', () => {
     if (confirm('Are you sure you want to end the game?')) {
         location.reload();
     }
 });
+
+// ================================
+// UTILITY
+// ================================
+function hideAllScreens() {
+    [screenSetup, screenRoleViewing, screenRoleDisplay, screenGameStart,
+        screenElimination, screenRoleReveal, screenMrWhiteGuess, screenGameOver].forEach(screen => {
+            screen.classList.add('hidden');
+        });
+}
 
 // ================================
 // INITIALIZE

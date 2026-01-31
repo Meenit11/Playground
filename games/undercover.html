@@ -178,16 +178,78 @@
                 <h1 class="game-start-title">🎮 Game Begins!</h1>
 
                 <div class="speaker-box">
-                    <p class="speaker-label">First Speaker:</p>
-                    <h2 id="first-speaker-name" class="speaker-name"></h2>
+                    <p class="speaker-label">Current Speaker:</p>
+                    <h2 id="current-speaker-name" class="speaker-name"></h2>
                 </div>
 
                 <div class="instructions-box">
-                    <p>Each player describes their word in one sentence.</p>
+                    <p>Describe your word in 1-2 words.</p>
                     <p>After everyone speaks, vote to eliminate ONE suspicious player.</p>
                 </div>
 
-                <button class="btn btn-primary btn-full" id="end-game-btn">End Game</button>
+                <button class="btn btn-primary btn-full" id="eliminate-btn">Eliminate Player</button>
+                <button class="btn btn-outline btn-full" id="end-game-btn">End Game</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Elimination Voting -->
+        <div id="screen-elimination" class="screen hidden">
+            <div class="elimination-center">
+                <h1 class="centered-title">Eliminate Player</h1>
+                <p class="elimination-instruction">Game Master: Select ONE player to eliminate</p>
+
+                <div id="player-elimination-list" class="elimination-list"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: Role Reveal (After Elimination) -->
+        <div id="screen-role-reveal" class="screen hidden">
+            <div class="role-reveal-center">
+                <h1 class="reveal-title">Player Eliminated</h1>
+
+                <div class="reveal-card">
+                    <h2 id="eliminated-player-name" class="eliminated-name"></h2>
+                    <img id="eliminated-role-image" src="" alt="Role" class="role-image-large">
+                    <h3 id="eliminated-role-name" class="eliminated-role"></h3>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" id="continue-after-elimination-btn">Continue
+                    Game</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: Mr. White Guess -->
+        <div id="screen-mrwhite-guess" class="screen hidden">
+            <div class="guess-center">
+                <h1 class="centered-title">Mr. White's Last Chance!</h1>
+                <p class="guess-instruction">Mr. White: Guess the Agent's word to win!</p>
+
+                <input type="text" id="mrwhite-guess-input" class="guess-input" placeholder="Type your guess">
+                <button class="btn btn-primary btn-full btn-lg" id="submit-guess-btn">Submit Guess</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 8: Game Over -->
+        <div id="screen-game-over" class="screen hidden">
+            <div class="game-over-center">
+                <h1 id="winner-title" class="winner-title"></h1>
+
+                <div class="winner-card">
+                    <p id="winner-message" class="winner-message"></p>
+                </div>
+
+                <div class="reveal-words">
+                    <div class="word-reveal-box">
+                        <p class="word-reveal-label">Agent Word:</p>
+                        <h2 id="reveal-agent-word" class="word-reveal"></h2>
+                    </div>
+                    <div class="word-reveal-box">
+                        <p class="word-reveal-label">Spy Word:</p>
+                        <h2 id="reveal-spy-word" class="word-reveal"></h2>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" id="play-again-btn">Play Again</button>
             </div>
         </div>
 

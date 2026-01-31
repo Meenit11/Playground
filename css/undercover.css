@@ -725,6 +725,21 @@ h3 {
     text-align: center;
     margin-bottom: var(--spacing-lg);
     box-shadow: 0 15px 40px rgba(252, 211, 77, 0.3);
+    animation: yellowGlow 4s ease-in-out infinite;
+}
+
+@keyframes yellowGlow {
+
+    0%,
+    100% {
+        border-color: var(--yellow);
+        box-shadow: 0 15px 40px rgba(252, 211, 77, 0.3);
+    }
+
+    50% {
+        border-color: var(--yellow-light);
+        box-shadow: 0 20px 50px rgba(252, 211, 77, 0.5);
+    }
 }
 
 .speaker-label {
@@ -762,6 +777,223 @@ h3 {
 
 .instructions-box p:last-child {
     margin-bottom: 0;
+}
+
+/* ================================
+   ELIMINATION SCREEN
+   ================================ */
+.elimination-center,
+.role-reveal-center,
+.guess-center,
+.game-over-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: var(--spacing-lg);
+}
+
+.elimination-instruction,
+.guess-instruction {
+    color: var(--purple-700);
+    font-size: clamp(0.95rem, 4vw, 1.05rem);
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.elimination-list {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.elimination-player {
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid var(--purple-300);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.elimination-player:active {
+    transform: scale(0.98);
+    border-color: var(--pink);
+    background: rgba(244, 114, 182, 0.1);
+}
+
+.elimination-player-name {
+    font-size: clamp(1.1rem, 4.5vw, 1.25rem);
+    font-weight: var(--font-weight-bold);
+    color: var(--purple-800);
+}
+
+.elimination-player-status {
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    color: var(--purple-600);
+}
+
+/* ================================
+   ROLE REVEAL SCREEN
+   ================================ */
+.reveal-title {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-weight: var(--font-weight-extrabold);
+    background: linear-gradient(135deg, var(--pink), var(--purple-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-xl);
+}
+
+.reveal-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid var(--pink);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    box-shadow: 0 20px 60px rgba(244, 114, 182, 0.3);
+    animation: pinkGlow 4s ease-in-out infinite;
+}
+
+@keyframes pinkGlow {
+
+    0%,
+    100% {
+        border-color: var(--pink);
+        box-shadow: 0 20px 60px rgba(244, 114, 182, 0.3);
+    }
+
+    50% {
+        border-color: #FCA5CD;
+        box-shadow: 0 25px 70px rgba(244, 114, 182, 0.5);
+    }
+}
+
+.eliminated-name {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--purple-800);
+    margin-bottom: var(--spacing-lg);
+}
+
+.eliminated-role {
+    font-size: clamp(1.25rem, 5vw, 1.5rem);
+    font-weight: var(--font-weight-bold);
+    background: linear-gradient(135deg, var(--pink), var(--purple-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: var(--spacing-lg);
+}
+
+/* ================================
+   MR. WHITE GUESS SCREEN
+   ================================ */
+.guess-input {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--spacing-lg);
+    border: 3px solid var(--teal);
+    border-radius: var(--radius-xl);
+    font-size: clamp(1.1rem, 5vw, 1.3rem);
+    font-weight: var(--font-weight-bold);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--purple-900);
+    margin-bottom: var(--spacing-lg);
+    transition: all 0.2s ease;
+}
+
+.guess-input:focus {
+    outline: none;
+    border-color: var(--teal-light);
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.2);
+}
+
+/* ================================
+   GAME OVER SCREEN
+   ================================ */
+.winner-title {
+    font-size: clamp(2rem, 8vw, 3rem);
+    font-weight: var(--font-weight-extrabold);
+    background: linear-gradient(135deg, var(--yellow), var(--teal), var(--pink));
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbowSlide 5s ease infinite;
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+}
+
+@keyframes rainbowSlide {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.winner-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid var(--teal);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: 0 20px 60px rgba(20, 184, 166, 0.3);
+}
+
+.winner-message {
+    font-size: clamp(1.1rem, 4.5vw, 1.3rem);
+    color: var(--purple-800);
+    text-align: center;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.reveal-words {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.word-reveal-box {
+    background: rgba(243, 232, 255, 0.8);
+    border: 2px solid var(--purple-400);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-align: center;
+    min-width: 150px;
+}
+
+.word-reveal-label {
+    color: var(--purple-600);
+    font-size: clamp(0.85rem, 3vw, 0.9rem);
+    margin: 0 0 var(--spacing-xs) 0;
+}
+
+.word-reveal {
+    font-size: clamp(1.25rem, 5vw, 1.5rem);
+    font-weight: var(--font-weight-extrabold);
+    background: linear-gradient(135deg, var(--purple-700), var(--purple-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
 }
 
 /* ================================
