@@ -55,10 +55,10 @@
                         <h4>Mr. White</h4>
                         <p>Doesn't know the word</p>
                     </div>
-                    <div class="counter-control">
-                        <button class="counter-btn" id="decrease-mrwhite">−</button>
-                        <span class="counter-value" id="mrwhite-count">1</span>
-                        <button class="counter-btn" id="increase-mrwhite">+</button>
+                    <div class="counter-control-vertical">
+                        <button class="counter-btn-small" id="increase-mrwhite">+</button>
+                        <span class="counter-value-small" id="mrwhite-count">1</span>
+                        <button class="counter-btn-small" id="decrease-mrwhite">−</button>
                     </div>
                 </div>
 
@@ -69,10 +69,10 @@
                         <h4>Spy</h4>
                         <p>Gets different word</p>
                     </div>
-                    <div class="counter-control">
-                        <button class="counter-btn" id="decrease-spies">−</button>
-                        <span class="counter-value" id="spies-count">1</span>
-                        <button class="counter-btn" id="increase-spies">+</button>
+                    <div class="counter-control-vertical">
+                        <button class="counter-btn-small" id="increase-spies">+</button>
+                        <span class="counter-value-small" id="spies-count">0</span>
+                        <button class="counter-btn-small" id="decrease-spies">−</button>
                     </div>
                 </div>
 
@@ -83,7 +83,7 @@
                         <h4>Agents</h4>
                         <p>Majority with main word</p>
                     </div>
-                    <span class="counter-value agents-value" id="agents-count">2</span>
+                    <span class="counter-value-small agents-value" id="agents-count">3</span>
                 </div>
 
                 <!-- Action Buttons -->
@@ -149,10 +149,9 @@
 
                 <div class="pass-phone-box">
                     <p class="player-name-large" id="next-viewer-name">Player Name</p>
-                    <p class="pass-instruction">Pass the phone to this player</p>
                 </div>
 
-                <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">👁️ Reveal My Role</button>
+                <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">Reveal My Role</button>
             </div>
         </div>
 
@@ -162,13 +161,14 @@
                 <div class="role-card-large">
                     <img id="role-image" src="" alt="Role" class="role-image-large">
                     <h2 id="role-name-display" class="role-name-large"></h2>
+                    <p id="role-description" class="role-description"></p>
                     <div id="word-display" class="word-box">
-                        <p class="word-label">Your Word:</p>
                         <h1 id="player-word" class="word-large"></h1>
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-full btn-lg" id="next-player-btn">Pass to Next →</button>
+                <button class="btn btn-primary btn-full btn-lg" id="next-player-btn">Pass Phone to <span
+                        id="next-player-name">Next Player</span></button>
             </div>
         </div>
 

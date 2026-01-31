@@ -1,5 +1,5 @@
 // ================================
-// UNDERCOVER - COMPLETE REDESIGN
+// UNDERCOVER - COMPLETE GAME
 // ================================
 
 // Game State
@@ -7,26 +7,33 @@ let gameState = {
     totalPlayers: 4,
     players: [],
     mrWhiteCount: 1,
-    spiesCount: 1,
-    agentsCount: 2,
+    spiesCount: 0,
+    agentsCount: 3,
     currentPlayerIndex: 0,
     agentWord: '',
-    spyWord: ''
+    spyWord: '',
+    wordPairs: []
 };
 
-// Word Pairs
-const wordPairs = [
-    { agent: "Coffee", spy: "Tea" },
-    { agent: "Cat", spy: "Dog" },
-    { agent: "Pizza", spy: "Burger" },
-    { agent: "Summer", spy: "Winter" },
-    { agent: "Book", spy: "Movie" },
-    { agent: "Ocean", spy: "Lake" },
-    { agent: "Guitar", spy: "Piano" },
-    { agent: "Apple", spy: "Orange" },
-    { agent: "Car", spy: "Bike" },
-    { agent: "Doctor", spy: "Nurse" }
-];
+// Load words from JSON
+async function loadWords() {
+    try {
+        const response = await fetch('../words.json');
+        const data = await response.json();
+        gameState.wordPairs = data.word_pairs;
+    } catch (error) {
+        console.error('Error loading words:', error);
+        // Fallback word pairs
+        gameState.wordPairs = [
+            ["Coffee", "Tea"],
+            ["Cat", "Dog"],
+            ["Pizza", "Burger"]
+        ];
+    }
+}
+
+// Initialize
+loadWords();
 
 // DOM Elements
 const playerCountDisplay = document.getElementById('player-count-display');
@@ -203,30 +210,33 @@ startGameBtn.addEventListener('click', () => {
 // ROLE ASSIGNMENT
 // ================================
 function assignRoles() {
-    // Select random word pair
-    const wordPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
-    gameState.agentWord = wordPair.agent;
-    gameState.spyWord = wordPair.spy;
+    // Select random word pair from words.json
+    const randomPair = gameState.wordPairs[Math.floor(Math.random() * gameState.wordPairs.length)];
+    gameState.agentWord = randomPair[0];
+    gameState.spyWord = randomPair[1];
 
     // Shuffle players
     const shuffled = [...gameState.players].sort(() => Math.random() - 0.5);
 
     // Assign roles
     gameState.playerRoles = shuffled.map((name, index) => {
-        let role, word;
+        let actualRole, word, displayRole;
 
         if (index < gameState.mrWhiteCount) {
-            role = 'Mr. White';
+            actualRole = 'Mr. White';
+            displayRole = 'Mr. White';
             word = null;
         } else if (index < gameState.mrWhiteCount + gameState.spiesCount) {
-            role = 'Spy';
+            actualRole = 'Spy';
+            displayRole = 'Spy / Agent'; // Ambiguous
             word = gameState.spyWord;
         } else {
-            role = 'Agent';
+            actualRole = 'Agent';
+            displayRole = 'Spy / Agent'; // Ambiguous
             word = gameState.agentWord;
         }
 
-        return { name, role, word };
+        return { name, actualRole, displayRole, word };
     });
 
     gameState.currentPlayerIndex = 0;
@@ -253,20 +263,35 @@ function showRoleDisplay() {
 
     const currentPlayer = gameState.playerRoles[gameState.currentPlayerIndex];
 
-    // Set role image
+    // Set role image and display
     const roleImage = document.getElementById('role-image');
     const roleNameDisplay = document.getElementById('role-name-display');
+    const roleDescription = document.getElementById('role-description');
     const wordDisplay = document.getElementById('word-display');
     const playerWord = document.getElementById('player-word');
+    const nextPlayerBtn = document.getElementById('next-player-btn');
+    const nextPlayerName = document.getElementById('next-player-name');
 
-    roleImage.src = `../images/${currentPlayer.role}.png`;
-    roleNameDisplay.textContent = currentPlayer.role;
-
-    if (currentPlayer.word) {
+    if (currentPlayer.actualRole === 'Mr. White') {
+        // Mr. White knows they are Mr. White
+        roleImage.src = '../images/Mr. White.png';
+        roleNameDisplay.textContent = "You're Mr. White";
+        roleDescription.textContent = "You are Mr. White. Blend in and guess the word!";
+        wordDisplay.style.display = 'none';
+    } else {
+        // Spy and Agent see the same image and ambiguous role
+        roleImage.src = '../images/Spy Agent.png';
+        roleNameDisplay.textContent = "Spy / Agent";
+        roleDescription.textContent = "You may be Spy or Agent. Be clever!";
         wordDisplay.style.display = 'block';
         playerWord.textContent = currentPlayer.word;
+    }
+
+    // Update next button
+    if (gameState.currentPlayerIndex < gameState.playerRoles.length - 1) {
+        nextPlayerName.textContent = gameState.playerRoles[gameState.currentPlayerIndex + 1].name;
     } else {
-        wordDisplay.style.display = 'none';
+        nextPlayerName.textContent = 'Start Game';
     }
 }
 
