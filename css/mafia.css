@@ -109,11 +109,94 @@ body.day::before {
 }
 
 .game-logo {
-    max-width: 280px;
+    max-width: 120px;
     width: 100%;
     height: auto;
     display: block;
-    margin: 0 auto;
+    margin: 0 auto var(--spacing-md) auto;
+    filter: drop-shadow(0 10px 25px rgba(251, 146, 60, 0.5));
+    animation: logoFloat 3s ease-in-out infinite, logoGlow 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes logoGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 10px 25px rgba(251, 146, 60, 0.5));
+    }
+
+    50% {
+        filter: drop-shadow(0 15px 35px rgba(251, 146, 60, 0.8));
+    }
+}
+
+.game-title-main {
+    color: var(--light);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-extrabold);
+    margin: 0 0 var(--spacing-sm) 0;
+    background: linear-gradient(135deg, #FB923C 0%, #FDBA74 50%, #FB923C 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientSlide 4s ease infinite, titlePulse 2s ease-in-out infinite;
+}
+
+@keyframes gradientSlide {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes titlePulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.subtitle {
+    color: var(--gray-300);
+    font-size: var(--font-size-sm);
+    margin: 0;
+    animation: subtitleGlow 3s ease-in-out infinite;
+}
+
+@keyframes subtitleGlow {
+
+    0%,
+    100% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 15px rgba(251, 146, 60, 0.4);
+    }
 }
 
 /* Glassmorphism for containers */

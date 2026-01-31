@@ -441,7 +441,13 @@ function startDayPhase() {
     const victimId = gameState.nightVictimId;
     if (victimId && victimId !== 'none') {
         eliminatePlayer(victimId, 'night');
+        // Check if Mafia won after night elimination
+        if (gameState.gameEnded) return;
     }
+
+    // Also check win conditions at start of day (in case Mafia >= Others now)
+    if (checkWinConditions()) return;
+
     document.body.classList.remove('night');
     document.body.classList.add('day');
     showScreen('screen-day');
