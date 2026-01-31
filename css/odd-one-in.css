@@ -3,8 +3,22 @@
    ================================ */
 
 body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 50%, #EDE9FE 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
     min-height: 100vh;
+}
+
+@keyframes gradientShift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .game-container {
@@ -33,11 +47,23 @@ body {
 }
 
 .game-logo {
-    width: 100px;
-    height: 100px;
+    width: 140px;
+    height: 140px;
     margin-bottom: var(--spacing-md);
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
-    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 8px 20px rgba(168, 85, 247, 0.3));
+    animation: float 3s ease-in-out infinite, logoGlow 4s ease-in-out infinite;
+}
+
+@keyframes logoGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 8px 20px rgba(168, 85, 247, 0.3));
+    }
+
+    50% {
+        filter: drop-shadow(0 12px 30px rgba(168, 85, 247, 0.5));
+    }
 }
 
 .game-logo-small {

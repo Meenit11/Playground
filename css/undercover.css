@@ -3,8 +3,22 @@
    ================================ */
 
 body {
-    background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
+    background: linear-gradient(135deg, #FFF5F7 0%, #FDF2F8 50%, #FCE7F3 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
     min-height: 100vh;
+}
+
+@keyframes gradientShift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .game-container {
@@ -19,11 +33,37 @@ body {
 }
 
 .game-logo {
-    max-width: 280px;
+    max-width: 140px;
     width: 100%;
     height: auto;
     display: block;
-    margin: 0 auto;
+    margin: 0 auto var(--spacing-md) auto;
+    filter: drop-shadow(0 8px 20px rgba(236, 72, 153, 0.3));
+    animation: logoFloat 3s ease-in-out infinite, logoGlow 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes logoGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 8px 20px rgba(236, 72, 153, 0.3));
+    }
+
+    50% {
+        filter: drop-shadow(0 12px 30px rgba(236, 72, 153, 0.5));
+    }
 }
 
 /* ================================
