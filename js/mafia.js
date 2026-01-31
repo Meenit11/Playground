@@ -68,41 +68,21 @@ function setupEventListeners() {
     if (decBtn) decBtn.onclick = () => adjustPlayerCount(-1);
     if (incBtn) incBtn.onclick = () => adjustPlayerCount(1);
 
-    // Mafia count adjustment 
+    // Mafia count adjustment
     const decMafia = document.getElementById('decrease-mafia');
     const incMafia = document.getElementById('increase-mafia');
-    if (decMafia) decMafia.onclick = () => adjustRoleCount('mafia', -1);
-    if (incMafia) incMafia.onclick = () => adjustRoleCount('mafia', 1);
+    if (decMafia) decMafia.onclick = () => adjustMafiaCount(-1);
+    if (incMafia) incMafia.onclick = () => adjustMafiaCount(1);
 
-    // Doctor count adjustment
-    const decDoc = document.getElementById('decrease-doctor');
-    const incDoc = document.getElementById('increase-doctor');
-    if (decDoc) decDoc.onclick = () => adjustRoleCount('doctor', -1);
-    if (incDoc) incDoc.onclick = () => adjustRoleCount('doctor', 1);
-
-    // Detective count adjustment
-    const decDet = document.getElementById('decrease-detective');
-    const incDet = document.getElementById('increase-detective');
-    if (decDet) decDet.onclick = () => adjustRoleCount('detective', -1);
-    if (incDet) incDet.onclick = () => adjustRoleCount('detective', 1);
-
-    // Jester count adjustment
-    const decJes = document.getElementById('decrease-jester');
-    const incJes = document.getElementById('increase-jester');
-    if (decJes) decJes.onclick = () => adjustRoleCount('jester', -1);
-    if (incJes) incJes.onclick = () => adjustRoleCount('jester', 1);
-
-    // Bomber count adjustment
-    const decBom = document.getElementById('decrease-bomber');
-    const incBom = document.getElementById('increase-bomber');
-    if (decBom) decBom.onclick = () => adjustRoleCount('bomber', -1);
-    if (incBom) incBom.onclick = () => adjustRoleCount('bomber', 1);
-
-    // Lover count adjustment
-    const decLov = document.getElementById('decrease-lover');
-    const incLov = document.getElementById('increase-lover');
-    if (decLov) decLov.onclick = () => adjustRoleCount('lover', -1);
-    if (incLov) incLov.onclick = () => adjustRoleCount('lover', 1);
+    // Role toggles
+    const detToggle = document.getElementById('detective-toggle');
+    const jesToggle = document.getElementById('jester-toggle');
+    const bomToggle = document.getElementById('bomber-toggle');
+    const lovToggle = document.getElementById('lover-toggle');
+    if (detToggle) detToggle.onchange = (e) => toggleRole('detective', e.target.checked);
+    if (jesToggle) jesToggle.onchange = (e) => toggleRole('jester', e.target.checked);
+    if (bomToggle) bomToggle.onchange = (e) => toggleRole('bomber', e.target.checked);
+    if (lovToggle) lovToggle.onchange = (e) => toggleRole('lover', e.target.checked);
 
     // Navigation Buttons
     const startBtn = document.getElementById('start-game-btn');
@@ -114,7 +94,6 @@ function setupEventListeners() {
     const confirmElimBtn = document.getElementById('confirm-elimination-btn');
     const skipDayBtn = document.getElementById('skip-elimination-btn');
     const playAgainBtn = document.getElementById('play-again-btn');
-    const openRulesBtn = document.getElementById('open-rules-btn');
 
     if (startBtn) startBtn.onclick = startGame;
     if (revealBtn) revealBtn.onclick = showRoleCard;
@@ -125,7 +104,6 @@ function setupEventListeners() {
     if (confirmElimBtn) confirmElimBtn.onclick = confirmEliminations;
     if (skipDayBtn) skipDayBtn.onclick = skipElimination;
     if (playAgainBtn) playAgainBtn.onclick = playAgain;
-    if (openRulesBtn) openRulesBtn.onclick = openRules;
 }
 
 // ================================
@@ -133,11 +111,12 @@ function setupEventListeners() {
 // ================================
 
 function adjustPlayerCount(delta) {
-    let newValue = gameState.totalPlayers + delta;
+    const input = document.getElementById('player-count-input');
+    let newValue = parseInt(input.value) + delta;
     newValue = Math.max(5, Math.min(15, newValue));
 
+    input.value = newValue;
     gameState.totalPlayers = newValue;
-    document.getElementById('player-count-display').textContent = newValue;
 
     generatePlayerInputs(newValue);
     updateRoleDistribution();
@@ -163,14 +142,22 @@ function generatePlayerInputs(count) {
     }
 }
 
-function adjustRoleCount(role, delta) {
-    let newValue = gameState.roleConfig[role] + delta;
+function adjustMafiaCount(delta) {
+    const input = document.getElementById('mafia-count');
+    let newValue = parseInt(input.value) + delta;
     newValue = Math.max(0, Math.min(5, newValue));
 
-    gameState.roleConfig[role] = newValue;
-    const display = document.getElementById(`${role}-count-display`);
-    if (display) display.textContent = newValue;
+    input.value = newValue;
+    gameState.roleConfig.mafia = newValue;
 
+    document.getElementById('decrease-mafia').disabled = (newValue <= 0);
+    document.getElementById('increase-mafia').disabled = (newValue >= 5);
+
+    updateRoleDistribution();
+}
+
+function toggleRole(role, isEnabled) {
+    gameState.roleConfig[role] = isEnabled ? 1 : 0;
     updateRoleDistribution();
 }
 
@@ -471,17 +458,16 @@ function displayDayPhase() {
     document.getElementById('day-round-number').textContent = gameState.currentRound;
     const container = document.getElementById('alive-players-container');
     container.innerHTML = '';
-    gameState.votingQueue = [];
 
     gameState.players.filter(p => p.isAlive).forEach(p => {
         const item = document.createElement('div');
-        item.className = 'elimination-item';
-        item.id = `elim-${p.id}`;
+        item.className = 'elimination-player-item';
         item.innerHTML = `
-            <span class="player-name">${p.name}</span>
-            <span class="player-status">Alive</span>
+            <div class="player-selection-row" onclick="togglePlayerSelection('${p.id}')">
+                <input type="checkbox" class="elimination-checkbox" id="check-${p.id}" data-player-id="${p.id}" onclick="event.stopPropagation(); updateEliminationButton();">
+                <span class="player-name">${p.name}</span>
+            </div>
         `;
-        item.onclick = () => togglePlayerSelection(p.id);
         container.appendChild(item);
     });
 
@@ -489,31 +475,37 @@ function displayDayPhase() {
 }
 
 function togglePlayerSelection(id) {
-    const idx = gameState.votingQueue.indexOf(id);
-    const item = document.getElementById(`elim-${id}`);
-
-    if (idx > -1) {
-        gameState.votingQueue.splice(idx, 1);
-        item.classList.remove('selected');
-    } else if (gameState.votingQueue.length < 2) {
-        gameState.votingQueue.push(id);
-        item.classList.add('selected');
+    const cb = document.getElementById(`check-${id}`);
+    if (cb) {
+        cb.checked = !cb.checked;
+        updateRowHighlights();
+        updateEliminationButton();
     }
+}
 
-    updateEliminationButton();
+function updateRowHighlights() {
+    document.querySelectorAll('.player-selection-row').forEach(row => {
+        const cb = row.querySelector('input');
+        if (cb.checked) row.classList.add('selected');
+        else row.classList.remove('selected');
+    });
 }
 
 function updateEliminationButton() {
+    const checked = document.querySelectorAll('.elimination-checkbox:checked');
     const btn = document.getElementById('confirm-elimination-btn');
-    const count = gameState.votingQueue.length;
-    btn.disabled = count === 0;
-    btn.textContent = count === 0 ? 'Eliminate Selected' : `Eliminate ${count} Player${count > 1 ? 's' : ''}`;
+    btn.disabled = checked.length === 0 || checked.length > 2;
+    updateRowHighlights();
 }
 
 function confirmEliminations() {
-    const ids = gameState.votingQueue;
+    const checked = document.querySelectorAll('.elimination-checkbox:checked');
+    const ids = Array.from(checked).map(cb => cb.dataset.playerId);
 
-    if (ids.length < 1) return;
+    if (ids.length < 1 || ids.length > 2) {
+        alert('You must eliminate either 1 or max 2 players!');
+        return;
+    }
 
     if (!confirm(`Eliminate ${ids.length} player(s)?`)) return;
 
@@ -630,7 +622,7 @@ function checkWinConditions() {
 
 function showWinner(team) {
     gameState.gameEnded = true;
-    document.getElementById('winner-title').textContent = `${team.toUpperCase()} WINS!`;
+    document.getElementById('winner-title').textContent = `${team} Wins!`;
     const list = document.getElementById('final-roles-list');
     list.innerHTML = '';
     gameState.players.forEach(p => {
@@ -645,50 +637,13 @@ function showWinner(team) {
     document.body.classList.remove('night');
     document.body.classList.add('day');
     showScreen('screen-winner');
-    createConfetti();
+    showConfetti(document.getElementById('confetti-container'), 100);
 }
 
-function createConfetti() {
-    const container = document.getElementById('confetti-container');
-    if (!container) return;
-    container.innerHTML = '';
-
-    // Create central burst sparkle
-    const spark = document.createElement('div');
-    spark.className = 'popper-spark';
-    spark.style.left = '50%';
-    spark.style.top = '50%';
-    spark.style.transform = 'translate(-50%, -50%)';
-    container.appendChild(spark);
-
-    const colors = ['#F97316', '#FB923C', '#FDBA74', '#EA580C', '#C2410C'];
-
-    const count = 60;
-    for (let i = 0; i < count; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-
-        // Random trajectory for burst
-        const angle = (i / count) * 360 + (Math.random() * 20 - 10);
-        const distance = 100 + Math.random() * 250;
-        const tx = Math.cos(angle * Math.PI / 180) * distance;
-        const ty = Math.sin(angle * Math.PI / 180) * distance;
-        const rot = Math.random() * 720;
-
-        confetti.style.setProperty('--tx', `${tx}px`);
-        confetti.style.setProperty('--ty', `${ty}px`);
-        confetti.style.setProperty('--rot', `${rot}deg`);
-
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.top = '50%';
-        confetti.style.left = '50%';
-
-        container.appendChild(confetti);
-    }
+function nextRound() {
+    gameState.currentRound++;
+    startNightPhase();
 }
-
-function openRules() { document.getElementById('rules-modal').classList.remove('hidden'); }
-function closeRules() { document.getElementById('rules-modal').classList.add('hidden'); }
 
 function playAgain() { location.reload(); }
 

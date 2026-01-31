@@ -4,34 +4,22 @@
 
 body {
     min-height: 100vh;
-    background: linear-gradient(-45deg,
-            #EEF2FF,
-            /* Very light indigo */
-            #FFF7ED,
-            /* Very light orange */
-            #F0FDF4,
-            /* Very light green */
-            #FDF2F8
-            /* Very light pink */
+    background: linear-gradient(135deg,
+            #FEF3C7 0%,
+            /* Warm yellow */
+            #DBEAFE 25%,
+            /* Sky blue */
+            #D1FAE5 50%,
+            /* Mint green */
+            #FCE7F3 75%,
+            /* Soft pink */
+            #FEF3C7 100%
+            /* Back to yellow */
         );
     background-size: 400% 400%;
-    animation: gradientFlow 15s ease infinite;
+    animation: rainbowShift 25s ease infinite;
     position: relative;
     overflow-x: hidden;
-}
-
-@keyframes gradientFlow {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
 }
 
 @keyframes rainbowShift {
@@ -54,6 +42,20 @@ body {
     100% {
         background-position: 0% 50%;
     }
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% -20%, rgba(168, 85, 247, 0.15), transparent 70%),
+        radial-gradient(circle at 0% 100%, rgba(20, 184, 166, 0.1), transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(244, 114, 182, 0.1), transparent 50%);
+    pointer-events: none;
+    z-index: -1;
 }
 
 body::after {
@@ -271,24 +273,10 @@ body::after {
 }
 
 .main-logo {
-    width: 220px;
+    width: 160px;
     height: auto;
-    filter: drop-shadow(0 12px 30px rgba(139, 92, 246, 0.25));
-    animation: logoPulse 4s ease-in-out infinite;
-}
-
-@keyframes logoPulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        filter: drop-shadow(0 12px 30px rgba(139, 92, 246, 0.25));
-    }
-
-    50% {
-        transform: scale(1.05);
-        filter: drop-shadow(0 15px 40px rgba(139, 92, 246, 0.4));
-    }
+    filter: drop-shadow(0 6px 20px rgba(251, 146, 60, 0.25));
+    animation: logoRainbow 6s ease-in-out infinite;
 }
 
 @keyframes logoRainbow {
@@ -427,12 +415,14 @@ body::after {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 3px solid;
-    border-radius: 28px;
-    padding: var(--spacing-xl) var(--spacing-lg);
-    overflow: hidden;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
     animation: cardFadeIn 0.7s ease-out forwards;
-    transition: transform 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.game-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
 }
 
 .game-card:nth-child(1) {
@@ -578,11 +568,10 @@ body::after {
 }
 
 .mafia-icon {
-    width: 240px;
-    height: 240px;
-    margin-top: -30px;
-    margin-bottom: -15px;
-    filter: drop-shadow(0 10px 20px rgba(251, 146, 60, 0.2));
+    width: 195px;
+    height: 195px;
+    margin-top: -15px;
+    margin-bottom: -10px;
 }
 
 @keyframes iconFloat {
