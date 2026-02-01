@@ -107,7 +107,7 @@ h1 {
     font-size: clamp(2rem, 8vw, 2.5rem);
     font-weight: 800;
     margin-bottom: var(--spacing-xs);
-    background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -129,9 +129,14 @@ h1 {
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+}
+
 .btn-primary:active {
-    transform: scale(0.95);
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+    transform: scale(0.98);
 }
 
 .subtitle {
@@ -182,27 +187,20 @@ input[type="number"]:focus,
     margin-top: var(--spacing-md);
     text-align: center;
     padding: var(--spacing-md);
-    background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
-    color: white !important;
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+    color: #FFFFFF !important;
     border-radius: var(--radius-full);
     font-weight: 700;
     text-decoration: none !important;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 15px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     font-size: 0.95rem;
-    border: none;
 }
 
-.back-link:visited,
-.back-link:hover,
-.back-link:focus {
-    color: white !important;
-    text-decoration: none !important;
-}
-
-.back-link:active {
-    transform: scale(0.96);
-    opacity: 0.9;
+.back-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+    filter: brightness(1.1);
 }
 
 .internal-title {

@@ -2,23 +2,24 @@
 // ODD ONE IN - GAME LOGIC
 // ================================
 
-// Game State
+// Shared Game Data (What gets synced across players)
 let gameState = {
     gameId: null,
-    gm: null,
     players: [],
     currentRound: 1,
     currentQuestion: '',
     currentPlayerIndex: 0,
-    timerState: {
-        remaining: 10,
-        isPaused: false
-    },
+    timerState: { remaining: 10, isPaused: false },
     answers: [],
     allQuestions: null,
     usedQuestions: new Set(),
-    isGM: false // Tracks if current user is the GM
+    isStarted: false
 };
+
+// Local Tab State (Specific to this browser session)
+let isLocalGM = false;
+let localPlayerId = null;
+let currentUserName = '';
 
 let gameTimer = null;
 
@@ -74,24 +75,17 @@ function checkInviteLink() {
     // Add storage event listener to sync tabs on same machine
     window.addEventListener('storage', (e) => {
         if (e.key === 'meenit-odd-one-in') {
-            try {
-                const updated = JSON.parse(e.newValue);
-                if (updated && updated.gameId === gameState.gameId) {
-                    // PRESERVE local role (isGM) for this tab
-                    const localRole = gameState.isGM;
-                    gameState = updated;
-                    gameState.isGM = localRole;
+            const updated = JSON.parse(e.newValue);
+            if (updated && updated.gameId === gameState.gameId) {
+                // Keep local state but update shared data
+                gameState = updated;
+                updateLobbyView();
 
-                    updateLobbyView();
-
-                    // If GM started game, move player to playing screen
-                    if (gameState.isStarted && !document.getElementById('screen-lobby-player').classList.contains('hidden')) {
-                        showScreen('screen-playing');
-                        startAnswerCollection();
-                    }
+                // If GM started game, move player to playing screen
+                if (gameState.isStarted && !document.getElementById('screen-lobby-player').classList.contains('hidden')) {
+                    showScreen('screen-playing');
+                    startAnswerCollection();
                 }
-            } catch (err) {
-                console.error('State sync error:', err);
             }
         }
     });
@@ -179,10 +173,13 @@ function createGame() {
 
     if (btn) btn.disabled = true;
 
+    currentUserName = name;
+    localPlayerId = generateId();
+    isLocalGM = true;
+
     gameState.gameId = generateId().slice(0, 8).toUpperCase();
-    gameState.gm = { id: generateId(), name: name, isGM: true, isEliminated: false };
-    gameState.players = [gameState.gm];
-    gameState.isGM = true;
+    gameState.players = [{ id: localPlayerId, name: name, isGM: true, isEliminated: false }];
+    gameState.isStarted = false;
 
     saveGame('odd-one-in', gameState);
     updateLobbyView();
@@ -190,7 +187,7 @@ function createGame() {
 }
 
 function joinGame() {
-    console.log('Join Game clicked');
+    console.log('Join Game button clicked');
     const btn = document.getElementById('join-game-btn');
     const input = document.getElementById('player-name');
     const name = input ? input.value.trim() : '';
@@ -202,36 +199,49 @@ function joinGame() {
 
     if (btn) btn.disabled = true;
 
-    // Load latest state before join
+    // Load latest state before performing join
     const existingGame = loadGame('odd-one-in');
     if (existingGame && existingGame.gameId === gameState.gameId) {
-        const localRole = gameState.isGM;
         gameState = existingGame;
-        gameState.isGM = localRole;
     }
 
-    if (!gameState.players) gameState.players = [];
+    console.log('Current players in room:', gameState.players.map(p => p.name));
 
     // Prevent joining if name already exists
     if (gameState.players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+        console.warn(`Name conflict: ${name} already exists in lobby.`);
         alert('This name is already in the game! Please choose another one.');
         if (btn) btn.disabled = false;
         return;
     }
 
-    console.log(`Joining as: ${name}`);
-    const player = { id: generateId(), name: name, isGM: false, isEliminated: false };
+    // Set local state
+    currentUserName = name;
+    localPlayerId = generateId();
+    isLocalGM = false;
+
+    const player = { id: localPlayerId, name: name, isGM: false, isEliminated: false };
     gameState.players.push(player);
-    gameState.isGM = false;
 
     saveGame('odd-one-in', gameState);
     updateLobbyView();
 
-    // Redirect immediately
-    showScreen('screen-lobby-player');
-
-    // Reset button after delay
+    // Reset button state just in case redirect is slow
     setTimeout(() => { if (btn) btn.disabled = false; }, 1000);
+
+    // Redirect to the lobby screen
+    try {
+        console.log('Redirecting player to Waiting Room');
+        showScreen('screen-lobby-player');
+    } catch (e) {
+        console.error('Redirect failed:', e);
+        // Fallback
+        const rooms = ['screen-lobby-player', 'screen-player-join'];
+        rooms.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden', id !== 'screen-lobby-player');
+        });
+    }
 }
 
 function simulatePlayersJoining() {
@@ -252,54 +262,38 @@ function updateLobbyView() {
     const containerPlayer = document.getElementById('players-container-player');
     const countGM = document.getElementById('player-count-gm');
 
-    if (!gameState.players) return;
     if (countGM) countGM.textContent = gameState.players.length;
 
     const renderPlayer = (player) => {
-        // Try to identify if this is 'Me' based on name or isGM flag
-        const nameInput = document.getElementById('player-name') || document.getElementById('entry-name');
-        const currentUserName = nameInput ? nameInput.value.trim() : '';
-        const isSelf = (gameState.isGM && player.isGM) || (!gameState.isGM && player.name === currentUserName);
-
+        const isSelf = player.id === localPlayerId;
         const item = createElement('div', {
             classes: ['lobby-player-card', player.isGM ? 'gm-card' : '']
         });
 
         item.innerHTML = `
             <div class="player-avatar">
-                ${(player.name || '?').charAt(0).toUpperCase()}
+                ${player.name.charAt(0).toUpperCase()}
             </div>
             <div class="player-details" style="flex: 1; display: flex; align-items: center; gap: 8px;">
-                <span class="p-name">${player.isGM ? '👑 ' : ''}${player.name} ${isSelf ? '(You)' : ''}</span>
+                <span class="p-name" style="color: #1E3A8A; font-weight: 700;">${player.isGM ? '👑 ' : ''}${player.name} ${isSelf ? '(You)' : ''}</span>
             </div>
-            ${gameState.isGM && !player.isGM ? `
-                <button class="remove-p-btn" title="Remove Player" onclick="removePlayer('${player.id}')">
-                    <span>✕</span>
-                </button>` : ''}
+            ${isLocalGM && !player.isGM ? `<button class="remove-p-btn" title="Remove Player" onclick="removePlayer('${player.id}')">✕</button>` : ''}
         `;
         return item;
     };
 
-    // Sort: GM first, then others
     const playersSorted = [...gameState.players].sort((a, b) => (b.isGM ? 1 : 0) - (a.isGM ? 1 : 0));
 
     if (containerGM) {
         containerGM.innerHTML = '';
-        playersSorted.forEach(p => {
-            const el = renderPlayer(p);
-            if (el) containerGM.appendChild(el);
-        });
-
+        playersSorted.forEach(p => containerGM.appendChild(renderPlayer(p)));
         const startBtn = document.getElementById('start-game-btn-gm');
         if (startBtn) startBtn.disabled = gameState.players.length < 3;
     }
 
     if (containerPlayer) {
         containerPlayer.innerHTML = '';
-        playersSorted.forEach(p => {
-            const el = renderPlayer(p);
-            if (el) containerPlayer.appendChild(el);
-        });
+        playersSorted.forEach(p => containerPlayer.appendChild(renderPlayer(p)));
     }
 }
 
@@ -512,9 +506,3 @@ function saveEditedQuestion() {
     hideEditQuestionModal();
 }
 function skipQuestion() { selectQuestion(); document.getElementById('question-text').textContent = gameState.currentQuestion; }
-
-function removePlayer(playerId) {
-    gameState.players = gameState.players.filter(p => p.id !== playerId);
-    saveGame('odd-one-in', gameState);
-    updateLobbyView();
-}
