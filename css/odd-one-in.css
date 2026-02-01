@@ -84,8 +84,8 @@ body::after {
     animation: floatGentle 4s ease-in-out infinite;
 }
 
-.game-logo-small {
-    width: 70px;
+.game-logo-lobby {
+    width: 110px;
     height: auto;
     margin-bottom: var(--spacing-sm);
     filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.2));
@@ -151,6 +151,56 @@ h1 {
     border: 3px solid white;
     position: relative;
     overflow: hidden;
+}
+
+input[type="text"],
+input[type="number"],
+#answer-input {
+    width: 100%;
+    border: 3px solid #BFDBFE;
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-md);
+    font-size: 1rem;
+    background: white;
+    color: var(--blue-900);
+    transition: all 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+#answer-input:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.back-link {
+    display: block;
+    width: 100%;
+    margin-top: var(--spacing-lg);
+    text-align: center;
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+    color: white;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+}
+
+.back-link:active {
+    transform: scale(0.96);
+}
+
+.internal-title {
+    text-align: center;
+    color: var(--blue-800);
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-lg);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 #screen-entry .content-card {

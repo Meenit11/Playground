@@ -217,6 +217,9 @@ function joinGame() {
 
     saveGame('odd-one-in', gameState);
     updateLobbyView();
+
+    // Redirect to the lobby screen
+    console.log('Redirecting player to Waiting Room');
     showScreen('screen-lobby-player');
 }
 
