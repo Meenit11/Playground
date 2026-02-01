@@ -107,7 +107,7 @@ h1 {
     font-size: clamp(2rem, 8vw, 2.5rem);
     font-weight: 800;
     margin-bottom: var(--spacing-xs);
-    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+    background: linear-gradient(135deg, #1E3A8A, #3B82F6);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -183,17 +183,26 @@ input[type="number"]:focus,
     text-align: center;
     padding: var(--spacing-md);
     background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
-    color: white;
+    color: white !important;
     border-radius: var(--radius-full);
     font-weight: 700;
-    text-decoration: none;
+    text-decoration: none !important;
     transition: all 0.3s ease;
     box-shadow: 0 8px 15px rgba(37, 99, 235, 0.1);
     font-size: 0.95rem;
+    border: none;
+}
+
+.back-link:visited,
+.back-link:hover,
+.back-link:focus {
+    color: white !important;
+    text-decoration: none !important;
 }
 
 .back-link:active {
     transform: scale(0.96);
+    opacity: 0.9;
 }
 
 .internal-title {
