@@ -382,10 +382,14 @@ function startQuestionRound() {
     // Select random question
     selectRandomQuestion();
 
-    // Reset answers
+    // Reset answers and timer state
     gameState.answers = [];
     gameState.timerValue = 10;
     gameState.timerPaused = false;
+
+    // Reset pause button text
+    const pauseBtn = document.getElementById('pause-timer-btn');
+    if (pauseBtn) pauseBtn.textContent = 'Pause Timer';
 
     showScreen('screen-question');
 
@@ -404,7 +408,14 @@ function startQuestionRound() {
     } else {
         answerSection.classList.remove('hidden');
         eliminatedMessage.classList.add('hidden');
-        document.getElementById('answer-input').value = '';
+
+        // Reset answer input
+        const answerInput = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-answer-btn');
+        answerInput.value = '';
+        answerInput.disabled = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Answer';
     }
 
     gmControls.classList.toggle('hidden', !isGM);
@@ -419,19 +430,40 @@ function startQuestionRound() {
 }
 
 function selectRandomQuestion() {
-    if (!gameState.allQuestions || !gameState.allQuestions.oddOneIn) {
+    if (!gameState.allQuestions) {
         gameState.currentQuestion = 'What is your favorite color?';
         return;
     }
 
     const activePlayers = gameState.players.filter(p => !p.isEliminated).length;
-    const questions = gameState.allQuestions.oddOneIn;
 
-    // Filter available questions
+    // Select tier based on active player count
+    let tier;
+    let questions;
+
+    if (activePlayers >= 10) {
+        tier = 'tier1_broad';
+        questions = gameState.allQuestions.tier1_broad?.questions || [];
+    } else if (activePlayers >= 5) {
+        tier = 'tier2_medium';
+        questions = gameState.allQuestions.tier2_medium?.questions || [];
+    } else {
+        tier = 'tier3_narrow';
+        questions = gameState.allQuestions.tier3_narrow?.questions || [];
+    }
+
+    console.log(`Active players: ${activePlayers}, Using tier: ${tier}`);
+
+    if (questions.length === 0) {
+        gameState.currentQuestion = 'What is your favorite color?';
+        return;
+    }
+
+    // Filter available questions from this tier
     const available = questions.filter(q => !gameState.usedQuestions.has(q));
 
     if (available.length === 0) {
-        // Reset if all questions used
+        // Reset if all questions from this tier used
         gameState.usedQuestions.clear();
         gameState.currentQuestion = getRandomItem(questions);
     } else {
@@ -439,6 +471,7 @@ function selectRandomQuestion() {
     }
 
     gameState.usedQuestions.add(gameState.currentQuestion);
+    console.log('Selected question:', gameState.currentQuestion);
 }
 
 // ================================
@@ -502,6 +535,12 @@ function skipQuestion() {
     if (!isGM) return;
 
     stopTimer();
+
+    // Reset pause button state
+    gameState.timerPaused = false;
+    const pauseBtn = document.getElementById('pause-timer-btn');
+    if (pauseBtn) pauseBtn.textContent = 'Pause Timer';
+
     endQuestionRound();
 }
 
