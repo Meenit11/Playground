@@ -57,7 +57,7 @@
                 <div class="players-section">
                     <h3>Players (<span id="player-count">1</span>)</h3>
                     <div id="players-list" class="players-list">
-                        <!-- Players will be added here dynamically -->
+                        <!-- Players (and removal buttons) added here -->
                     </div>
                 </div>
 
@@ -123,7 +123,7 @@
                 <div class="players-section">
                     <h3>Players (<span id="player-count-view">1</span>)</h3>
                     <div id="players-list-view" class="players-list">
-                        <!-- Players will be added here dynamically -->
+                        <!-- Players added here (no remove buttons) -->
                     </div>
                 </div>
 
@@ -169,14 +169,15 @@
                 <!-- Timer Display -->
                 <div class="timer-container">
                     <div class="timer-display" id="timer-display">10</div>
-                    <p class="timer-label">seconds remaining</p>
+                    <p class="timer-label" id="timer-label">seconds remaining</p>
                 </div>
 
                 <!-- Answer Section (for active players) -->
                 <div id="answer-section">
                     <label for="answer-input">Enter Your Answer</label>
-                    <input type="text" id="answer-input" placeholder="Type your answer..." maxlength="50">
-                    <button class="btn btn-primary btn-full mt-md" id="submit-answer-btn">Submit Answer</button>
+                    <input type="text" id="answer-input" placeholder="Type your answer..." maxlength="50" disabled>
+                    <button class="btn btn-primary btn-full mt-md" id="submit-answer-btn" disabled>Submit
+                        Answer</button>
                 </div>
 
                 <!-- Eliminated Player Message -->
@@ -215,8 +216,8 @@
                     <h3>Game Master Actions</h3>
                     <button class="btn btn-danger btn-full mt-md" id="eliminate-selected-btn">Eliminate
                         Selected</button>
-                    <button class="btn btn-primary btn-full mt-sm" id="next-round-no-elim-btn">Next Round (No
-                        Elimination)</button>
+                    <button class="btn btn-primary btn-full mt-sm" id="next-round-no-elim-btn">Next Round with No
+                        Elimination</button>
                 </div>
             </div>
         </div>
@@ -234,6 +235,7 @@
                     <p class="winner-subtitle">You are the Odd One In champion!</p>
                 </div>
 
+                <!-- Only GM sees Play Again -->
                 <button class="btn btn-primary btn-full mt-xl" id="play-again-btn">Play Again</button>
                 <a href="../index.html" class="back-link">Back to Home</a>
             </div>

@@ -583,8 +583,6 @@ textarea:focus {
     gap: var(--spacing-md);
     cursor: pointer;
     transition: all 0.2s ease;
-    user-select: none;
-    /* Prevent text selection when clicking */
 }
 
 .answer-card:hover {
@@ -593,18 +591,14 @@ textarea:focus {
 }
 
 .answer-card.selected {
-    background: #DBEAFE !important;
-    border-color: var(--blue-600) !important;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    background: #DBEAFE;
+    border-color: var(--blue-500);
 }
 
-/* Ensure checkbox click doesn't conflict */
 .answer-checkbox {
     width: 24px;
     height: 24px;
     cursor: pointer;
-    pointer-events: none;
-    /* Let the card handle the click */
 }
 
 .answer-content {
