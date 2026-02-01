@@ -403,6 +403,15 @@ input[type="number"]:focus,
     transform: scale(1.1);
 }
 
+.pending-card {
+    border: 2px dashed #F59E0B !important;
+    background: #FFFBEB !important;
+}
+
+.pending-card .player-avatar {
+    background: #F59E0B !important;
+}
+
 /* ================================
    RESPONSIVE
    ================================ */

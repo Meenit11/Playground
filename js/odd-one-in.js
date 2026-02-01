@@ -5,7 +5,8 @@
 // Shared Game Data (What gets synced across players)
 let gameState = {
     gameId: null,
-    players: [],
+    players: [],           // Approved players in the game
+    pendingPlayers: [],    // Players waiting for GM approval
     currentRound: 1,
     currentQuestion: '',
     currentPlayerIndex: 0,
@@ -13,7 +14,8 @@ let gameState = {
     answers: [],
     allQuestions: null,
     usedQuestions: new Set(),
-    isStarted: false
+    isStarted: false,
+    gmId: null            // ID of the Game Master
 };
 
 // Local Tab State (Specific to this browser session)
@@ -67,13 +69,23 @@ function checkInviteLink() {
         showScreen('screen-entry');
     }
 
+    // Storage listener for cross-tab sync
     window.addEventListener('storage', (e) => {
         if (e.key === 'meenit-odd-one-in') {
             const updated = JSON.parse(e.newValue);
             if (updated && updated.gameId === gameState.gameId) {
+                const wasApproved = !gameState.players.find(p => p.id === localPlayerId) &&
+                    updated.players.find(p => p.id === localPlayerId);
+
                 gameState = updated;
                 updateLobbyView();
 
+                // If player was just approved, move them to lobby
+                if (wasApproved && !isLocalGM) {
+                    showScreen('screen-lobby-player');
+                }
+
+                // If GM started game, move player to playing screen
                 if (gameState.isStarted && !document.getElementById('screen-lobby-player').classList.contains('hidden')) {
                     showScreen('screen-playing');
                     startAnswerCollection();
@@ -132,7 +144,7 @@ function showScreen(screenId) {
     const screens = [
         'screen-entry', 'screen-lobby-gm', 'screen-lobby-player',
         'screen-player-join', 'screen-playing', 'screen-judging',
-        'screen-winner', 'screen-spectator'
+        'screen-winner', 'screen-spectator', 'screen-waiting-approval'
     ];
     screens.forEach(id => {
         const screen = document.getElementById(id);
@@ -168,40 +180,14 @@ function createGame() {
     isLocalGM = true;
 
     gameState.gameId = generateId().slice(0, 8).toUpperCase();
+    gameState.gmId = localPlayerId;
     gameState.players = [{ id: localPlayerId, name: name, isGM: true, isEliminated: false }];
+    gameState.pendingPlayers = [];
     gameState.isStarted = false;
 
     saveGame('odd-one-in', gameState);
     updateLobbyView();
     showScreen('screen-lobby-gm');
-    startLobbyPolling();
-}
-
-// Poll for updates while in lobby
-let lobbyPollInterval = null;
-
-function startLobbyPolling() {
-    stopLobbyPolling();
-    console.log('Starting lobby polling...');
-    lobbyPollInterval = setInterval(() => {
-        const latestState = loadGame('odd-one-in');
-        if (latestState && latestState.gameId === gameState.gameId) {
-            const oldPlayerCount = gameState.players.length;
-            gameState = latestState;
-            if (gameState.players.length !== oldPlayerCount) {
-                console.log(`Player count changed: ${oldPlayerCount} -> ${gameState.players.length}`);
-                updateLobbyView();
-            }
-        }
-    }, 2000);
-}
-
-function stopLobbyPolling() {
-    if (lobbyPollInterval) {
-        clearInterval(lobbyPollInterval);
-        lobbyPollInterval = null;
-        console.log('Stopped lobby polling');
-    }
 }
 
 function joinGame() {
@@ -223,9 +209,10 @@ function joinGame() {
         gameState = existingGame;
     }
 
-    // Name check
-    if (gameState.players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-        alert('This name is already in the game! Please choose another one.');
+    // Check if name already exists in approved or pending players
+    const allPlayers = [...gameState.players, ...gameState.pendingPlayers];
+    if (allPlayers.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+        alert('This name is already in use! Please choose another one.');
         if (btn) btn.disabled = false;
         return;
     }
@@ -236,56 +223,108 @@ function joinGame() {
     isLocalGM = false;
 
     const player = { id: localPlayerId, name: name, isGM: false, isEliminated: false };
-    gameState.players.push(player);
+
+    // Add to pending players for GM approval
+    gameState.pendingPlayers.push(player);
 
     saveGame('odd-one-in', gameState);
-    updateLobbyView();
 
-    // DIRECT screen transition
-    console.log('Switching to lobby screen...');
-    document.getElementById('screen-player-join').classList.add('hidden');
-    document.getElementById('screen-lobby-player').classList.remove('hidden');
-    console.log('Screen switched!');
-    startLobbyPolling();
+    // Show waiting screen
+    console.log('Waiting for GM approval...');
+    showWaitingForApprovalScreen(name);
 
     setTimeout(() => { if (btn) btn.disabled = false; }, 1000);
 }
 
-function simulatePlayersJoining() {
-    const demoNames = ['Ali', 'Simran', 'Rahul'];
-    let delay = 1000;
-    demoNames.forEach(name => {
-        setTimeout(() => {
-            if (gameState.players.some(p => p.name === name)) return;
-            gameState.players.push({ id: generateId(), name: name, isGM: false });
-            updateLobbyView();
-        }, delay);
-        delay += 1000;
-    });
+function showWaitingForApprovalScreen(playerName) {
+    const screen = document.getElementById('screen-waiting-approval');
+    if (!screen) {
+        // Create waiting screen if it doesn't exist
+        const container = document.querySelector('.game-container');
+        const waitingScreen = document.createElement('div');
+        waitingScreen.id = 'screen-waiting-approval';
+        waitingScreen.className = 'screen hidden';
+        waitingScreen.innerHTML = `
+            <div class="screen-header">
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo-lobby">
+                <h1>Odd One In</h1>
+                <p class="subtitle">Waiting for approval...</p>
+            </div>
+            <div class="content-card">
+                <div style="text-align: center; padding: var(--spacing-xl);">
+                    <div style="font-size: 4rem; margin-bottom: var(--spacing-lg);">⏳</div>
+                    <h2 style="color: var(--blue-800); margin-bottom: var(--spacing-md);">Waiting for Game Master</h2>
+                    <p style="color: var(--blue-600); font-size: 1.1rem;" id="waiting-player-name-display"></p>
+                    <p style="color: var(--blue-500); margin-top: var(--spacing-lg);">The Game Master will approve your request shortly...</p>
+                </div>
+            </div>
+        `;
+        container.appendChild(waitingScreen);
+    }
+
+    document.getElementById('waiting-player-name-display').textContent = `Hi ${playerName}!`;
+    showScreen('screen-waiting-approval');
+}
+
+function approvePlayer(playerId) {
+    if (!isLocalGM) return;
+
+    const pendingPlayer = gameState.pendingPlayers.find(p => p.id === playerId);
+    if (pendingPlayer) {
+        // Move from pending to approved
+        gameState.pendingPlayers = gameState.pendingPlayers.filter(p => p.id !== playerId);
+        gameState.players.push(pendingPlayer);
+
+        saveGame('odd-one-in', gameState);
+        updateLobbyView();
+    }
+}
+
+function rejectPlayer(playerId) {
+    if (!isLocalGM) return;
+
+    gameState.pendingPlayers = gameState.pendingPlayers.filter(p => p.id !== playerId);
+    saveGame('odd-one-in', gameState);
+    updateLobbyView();
 }
 
 function updateLobbyView() {
     const containerGM = document.getElementById('players-container-gm');
     const containerPlayer = document.getElementById('players-container-player');
     const countGM = document.getElementById('player-count-gm');
+    const pendingContainer = document.getElementById('pending-players-container');
 
     if (countGM) countGM.textContent = gameState.players.length;
 
-    const renderPlayer = (player) => {
+    const renderPlayer = (player, isPending = false) => {
         const isSelf = player.id === localPlayerId;
         const item = createElement('div', {
-            classes: ['lobby-player-card', player.isGM ? 'gm-card' : '']
+            classes: ['lobby-player-card', player.isGM ? 'gm-card' : '', isPending ? 'pending-card' : '']
         });
 
-        item.innerHTML = `
-            <div class="player-avatar">
-                ${player.name.charAt(0).toUpperCase()}
-            </div>
-            <div class="player-details" style="flex: 1; display: flex; align-items: center; gap: 8px;">
-                <span class="p-name" style="color: #1E3A8A; font-weight: 700;">${player.isGM ? '👑 ' : ''}${player.name} ${isSelf ? '(You)' : ''}</span>
-            </div>
-            ${isLocalGM && !player.isGM ? `<button class="remove-p-btn" title="Remove Player" onclick="removePlayer('${player.id}')">✕</button>` : ''}
-        `;
+        if (isPending && isLocalGM) {
+            item.innerHTML = `
+                <div class="player-avatar" style="background: #F59E0B;">
+                    ${player.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="player-details" style="flex: 1;">
+                    <span class="p-name" style="color: #1E3A8A; font-weight: 700;">${player.name}</span>
+                    <span style="font-size: 0.75rem; color: #F59E0B;">Waiting for approval</span>
+                </div>
+                <button class="btn btn-sm" style="background: #10B981; color: white; padding: 8px 12px; margin-right: 4px;" onclick="approvePlayer('${player.id}')">✓ Approve</button>
+                <button class="remove-p-btn" title="Reject" onclick="rejectPlayer('${player.id}')">✕</button>
+            `;
+        } else {
+            item.innerHTML = `
+                <div class="player-avatar">
+                    ${player.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="player-details" style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                    <span class="p-name" style="color: #1E3A8A; font-weight: 700;">${player.isGM ? '👑 ' : ''}${player.name} ${isSelf ? '(You)' : ''}</span>
+                </div>
+                ${isLocalGM && !player.isGM ? `<button class="remove-p-btn" title="Remove Player" onclick="removePlayer('${player.id}')">✕</button>` : ''}
+            `;
+        }
         return item;
     };
 
@@ -294,8 +333,22 @@ function updateLobbyView() {
     if (containerGM) {
         containerGM.innerHTML = '';
         playersSorted.forEach(p => containerGM.appendChild(renderPlayer(p)));
+
         const startBtn = document.getElementById('start-game-btn-gm');
         if (startBtn) startBtn.disabled = gameState.players.length < 3;
+    }
+
+    // Show pending players section for GM
+    if (pendingContainer && isLocalGM) {
+        if (gameState.pendingPlayers.length > 0) {
+            pendingContainer.innerHTML = '<h3 style="color: var(--blue-800); margin-bottom: var(--spacing-md);">⏳ Pending Approvals</h3>';
+            gameState.pendingPlayers.forEach(p => {
+                pendingContainer.appendChild(renderPlayer(p, true));
+            });
+            pendingContainer.style.display = 'block';
+        } else {
+            pendingContainer.style.display = 'none';
+        }
     }
 
     if (containerPlayer) {
@@ -305,6 +358,8 @@ function updateLobbyView() {
 }
 
 function removePlayer(id) {
+    if (!isLocalGM) return;
+
     gameState.players = gameState.players.filter(p => p.id !== id);
     saveGame('odd-one-in', gameState);
     updateLobbyView();
@@ -340,6 +395,7 @@ function shareOnWhatsApp() {
 // ================================
 
 function startGame() {
+    if (!isLocalGM) return;
     if (gameState.players.length < 3) return;
 
     gameState.currentRound = 1;
@@ -482,12 +538,16 @@ function stopTimer() {
 }
 
 function pauseTimer() {
+    if (!isLocalGM) return;
+
     gameState.timerState.isPaused = !gameState.timerState.isPaused;
     const btn = document.getElementById('pause-timer-btn');
     btn.textContent = gameState.timerState.isPaused ? 'Resume' : 'Pause';
 }
 
 function resetTimer() {
+    if (!isLocalGM) return;
+
     gameState.timerState.remaining = 10;
     updateTimerDisplay();
 }
@@ -530,6 +590,8 @@ function showJudgingScreen() {
 }
 
 function eliminatePlayer(playerId) {
+    if (!isLocalGM) return;
+
     const player = gameState.players.find(p => p.id === playerId);
     if (player) {
         player.isEliminated = true;
@@ -539,6 +601,8 @@ function eliminatePlayer(playerId) {
 }
 
 function nextRound() {
+    if (!isLocalGM) return;
+
     const activePlayers = gameState.players.filter(p => !p.isEliminated);
 
     if (activePlayers.length === 1) {
@@ -565,10 +629,13 @@ function showWinner(winner) {
 }
 
 function playAgain() {
+    if (!isLocalGM) return;
+
     gameState.players.forEach(p => p.isEliminated = false);
     gameState.currentRound = 1;
     gameState.answers = [];
     gameState.usedQuestions.clear();
+    gameState.isStarted = false;
     saveGame('odd-one-in', gameState);
 
     if (isLocalGM) {
