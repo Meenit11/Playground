@@ -81,6 +81,22 @@ function checkInviteLink() {
             }
         }
     });
+
+    // Poll for state changes every second
+    setInterval(() => {
+        const currentScreen = document.querySelector('.screen:not(.hidden)');
+        if (currentScreen && (currentScreen.id === 'screen-lobby-gm' || currentScreen.id === 'screen-lobby-player')) {
+            const latest = loadGame('odd-one-in');
+            if (latest && latest.gameId === gameState.gameId) {
+                const oldPlayerCount = gameState.players.length;
+                gameState = latest;
+                if (gameState.players.length !== oldPlayerCount) {
+                    console.log('Player count changed:', oldPlayerCount, '->', gameState.players.length);
+                    updateLobbyView();
+                }
+            }
+        }
+    }, 1000);
 }
 
 // ================================
