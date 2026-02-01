@@ -160,14 +160,19 @@ function showScreen(screenId) {
 // ================================
 
 function createGame() {
-    const name = document.getElementById('entry-name').value.trim();
+    const btn = document.getElementById('create-game-btn');
+    const input = document.getElementById('entry-name');
+    const name = input ? input.value.trim() : '';
+
     if (!name) {
-        shakeElement(document.getElementById('entry-name'));
+        if (input) shakeElement(input);
         return;
     }
 
+    if (btn) btn.disabled = true;
+
     gameState.gameId = generateId().slice(0, 8).toUpperCase();
-    gameState.gm = { id: generateId(), name: name, isGM: true };
+    gameState.gm = { id: generateId(), name: name, isGM: true, isEliminated: false };
     gameState.players = [gameState.gm];
     gameState.isGM = true;
 
@@ -177,25 +182,31 @@ function createGame() {
 }
 
 function joinGame() {
-    console.log('Join Game clicked');
+    console.log('Join Game button clicked');
+    const btn = document.getElementById('join-game-btn');
     const input = document.getElementById('player-name');
     const name = input ? input.value.trim() : '';
 
     if (!name) {
-        console.warn('Empty name, shaking input');
         if (input) shakeElement(input);
         return;
     }
 
-    // Load latest state before performing join to avoid overwriting
+    if (btn) btn.disabled = true;
+
+    // Load latest state before performing join
     const existingGame = loadGame('odd-one-in');
     if (existingGame && existingGame.gameId === gameState.gameId) {
         gameState = existingGame;
     }
 
+    console.log('Current players in room:', gameState.players.map(p => p.name));
+
     // Prevent joining if name already exists
     if (gameState.players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+        console.warn(`Name conflict: ${name} already exists in lobby.`);
         alert('This name is already in the game! Please choose another one.');
+        if (btn) btn.disabled = false;
         return;
     }
 
