@@ -50,7 +50,12 @@ function checkInviteLink() {
     const params = new URLSearchParams(window.location.search);
     const joinCode = params.get('join');
 
+    console.log('=== CHECK INVITE LINK ===');
+    console.log('URL:', window.location.href);
+    console.log('Join code:', joinCode);
+
     if (joinCode) {
+        console.log('→ Player joining via link');
         const existingGame = loadGame('odd-one-in');
         if (existingGame && existingGame.gameId === joinCode) {
             gameState = existingGame;
@@ -62,8 +67,10 @@ function checkInviteLink() {
             if (el.closest('.screen-header')) el.classList.add('hidden');
         });
 
+        console.log('→ Showing screen-player-join');
         showScreen('screen-player-join');
     } else {
+        console.log('→ No join code, showing entry screen');
         showScreen('screen-entry');
     }
 
