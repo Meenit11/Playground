@@ -45,6 +45,32 @@ async function loadQuestions() {
     }
 }
 
+// ================================
+// UTILITY FUNCTIONS
+// ================================
+
+function shakeElement(element) {
+    element.classList.add('shake');
+    setTimeout(() => element.classList.remove('shake'), 500);
+}
+
+function showElement(element) {
+    if (element) element.classList.remove('hidden');
+}
+
+function hideElement(element) {
+    if (element) element.classList.add('hidden');
+}
+
+function showConfetti() {
+    // Simple confetti effect - can be enhanced later
+    console.log('🎉 Confetti!');
+}
+
+// ================================
+// INVITE LINK HANDLING
+// ================================
+
 // Check if joined via invite link
 function checkInviteLink() {
     const params = new URLSearchParams(window.location.search);
