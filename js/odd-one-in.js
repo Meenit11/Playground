@@ -218,6 +218,9 @@ function joinGame() {
     saveGame('odd-one-in', gameState);
     updateLobbyView();
 
+    // Reset button state just in case redirect is slow
+    setTimeout(() => { if (btn) btn.disabled = false; }, 1000);
+
     // Redirect to the lobby screen
     console.log('Redirecting player to Waiting Room');
     showScreen('screen-lobby-player');
@@ -253,27 +256,29 @@ function updateLobbyView() {
 
         item.innerHTML = `
             <div class="player-avatar">
-                ${player.isGM ? '👑' : player.name.charAt(0).toUpperCase()}
+                ${player.name.charAt(0).toUpperCase()}
             </div>
-            <div class="player-details">
-                <span class="p-name">${player.name} ${isSelf ? '(You)' : ''}</span>
-                ${player.isGM ? '<span class="p-role">Game Master</span>' : ''}
+            <div class="player-details" style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                <span class="p-name">${player.isGM ? '👑 ' : ''}${player.name} ${isSelf ? '(You)' : ''}</span>
             </div>
-            ${gameState.isGM && !player.isGM ? `<button class="remove-p-btn" onclick="removePlayer('${player.id}')">✕</button>` : ''}
+            ${gameState.isGM && !player.isGM ? `<button class="remove-p-btn" title="Remove Player" onclick="removePlayer('${player.id}')">✕</button>` : ''}
         `;
         return item;
     };
 
+    const playersSorted = [...gameState.players].sort((a, b) => (b.isGM ? 1 : 0) - (a.isGM ? 1 : 0));
+
     if (containerGM) {
         containerGM.innerHTML = '';
-        gameState.players.forEach(p => containerGM.appendChild(renderPlayer(p)));
+        playersSorted.forEach(p => containerGM.appendChild(renderPlayer(p)));
         // Enable start button if at least 3 players
-        document.getElementById('start-game-btn-gm').disabled = gameState.players.length < 3;
+        const startBtn = document.getElementById('start-game-btn-gm');
+        if (startBtn) startBtn.disabled = gameState.players.length < 3;
     }
 
     if (containerPlayer) {
         containerPlayer.innerHTML = '';
-        gameState.players.forEach(p => containerPlayer.appendChild(renderPlayer(p)));
+        playersSorted.forEach(p => containerPlayer.appendChild(renderPlayer(p)));
     }
 }
 

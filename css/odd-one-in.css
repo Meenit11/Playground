@@ -85,7 +85,7 @@ body::after {
 }
 
 .game-logo-lobby {
-    width: 110px;
+    width: 140px;
     height: auto;
     margin-bottom: var(--spacing-sm);
     filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.2));
@@ -157,12 +157,14 @@ input[type="text"],
 input[type="number"],
 #answer-input {
     width: 100%;
-    border: 3px solid #BFDBFE;
-    border-radius: var(--radius-xl);
     padding: var(--spacing-md);
     font-size: 1rem;
-    background: white;
     color: var(--blue-900);
+    background: white;
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+        linear-gradient(135deg, #2563EB, #60A5FA) border-box;
+    border-radius: var(--radius-xl);
     transition: all 0.2s ease;
 }
 
@@ -170,14 +172,14 @@ input[type="text"]:focus,
 input[type="number"]:focus,
 #answer-input:focus {
     outline: none;
-    border-color: #3B82F6;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
 }
 
 .back-link {
     display: block;
     width: 100%;
-    margin-top: var(--spacing-lg);
+    margin-top: var(--spacing-md);
     text-align: center;
     padding: var(--spacing-md);
     background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
@@ -186,7 +188,8 @@ input[type="number"]:focus,
     font-weight: 700;
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+    box-shadow: 0 8px 15px rgba(37, 99, 235, 0.1);
+    font-size: 0.95rem;
 }
 
 .back-link:active {
@@ -196,11 +199,13 @@ input[type="number"]:focus,
 .internal-title {
     text-align: center;
     color: var(--blue-800);
-    font-size: 1.35rem;
+    font-size: 1.4rem;
     font-weight: 800;
     margin-bottom: var(--spacing-lg);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--blue-50);
 }
 
 #screen-entry .content-card {
@@ -318,25 +323,31 @@ input[type="number"]:focus,
    PLAYER LIST
    ================================ */
 .lobby-player-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
 }
 
 .lobby-player-card {
     background: var(--blue-50);
-    border-radius: 12px;
-    padding: var(--spacing-sm);
+    border-radius: 16px;
+    padding: var(--spacing-md);
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
     border: 1px solid var(--blue-100);
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+.lobby-player-card:hover {
+    transform: translateY(-2px);
 }
 
 .player-avatar {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     background: var(--blue-500);
     color: white;
     border-radius: 50%;
@@ -344,7 +355,13 @@ input[type="number"]:focus,
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+}
+
+.gm-card {
+    border: 2px solid #F59E0B;
+    background: #FFFBEB;
 }
 
 .gm-card .player-avatar {
@@ -352,12 +369,31 @@ input[type="number"]:focus,
 }
 
 .p-name {
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--blue-900);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.remove-p-btn {
+    background: #FEE2E2;
+    color: #EF4444;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 800;
+    transition: all 0.2s ease;
+}
+
+.remove-p-btn:hover {
+    background: #EF4444;
+    color: white;
+    transform: scale(1.1);
 }
 
 /* ================================
