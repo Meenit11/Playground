@@ -577,53 +577,34 @@ textarea:focus {
     background: var(--blue-50);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
-    border: 3px solid var(--blue-100);
+    border: 2px solid var(--blue-100);
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
     cursor: pointer;
     transition: all 0.2s ease;
     user-select: none;
+    /* Prevent text selection when clicking */
 }
 
 .answer-card:hover {
     border-color: var(--blue-300);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
 .answer-card.selected {
-    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
-    border-color: var(--blue-600);
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
-    transform: translateY(-2px) scale(1.02);
+    background: #DBEAFE !important;
+    border-color: var(--blue-600) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
-.answer-card.selected::before {
-    content: '✓';
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--blue-600);
-    color: white;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1.1rem;
-}
-
-.answer-card {
-    position: relative;
-    padding-left: var(--spacing-md);
-}
-
-.answer-card.selected {
-    padding-left: calc(var(--spacing-md) + 36px);
+/* Ensure checkbox click doesn't conflict */
+.answer-checkbox {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    pointer-events: none;
+    /* Let the card handle the click */
 }
 
 .answer-content {
@@ -643,12 +624,7 @@ textarea:focus {
 }
 
 .blank-answer {
-    opacity: 0.6;
-}
-
-.blank-answer .answer-text {
-    font-style: italic;
-    color: var(--blue-500);
+    opacity: 0.5;
 }
 
 /* ================================

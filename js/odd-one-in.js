@@ -40,8 +40,16 @@ async function loadQuestions() {
     try {
         const response = await fetch('../questions.json');
         const data = await response.json();
-        gameState.allQuestions = data;
-        console.log('Questions loaded successfully');
+        // Check structure: data could be array or object {oddOneIn: [...]}
+        if (data.oddOneIn) {
+            gameState.allQuestions = data;
+        } else if (Array.isArray(data)) {
+            // If it's a flat array, wrap it or assign to oddOneIn property for compatibility
+            gameState.allQuestions = { oddOneIn: data };
+        } else {
+            gameState.allQuestions = data; // Fallback
+        }
+        console.log('Questions loaded successfully', gameState.allQuestions);
     } catch (error) {
         console.error('Error loading questions:', error);
     }
@@ -297,17 +305,7 @@ function updateLobby() {
     // Enable/disable start button
     const startBtn = document.getElementById('start-game-btn');
     if (startBtn) {
-        const playerCount = gameState.players.length;
-        const canStart = playerCount >= 3;
-        startBtn.disabled = !canStart;
-
-        console.log(`Update Lobby: Players=${playerCount}, Start Button Disabled=${!canStart}`);
-
-        if (!canStart) {
-            startBtn.title = `Need ${3 - playerCount} more player(s) to start`;
-        } else {
-            startBtn.title = "Start the game!";
-        }
+        startBtn.disabled = gameState.players.length < 3;
     }
 }
 
@@ -394,28 +392,8 @@ function shareOnWhatsApp() {
 // ================================
 
 function startGame() {
-    console.log('=== START GAME CLICKED ===');
-    console.log('Current players:', gameState.players.length);
-    console.log('Local GM flag:', isGM);
-    console.log('Game GM ID:', gameState.gmId);
-    console.log('Local Player ID:', localPlayerId);
+    if (!isGM || gameState.players.length < 3) return;
 
-    // Robust GM check
-    const isActivelyGM = isGM || (gameState.gmId === localPlayerId);
-
-    if (!isActivelyGM) {
-        console.error('❌ Action denied: User is not the GM.');
-        alert('Only the Game Master can start the game.');
-        return;
-    }
-
-    if (gameState.players.length < 3) {
-        console.warn('❌ Cannot start: Not enough players (Min 3 required).');
-        alert('You need at least 3 players to start the game!');
-        return;
-    }
-
-    console.log('✅ Starting game...');
     gameState.isStarted = true;
     gameState.currentRound = 1;
     saveGame('odd-one-in', gameState);
@@ -464,44 +442,26 @@ function startQuestionRound() {
 }
 
 function selectRandomQuestion() {
-    if (!gameState.allQuestions) {
+    if (!gameState.allQuestions || !gameState.allQuestions.oddOneIn) {
         gameState.currentQuestion = 'What is your favorite color?';
         return;
     }
 
     const activePlayers = gameState.players.filter(p => !p.isEliminated).length;
-
-    // Select tier based on player count
-    let tier;
-    if (activePlayers >= 10) {
-        tier = gameState.allQuestions.tier1_broad?.questions || [];
-    } else if (activePlayers >= 5) {
-        tier = gameState.allQuestions.tier2_medium?.questions || [];
-    } else {
-        tier = gameState.allQuestions.tier3_narrow?.questions || [];
-    }
-
-    if (!tier || tier.length === 0) {
-        // Fallback to any available tier
-        tier = gameState.allQuestions.tier1_broad?.questions ||
-            gameState.allQuestions.tier2_medium?.questions ||
-            gameState.allQuestions.tier3_narrow?.questions ||
-            ['What is your favorite color?'];
-    }
+    const questions = gameState.allQuestions.oddOneIn;
 
     // Filter available questions
-    const available = tier.filter(q => !gameState.usedQuestions.has(q));
+    const available = questions.filter(q => !gameState.usedQuestions.has(q));
 
     if (available.length === 0) {
         // Reset if all questions used
         gameState.usedQuestions.clear();
-        gameState.currentQuestion = getRandomItem(tier);
+        gameState.currentQuestion = getRandomItem(questions);
     } else {
         gameState.currentQuestion = getRandomItem(available);
     }
 
     gameState.usedQuestions.add(gameState.currentQuestion);
-    console.log('Selected question:', gameState.currentQuestion);
 }
 
 // ================================
@@ -511,7 +471,9 @@ function selectRandomQuestion() {
 function startTimer() {
     stopTimer();
 
-    gameState.timerValue = 10;
+    // Only reset timerValue if it's not paused/resumed from an edit
+    if (gameState.timerValue <= 0) gameState.timerValue = 10;
+
     updateTimerDisplay();
 
     timerInterval = setInterval(() => {
@@ -651,6 +613,20 @@ function showAnswerReview() {
             classes: ['answer-card', item.answer ? '' : 'blank-answer']
         });
 
+        // Make entire card clickable for selection if GM
+        if (isGM) {
+            card.onclick = (e) => {
+                // Prevent check double-toggle if clicking directly on checkbox
+                if (e.target.type !== 'checkbox') {
+                    const cb = card.querySelector('.answer-checkbox');
+                    if (cb) {
+                        cb.checked = !cb.checked;
+                        card.classList.toggle('selected', cb.checked);
+                    }
+                }
+            };
+        }
+
         if (isGM) {
             const checkbox = createElement('input', {
                 classes: ['answer-checkbox'],
@@ -665,7 +641,9 @@ function showAnswerReview() {
         const content = createElement('div', { classes: ['answer-content'] });
 
         const text = createElement('div', { classes: ['answer-text'] });
-        text.textContent = item.answer || '(No answer)';
+        // Ensure even empty answers show something
+        text.textContent = item.answer || '(No answer provided)';
+        if (!item.answer) text.style.fontStyle = 'italic';
 
         const player = createElement('div', { classes: ['answer-player'] });
         player.textContent = `— ${item.playerName}`;
@@ -674,14 +652,8 @@ function showAnswerReview() {
         content.appendChild(player);
         card.appendChild(content);
 
-        if (isGM) {
-            card.addEventListener('click', (e) => {
-                if (e.target !== checkbox) {
-                    checkbox.checked = !checkbox.checked;
-                    checkbox.dispatchEvent(new Event('change'));
-                }
-            });
-        }
+        // IMPORTANT: Removed the previous click listener that was duplicating/conflicting logic
+        // The one added above handles the full card click
 
         container.appendChild(card);
     });
@@ -779,6 +751,11 @@ function playAgain() {
 function showEditQuestionModal() {
     if (!isGM) return;
 
+    // Pause timer while editing
+    gameState.timerPaused = true;
+    const pauseBtn = document.getElementById('pause-timer-btn');
+    if (pauseBtn) pauseBtn.textContent = 'Resume Timer';
+
     const modal = document.getElementById('edit-question-modal');
     const input = document.getElementById('edit-question-input');
     input.value = gameState.currentQuestion;
@@ -788,6 +765,7 @@ function showEditQuestionModal() {
 function hideEditQuestionModal() {
     const modal = document.getElementById('edit-question-modal');
     modal.classList.add('hidden');
+    // Timer remains paused until GM explicitly resumes
 }
 
 function saveEditedQuestion() {
