@@ -44,12 +44,14 @@
 
             <div class="content-card">
                 <div class="room-code-container">
-                    <div class="room-code-display">
-                        <span class="label">Invite Link</span>
-                        <div class="invite-actions">
-                            <button class="btn btn-sm btn-success" id="share-whatsapp-btn">🟢 Share on WhatsApp</button>
-                            <button class="btn btn-sm btn-outline" id="copy-link-btn">📋 Copy Link</button>
-                        </div>
+                    <p class="invite-label">Invite your friends to play! 🎮</p>
+                    <div class="invite-actions">
+                        <button class="btn btn-whatsapp" id="share-whatsapp-btn">
+                            <span class="icon">💬</span> WhatsApp
+                        </button>
+                        <button class="btn btn-copy" id="copy-link-btn">
+                            <span class="icon">📋</span> Copy Link
+                        </button>
                     </div>
                 </div>
 
@@ -65,14 +67,29 @@
             </div>
 
             <!-- Rules in Lobby -->
-            <div class="lobby-rules mt-xl">
-                <h3>🎮 Game Rules</h3>
-                <ul>
-                    <li>1️⃣ Everyone gets a question</li>
-                    <li>2️⃣ You have 10 seconds to answer</li>
-                    <li>3️⃣ Find the "Odd One In" (the answer that doesn't fit)</li>
-                    <li>4️⃣ Last player standing wins!</li>
-                </ul>
+            <div class="rules-card">
+                <div class="rules-header">
+                    <span class="rules-icon">🎮</span>
+                    <h3>How to Play</h3>
+                </div>
+                <div class="rules-list">
+                    <div class="rule-item">
+                        <span class="rule-num">1</span>
+                        <p>Everyone gets a unique question to answer secretly.</p>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-num">2</span>
+                        <p>You have <strong>10 seconds</strong> to type your answer.</p>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-num">3</span>
+                        <p>Spot the <strong>"Odd One In"</strong> — the answer that doesn't fit the vibe!</p>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-num">4</span>
+                        <p>Last player standing wins the playground! 🏆</p>
+                    </div>
+                </div>
             </div>
         </div>
 

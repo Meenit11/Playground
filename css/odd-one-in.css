@@ -1,35 +1,48 @@
 /* ================================
-   ODD ONE IN - COMPLETE BLUE THEME
+   ODD ONE IN - VIBRANT PLAYGROUND THEME
    ================================ */
+
+:root {
+    --blue-50: #EFF6FF;
+    --blue-100: #DBEAFE;
+    --blue-200: #BFDBFE;
+    --blue-300: #93C5FD;
+    --blue-400: #60A5FA;
+    --blue-500: #3B82F6;
+    --blue-600: #2563EB;
+    --blue-700: #1D4ED8;
+    --blue-800: #1E40AF;
+    --blue-900: #1E3A8A;
+
+    --vibrant-gradient: linear-gradient(135deg, #3B82F6 0%, #2DD4BF 100%);
+    --card-bg: rgba(255, 255, 255, 0.95);
+}
 
 body {
     background: linear-gradient(135deg,
-            #DBEAFE 0%,
-            /* Light blue */
-            #BFDBFE 25%,
-            /* Sky blue */
-            #93C5FD 50%,
-            /* Medium blue */
-            #DBEAFE 100%
-            /* Back to light */
-        );
-    background-size: 300% 300%;
-    animation: blueShift 20s ease infinite;
+            #E0F2FE 0%,
+            #DBEAFE 25%,
+            #F0FDFA 50%,
+            #E0F2FE 100%);
+    background-size: 400% 400%;
+    animation: vibrantFlow 15s ease infinite;
     min-height: 100vh;
-    color: #1E3A8A;
+    color: var(--blue-900);
     position: relative;
     overflow-x: hidden;
 }
 
-@keyframes blueShift {
-
-    0%,
-    100% {
+@keyframes vibrantFlow {
+    0% {
         background-position: 0% 50%;
     }
 
     50% {
         background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
     }
 }
 
@@ -41,29 +54,16 @@ body::after {
     width: 100%;
     height: 100%;
     background:
-        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 45%),
-        radial-gradient(circle at 80% 70%, rgba(96, 165, 250, 0.12) 0%, transparent 45%),
-        radial-gradient(circle at 50% 50%, rgba(147, 197, 253, 0.1) 0%, transparent 45%);
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(45, 212, 191, 0.1) 0%, transparent 40%);
     pointer-events: none;
     z-index: 0;
-    animation: blueGlow 10s ease-in-out infinite;
-}
-
-@keyframes blueGlow {
-
-    0%,
-    100% {
-        opacity: 0.6;
-    }
-
-    50% {
-        opacity: 1;
-    }
 }
 
 .game-container {
-    min-height: 100vh;
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
+    max-width: 500px;
+    margin: 0 auto;
     position: relative;
     z-index: 1;
 }
@@ -71,274 +71,223 @@ body::after {
 /* ================================
    SCREEN HEADER
    ================================ */
-.screen {
-    opacity: 1;
-    transition: opacity var(--transition-base);
-}
-
-.screen.hidden {
-    display: none;
-}
-
 .screen-header {
     text-align: center;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
 }
 
 .game-logo {
-    width: 180px;
-    height: 180px;
-    margin: 0 auto var(--spacing-sm) auto;
-    filter: drop-shadow(0 8px 24px rgba(59, 130, 246, 0.35));
-    animation: float 3.5s ease-in-out infinite, blueGlowLogo 4.5s ease-in-out infinite;
+    width: 140px;
+    height: auto;
+    margin-bottom: var(--spacing-md);
+    filter: drop-shadow(0 8px 20px rgba(59, 130, 246, 0.25));
+    animation: floatGentle 4s ease-in-out infinite;
 }
 
-@keyframes blueGlowLogo {
+@keyframes floatGentle {
 
     0%,
     100% {
-        filter: drop-shadow(0 8px 24px rgba(59, 130, 246, 0.35));
+        transform: translateY(0);
     }
 
     50% {
-        filter: drop-shadow(0 12px 32px rgba(59, 130, 246, 0.5));
+        transform: translateY(-10px);
     }
 }
 
-.game-logo-small {
-    width: 80px;
-    height: 80px;
-    margin-bottom: var(--spacing-sm);
-    filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));
-}
-
-.screen-header h1 {
-    color: #1E3A8A;
-    font-size: clamp(1.75rem, 6vw, 2.25rem);
-    font-weight: var(--font-weight-extrabold);
-    margin: 0;
-    background: linear-gradient(135deg, #1E40AF, #3B82F6, #60A5FA);
-    background-size: 200% 200%;
+h1 {
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    font-weight: 800;
+    margin-bottom: var(--spacing-xs);
+    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: blueGradientSlide 5s ease infinite;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
 }
 
-@keyframes blueGradientSlide {
-
-    0%,
-    100% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
+.subtitle {
+    color: var(--blue-600);
+    font-weight: 500;
+    font-size: 0.95rem;
 }
 
 /* ================================
-   CONTENT CARDS - BLUE THEME
+   CONTENT CARDS
    ================================ */
 .content-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 3px solid #93C5FD;
-    border-radius: var(--radius-2xl);
+    background: var(--card-bg);
+    border-radius: 28px;
+    padding: var(--spacing-xl);
+    box-shadow: 0 20px 50px rgba(30, 58, 138, 0.1);
+    border: 3px solid white;
+    position: relative;
+    overflow: hidden;
+}
+
+#screen-entry .content-card {
+    border-color: var(--blue-300);
+    box-shadow: 0 30px 60px rgba(59, 130, 246, 0.15);
+}
+
+/* ================================
+   INVITE SECTION (LOBBY)
+   ================================ */
+.room-code-container {
+    background: var(--blue-50);
+    border-radius: 16px;
     padding: var(--spacing-lg);
-    box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
-    margin-bottom: var(--spacing-lg);
-    animation: blueCardGlow 4.5s ease-in-out infinite;
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+    border: 1px dashed var(--blue-300);
 }
 
-@keyframes blueCardGlow {
-
-    0%,
-    100% {
-        border-color: #93C5FD;
-        box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
-    }
-
-    50% {
-        border-color: #60A5FA;
-        box-shadow: 0 25px 70px rgba(59, 130, 246, 0.25);
-    }
-}
-
-h2,
-h3 {
-    color: #1E3A8A;
+.invite-label {
+    font-weight: 600;
+    color: var(--blue-800);
     margin-bottom: var(--spacing-md);
-    font-weight: var(--font-weight-extrabold);
+    font-size: 0.9rem;
 }
 
-/* ================================
-   BUTTONS - BLUE THEME
-   ================================ */
-.btn {
-    font-weight: var(--font-weight-bold);
-    padding: var(--spacing-md) var(--spacing-xl);
-    border-radius: var(--radius-full);
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
-    font-size: clamp(0.95rem, 4vw, 1.05rem);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #3B82F6, #60A5FA);
-    color: white;
-    border: 3px solid #93C5FD;
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
-    animation: bluePulse 3.5s ease-in-out infinite;
-}
-
-@keyframes bluePulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
-    }
-
-    50% {
-        transform: scale(1.04);
-        box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
-    }
-}
-
-.btn-primary:active {
-    transform: scale(0.96) !important;
-}
-
-.btn-outline {
-    background: rgba(255, 255, 255, 0.9);
-    color: #1E40AF;
-    border: 3px solid #60A5FA;
-}
-
-.btn-outline:active {
-    transform: scale(0.96);
-    background: rgba(59, 130, 246, 0.1);
-}
-
-.btn-full {
-    width: 100%;
-    display: block;
-}
-
-/* ================================
-   FORM ELEMENTS - BLUE THEME
-   ================================ */
-.form-group {
-    margin-bottom: var(--spacing-lg);
-}
-
-.form-group label {
-    display: block;
-    color: #1E3A8A;
-    font-weight: var(--font-weight-semibold);
-    margin-bottom: var(--spacing-sm);
-    font-size: clamp(0.9rem, 3.5vw, 1rem);
-}
-
-input[type="number"],
-input[type="text"],
-select {
-    width: 100%;
-    padding: var(--spacing-md);
-    border: 2px solid #93C5FD;
-    border-radius: var(--radius-lg);
-    font-size: clamp(0.95rem, 4vw, 1.05rem);
-    background: rgba(255, 255, 255, 0.95);
-    color: #1E3A8A;
-    transition: all 0.2s ease;
-}
-
-input:focus,
-select:focus {
-    outline: none;
-    border-color: #3B82F6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-/* ================================
-   BACK LINK - BLUE THEME
-   ================================ */
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    color: #1E40AF;
-    text-decoration: none;
-    font-weight: var(--font-weight-semibold);
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid #93C5FD;
-    border-radius: var(--radius-full);
-    margin-top: var(--spacing-lg);
-    transition: all 0.2s ease;
-}
-
-.back-link:active {
-    transform: scale(0.96);
-    background: rgba(59, 130, 246, 0.1);
-}
-
-/* ================================
-   PLAYER ITEMS - BLUE THEME
-   ================================ */
-.player-item {
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid #93C5FD;
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-sm);
+.invite-actions {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: var(--spacing-sm);
 }
 
-.player-name {
-    color: #1E3A8A;
-    font-weight: var(--font-weight-semibold);
-    font-size: clamp(0.95rem, 4vw, 1.05rem);
+.btn-whatsapp {
+    flex: 1;
+    background: #25D366;
+    color: white;
+    border: none;
+    font-size: 0.9rem;
+    padding: var(--spacing-md) var(--spacing-sm);
+}
+
+.btn-whatsapp:hover {
+    background: #128C7E;
+}
+
+.btn-copy {
+    flex: 1;
+    background: var(--blue-600);
+    color: white;
+    border: none;
+    font-size: 0.9rem;
+}
+
+/* ================================
+   RULES CARD
+   ================================ */
+.rules-card {
+    background: white;
+    border-radius: 20px;
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+    border-left: 6px solid var(--blue-500);
+    box-shadow: 0 10px 25px rgba(30, 58, 138, 0.05);
+}
+
+.rules-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.rules-icon {
+    font-size: 1.5rem;
+}
+
+.rules-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--blue-800);
+}
+
+.rule-item {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    align-items: flex-start;
+}
+
+.rule-item:last-child {
+    margin-bottom: 0;
+}
+
+.rule-num {
+    background: var(--blue-100);
+    color: var(--blue-700);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.rule-item p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--blue-700);
+    line-height: 1.4;
+}
+
+/* ================================
+   PLAYER LIST
+   ================================ */
+.lobby-player-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.lobby-player-card {
+    background: var(--blue-50);
+    border-radius: 12px;
+    padding: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    border: 1px solid var(--blue-100);
+}
+
+.player-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--blue-500);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.gm-card .player-avatar {
+    background: #F59E0B;
+}
+
+.p-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--blue-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ================================
    RESPONSIVE
    ================================ */
-@media (min-width: 600px) {
-    .game-container {
-        padding: var(--spacing-lg);
-    }
-
-    .game-logo {
-        width: 200px;
-        height: 200px;
-    }
-}
-
-@media (min-width: 768px) {
-    .content-card {
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-
-/* ================================
-   ANIMATIONS
-   ================================ */
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0px);
-    }
-
-    50% {
-        transform: translateY(-12px);
+@media (max-width: 400px) {
+    .invite-actions {
+        flex-direction: column;
     }
 }

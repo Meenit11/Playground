@@ -50,16 +50,43 @@ function checkInviteLink() {
     const joinCode = params.get('join');
 
     if (joinCode) {
-        gameState.gameId = joinCode;
-        // Hide "Back to Home" on entry screen if joining via link
-        document.getElementById('entry-back-home').classList.add('hidden');
-        document.getElementById('join-back-home').classList.add('hidden');
+        // Try to load existing game state if it exists in local storage
+        const existingGame = loadGame('odd-one-in');
+        if (existingGame && existingGame.gameId === joinCode) {
+            gameState = existingGame;
+            console.log('Joined existing game found in local storage');
+        } else {
+            gameState.gameId = joinCode;
+        }
 
-        // Change entry screen to "Join" context
+        // Hide "Back to Home" on entry screen if joining via link
+        const backHomeBtn = document.getElementById('entry-back-home');
+        if (backHomeBtn) backHomeBtn.classList.add('hidden');
+        const joinBackHomeBtn = document.getElementById('join-back-home');
+        if (joinBackHomeBtn) joinBackHomeBtn.classList.add('hidden');
+
+        // Change screen to "Join" context
         showScreen('screen-player-join');
     } else {
         showScreen('screen-entry');
     }
+
+    // Add storage event listener to sync tabs on same machine
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'meenit-odd-one-in') {
+            const updated = JSON.parse(e.newValue);
+            if (updated && updated.gameId === gameState.gameId) {
+                gameState = updated;
+                updateLobbyView();
+
+                // If GM started game, move player to playing screen
+                if (gameState.isStarted && !document.getElementById('screen-lobby-player').classList.contains('hidden')) {
+                    showScreen('screen-playing');
+                    startAnswerCollection();
+                }
+            }
+        }
+    });
 }
 
 // ================================
@@ -160,17 +187,26 @@ function joinGame() {
         return;
     }
 
+    // Load latest state before performing join to avoid overwriting
+    const existingGame = loadGame('odd-one-in');
+    if (existingGame && existingGame.gameId === gameState.gameId) {
+        gameState = existingGame;
+    }
+
+    // Prevent joining if name already exists
+    if (gameState.players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+        alert('This name is already in the game! Please choose another one.');
+        return;
+    }
+
     console.log(`Joining as: ${name}`);
-    const player = { id: generateId(), name: name, isGM: false };
+    const player = { id: generateId(), name: name, isGM: false, isEliminated: false };
     gameState.players.push(player);
     gameState.isGM = false;
 
     saveGame('odd-one-in', gameState);
     updateLobbyView();
     showScreen('screen-lobby-player');
-
-    // Simulate other players joining for demo purposes
-    simulatePlayersJoining();
 }
 
 function simulatePlayersJoining() {
@@ -267,13 +303,15 @@ function startGame() {
     gameState.currentRound = 1;
     gameState.answers = [];
     gameState.currentPlayerIndex = 0;
+    gameState.isStarted = true; // Mark game as started for syncing tabs
 
     selectQuestion();
     saveGame('odd-one-in', gameState);
 
     showScreen('screen-playing');
     // Hide GM controls if not GM
-    document.getElementById('gm-controls').style.display = gameState.isGM ? 'flex' : 'none';
+    const gmControls = document.getElementById('gm-controls');
+    if (gmControls) gmControls.style.display = gameState.isGM ? 'flex' : 'none';
 
     startAnswerCollection();
 }
