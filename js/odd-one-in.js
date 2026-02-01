@@ -249,14 +249,14 @@ function selectQuestion() {
     if (!gameState.allQuestions) return;
     const questions = gameState.allQuestions.oddOneIn;
     // Simple random selection
-    let available = questions.filter(q => !gameState.usedQuestions.has(q));
+    let available = questions.filter(q => !gameState.usedQuestions.includes(q));
     if (available.length === 0) {
-        gameState.usedQuestions = new Set();
+        gameState.usedQuestions = [];
         available = questions;
     }
     const q = available[Math.floor(Math.random() * available.length)];
     gameState.currentQuestion = q;
-    gameState.usedQuestions.add(q);
+    gameState.usedQuestions.push(q);
 }
 
 // GM-side central timer logic
