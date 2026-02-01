@@ -845,6 +845,6 @@ body::after {
 .mafia-icon {
     width: 325px !important;
     height: 350px !important;
-    margin-top: -85px;
-    margin-bottom: -85px;
+    margin-top: -125px;
+    margin-bottom: -100px;
 }
