@@ -551,12 +551,7 @@ body::after {
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
 }
 
-.mafia-icon {
-    width: 2000000px;
-    height: 2000000px;
-    margin-top: -15px;
-    margin-bottom: -10px;
-}
+/* Game specific class definitions moved or updated below */
 
 @keyframes iconFloat {
 
@@ -840,4 +835,16 @@ body::after {
     .play-link:active {
         transform: scale(0.92) !important;
     }
+}
+
+/* 
+   Mafia icon needs a manual boost because its visual footprint 
+   is smaller than the other square/circular logos.
+   Placed at the bottom to ensure it overrides generic icon sizes.
+*/
+.mafia-icon {
+    width: 500px !important;
+    height: 500px !important;
+    margin-top: -15px;
+    margin-bottom: -10px;
 }
