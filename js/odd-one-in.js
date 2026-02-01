@@ -51,37 +51,29 @@ function checkInviteLink() {
     const joinCode = params.get('join');
 
     if (joinCode) {
-        // Try to load existing game state if it exists in local storage
         const existingGame = loadGame('odd-one-in');
         if (existingGame && existingGame.gameId === joinCode) {
             gameState = existingGame;
-            console.log('Joined existing game found in local storage');
         } else {
             gameState.gameId = joinCode;
         }
 
-        // Hide "Back to Home" on entry screen if joining via link
-        const backHomeBtn = document.getElementById('entry-back-home');
-        if (backHomeBtn) backHomeBtn.classList.add('hidden');
-        const joinBackHomeBtn = document.getElementById('join-back-home');
-        if (joinBackHomeBtn) joinBackHomeBtn.classList.add('hidden');
+        document.querySelectorAll('.back-link').forEach(el => {
+            if (el.closest('.screen-header')) el.classList.add('hidden');
+        });
 
-        // Change screen to "Join" context
         showScreen('screen-player-join');
     } else {
         showScreen('screen-entry');
     }
 
-    // Add storage event listener to sync tabs on same machine
     window.addEventListener('storage', (e) => {
         if (e.key === 'meenit-odd-one-in') {
             const updated = JSON.parse(e.newValue);
             if (updated && updated.gameId === gameState.gameId) {
-                // Keep local state but update shared data
                 gameState = updated;
                 updateLobbyView();
 
-                // If GM started game, move player to playing screen
                 if (gameState.isStarted && !document.getElementById('screen-lobby-player').classList.contains('hidden')) {
                     showScreen('screen-playing');
                     startAnswerCollection();
@@ -102,36 +94,33 @@ function setupEventListeners() {
         if (e.key === 'Enter') createGame();
     });
 
-    // Screen: Lobby GM
-    document.getElementById('share-whatsapp-btn').addEventListener('click', shareOnWhatsApp);
-    document.getElementById('copy-link-btn').addEventListener('click', copyInviteLink);
-    document.getElementById('start-game-btn-gm').addEventListener('click', startGame);
-
     // Screen: Player Join
     document.getElementById('join-game-btn').addEventListener('click', joinGame);
     document.getElementById('player-name').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') joinGame();
     });
 
+    // Screen: Lobby (GM)
+    document.getElementById('start-game-btn-gm').addEventListener('click', startGame);
+    document.getElementById('copy-link-btn').addEventListener('click', copyInviteLink);
+    document.getElementById('share-whatsapp-btn').addEventListener('click', shareOnWhatsApp);
+
     // Screen: Playing
-    document.getElementById('pause-timer-btn').addEventListener('click', toggleTimer);
-    document.getElementById('reset-timer-btn').addEventListener('click', resetTimer);
-    document.getElementById('edit-question-btn').addEventListener('click', showEditQuestionModal);
-    document.getElementById('skip-question-btn').addEventListener('click', skipQuestion);
     document.getElementById('submit-answer-btn').addEventListener('click', submitAnswer);
     document.getElementById('answer-input').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') submitAnswer();
     });
 
-    // Screen: Judging
+    // GM Controls
+    document.getElementById('pause-timer-btn').addEventListener('click', pauseTimer);
+    document.getElementById('reset-timer-btn').addEventListener('click', resetTimer);
+    document.getElementById('skip-player-btn').addEventListener('click', skipPlayer);
+
+    // Judging
     document.getElementById('next-round-btn').addEventListener('click', nextRound);
 
-    // Screen: Winner
+    // Winner
     document.getElementById('play-again-btn').addEventListener('click', playAgain);
-
-    // Edit Question Modal
-    document.getElementById('save-question-btn').addEventListener('click', saveEditedQuestion);
-    document.getElementById('cancel-edit-btn').addEventListener('click', hideEditQuestionModal);
 }
 
 // ================================
@@ -139,6 +128,7 @@ function setupEventListeners() {
 // ================================
 
 function showScreen(screenId) {
+    console.log('Showing screen:', screenId);
     const screens = [
         'screen-entry', 'screen-lobby-gm', 'screen-lobby-player',
         'screen-player-join', 'screen-playing', 'screen-judging',
@@ -187,7 +177,7 @@ function createGame() {
 }
 
 function joinGame() {
-    console.log('Join Game button clicked');
+    console.log('=== JOIN GAME CLICKED ===');
     const btn = document.getElementById('join-game-btn');
     const input = document.getElementById('player-name');
     const name = input ? input.value.trim() : '';
@@ -199,17 +189,14 @@ function joinGame() {
 
     if (btn) btn.disabled = true;
 
-    // Load latest state before performing join
+    // Load latest state
     const existingGame = loadGame('odd-one-in');
     if (existingGame && existingGame.gameId === gameState.gameId) {
         gameState = existingGame;
     }
 
-    console.log('Current players in room:', gameState.players.map(p => p.name));
-
-    // Prevent joining if name already exists
+    // Name check
     if (gameState.players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-        console.warn(`Name conflict: ${name} already exists in lobby.`);
         alert('This name is already in the game! Please choose another one.');
         if (btn) btn.disabled = false;
         return;
@@ -226,22 +213,13 @@ function joinGame() {
     saveGame('odd-one-in', gameState);
     updateLobbyView();
 
-    // Reset button state just in case redirect is slow
-    setTimeout(() => { if (btn) btn.disabled = false; }, 1000);
+    // DIRECT screen transition
+    console.log('Switching to lobby screen...');
+    document.getElementById('screen-player-join').classList.add('hidden');
+    document.getElementById('screen-lobby-player').classList.remove('hidden');
+    console.log('Screen switched!');
 
-    // Redirect to the lobby screen
-    try {
-        console.log('Redirecting player to Waiting Room');
-        showScreen('screen-lobby-player');
-    } catch (e) {
-        console.error('Redirect failed:', e);
-        // Fallback
-        const rooms = ['screen-lobby-player', 'screen-player-join'];
-        rooms.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.toggle('hidden', id !== 'screen-lobby-player');
-        });
-    }
+    setTimeout(() => { if (btn) btn.disabled = false; }, 1000);
 }
 
 function simulatePlayersJoining() {
@@ -299,6 +277,7 @@ function updateLobbyView() {
 
 function removePlayer(id) {
     gameState.players = gameState.players.filter(p => p.id !== id);
+    saveGame('odd-one-in', gameState);
     updateLobbyView();
 }
 
@@ -315,20 +294,20 @@ function copyInviteLink() {
     const link = getInviteLink();
     navigator.clipboard.writeText(link).then(() => {
         const btn = document.getElementById('copy-link-btn');
-        const oldText = btn.textContent;
+        const originalText = btn.textContent;
         btn.textContent = '✓ Copied!';
-        setTimeout(() => btn.textContent = oldText, 2000);
+        setTimeout(() => { btn.textContent = originalText; }, 2000);
     });
 }
 
 function shareOnWhatsApp() {
     const link = getInviteLink();
-    const text = encodeURIComponent(`Join my Odd One In game on Meenit's Playground! 🎮✨\n\nClick here to play: ${link}`);
-    window.open(`https://wa.me/?text=${text}`, '_blank');
+    const message = `Join my Odd One In game! ${link}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
 }
 
 // ================================
-// GAMEPLAY LOGIC
+// GAME FLOW - PLAYING
 // ================================
 
 function startGame() {
@@ -337,81 +316,114 @@ function startGame() {
     gameState.currentRound = 1;
     gameState.answers = [];
     gameState.currentPlayerIndex = 0;
-    gameState.isStarted = true; // Mark game as started for syncing tabs
+    gameState.isStarted = true;
 
     selectQuestion();
     saveGame('odd-one-in', gameState);
 
     showScreen('screen-playing');
-    // Hide GM controls if not GM
     const gmControls = document.getElementById('gm-controls');
-    if (gmControls) gmControls.style.display = gameState.isGM ? 'flex' : 'none';
+    if (gmControls) gmControls.style.display = isLocalGM ? 'flex' : 'none';
 
     startAnswerCollection();
 }
 
 function selectQuestion() {
-    if (!gameState.allQuestions) return;
-    const playerCount = gameState.players.filter(p => !p.isEliminated).length;
-    let tier = playerCount >= 10 ? 'tier1_broad' : (playerCount >= 5 ? 'tier2_medium' : 'tier3_narrow');
-    const questions = gameState.allQuestions[tier].questions;
-    let available = questions.filter(q => !gameState.usedQuestions.has(q));
-    if (available.length === 0) { gameState.usedQuestions.clear(); available = questions; }
+    if (!gameState.allQuestions || !gameState.allQuestions.oddOneIn) return;
+
+    const available = gameState.allQuestions.oddOneIn.filter(q => !gameState.usedQuestions.has(q));
+    if (available.length === 0) {
+        gameState.usedQuestions.clear();
+        return selectQuestion();
+    }
+
     gameState.currentQuestion = getRandomItem(available);
     gameState.usedQuestions.add(gameState.currentQuestion);
 }
 
 function startAnswerCollection() {
-    gameState.answers = [];
     gameState.currentPlayerIndex = 0;
-    updateGameHeader();
-    document.getElementById('question-text').textContent = gameState.currentQuestion;
-    showNextPlayerTurn();
-    startTimer();
+    gameState.answers = [];
+    collectNextAnswer();
 }
 
-function showNextPlayerTurn() {
-    const alivePlayers = gameState.players.filter(p => !p.isEliminated);
-    if (gameState.currentPlayerIndex >= alivePlayers.length) {
-        stopTimer();
-        showScreen('screen-judging');
-        displayAnswersForJudging();
+function collectNextAnswer() {
+    const activePlayers = gameState.players.filter(p => !p.isEliminated);
+
+    if (gameState.currentPlayerIndex >= activePlayers.length) {
+        showJudgingScreen();
         return;
     }
 
-    const currentPlayer = alivePlayers[gameState.currentPlayerIndex];
-    document.getElementById('player-name-turn').textContent = currentPlayer.name;
-    document.getElementById('answer-input').value = '';
+    const currentPlayer = activePlayers[gameState.currentPlayerIndex];
+    const isMyTurn = currentPlayer.id === localPlayerId;
 
-    // In a real app, only the current player would see the input.
-    // For local pass-phone style, we show it to whoever has the phone.
+    document.getElementById('question-text').textContent = gameState.currentQuestion;
+    document.getElementById('current-player-name').textContent = currentPlayer.name;
+
+    const answerSection = document.getElementById('answer-section');
+    const waitingSection = document.getElementById('waiting-section');
+
+    if (isMyTurn) {
+        showElement(answerSection);
+        hideElement(waitingSection);
+        document.getElementById('answer-input').value = '';
+        document.getElementById('answer-input').focus();
+        startTimer();
+    } else {
+        hideElement(answerSection);
+        showElement(waitingSection);
+        document.getElementById('waiting-player-name').textContent = currentPlayer.name;
+        startTimer();
+    }
 }
 
 function submitAnswer() {
     const input = document.getElementById('answer-input');
     const answer = input.value.trim();
-    const alivePlayers = gameState.players.filter(p => !p.isEliminated);
-    const currentPlayer = alivePlayers[gameState.currentPlayerIndex];
+
+    if (!answer) {
+        shakeElement(input);
+        return;
+    }
+
+    const activePlayers = gameState.players.filter(p => !p.isEliminated);
+    const currentPlayer = activePlayers[gameState.currentPlayerIndex];
 
     gameState.answers.push({
         playerId: currentPlayer.id,
         playerName: currentPlayer.name,
-        answer: answer || '(no answer)'
+        answer: answer
     });
 
+    stopTimer();
     gameState.currentPlayerIndex++;
-    if (gameState.currentPlayerIndex >= alivePlayers.length) {
-        stopTimer();
-        showScreen('screen-judging');
-        displayAnswersForJudging();
-    } else {
-        showNextPlayerTurn();
-        resetTimer();
-    }
+    saveGame('odd-one-in', gameState);
+
+    collectNextAnswer();
+}
+
+function skipPlayer() {
+    if (!isLocalGM) return;
+
+    const activePlayers = gameState.players.filter(p => !p.isEliminated);
+    const currentPlayer = activePlayers[gameState.currentPlayerIndex];
+
+    gameState.answers.push({
+        playerId: currentPlayer.id,
+        playerName: currentPlayer.name,
+        answer: '(Skipped)'
+    });
+
+    stopTimer();
+    gameState.currentPlayerIndex++;
+    saveGame('odd-one-in', gameState);
+
+    collectNextAnswer();
 }
 
 // ================================
-// TIMER & UTILS
+// TIMER
 // ================================
 
 function startTimer() {
@@ -419,90 +431,121 @@ function startTimer() {
     gameState.timerState.remaining = 10;
     gameState.timerState.isPaused = false;
     updateTimerDisplay();
+
     gameTimer = setInterval(() => {
         if (!gameState.timerState.isPaused) {
             gameState.timerState.remaining--;
             updateTimerDisplay();
-            if (gameState.timerState.remaining <= 0) { stopTimer(); submitAnswer(); }
+
+            if (gameState.timerState.remaining <= 0) {
+                stopTimer();
+                skipPlayer();
+            }
         }
     }, 1000);
 }
 
-function stopTimer() { if (gameTimer) clearInterval(gameTimer); }
-function resetTimer() { gameState.timerState.remaining = 10; updateTimerDisplay(); }
-function toggleTimer() {
-    gameState.timerState.isPaused = !gameState.timerState.isPaused;
-    document.getElementById('pause-timer-btn').textContent = gameState.timerState.isPaused ? '▶️ Resume' : '⏸️ Pause';
-}
-function updateTimerDisplay() {
-    const display = document.getElementById('timer-display');
-    const border = document.getElementById('timer-circle');
-    display.textContent = gameState.timerState.remaining;
-    if (gameState.timerState.remaining <= 3) border.classList.add('warning');
-    else border.classList.remove('warning');
+function stopTimer() {
+    if (gameTimer) {
+        clearInterval(gameTimer);
+        gameTimer = null;
+    }
 }
 
-function displayAnswersForJudging() {
-    document.getElementById('judging-question').textContent = gameState.currentQuestion;
+function pauseTimer() {
+    gameState.timerState.isPaused = !gameState.timerState.isPaused;
+    const btn = document.getElementById('pause-timer-btn');
+    btn.textContent = gameState.timerState.isPaused ? 'Resume' : 'Pause';
+}
+
+function resetTimer() {
+    gameState.timerState.remaining = 10;
+    updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+    const display = document.getElementById('timer-display');
+    if (display) {
+        display.textContent = gameState.timerState.remaining;
+        if (gameState.timerState.remaining <= 3) {
+            display.style.color = '#EF4444';
+        } else {
+            display.style.color = '#1E3A8A';
+        }
+    }
+}
+
+// ================================
+// JUDGING
+// ================================
+
+function showJudgingScreen() {
+    showScreen('screen-judging');
+
     const container = document.getElementById('answers-container');
     container.innerHTML = '';
 
-    const sorted = sortAlphabetically(gameState.answers.map(a => a.answer), true);
-    const sortedObjs = sorted.map(ans => gameState.answers.find(a => a.answer === ans));
+    const sortedAnswers = [...gameState.answers].sort((a, b) =>
+        a.answer.localeCompare(b.answer)
+    );
 
-    sortedObjs.forEach(ansObj => {
-        const player = gameState.players.find(p => p.id === ansObj.playerId);
-        const div = createElement('div', { classes: ['answer-item', !ansObj.answer || ansObj.answer === '(no answer)' ? 'blank' : ''] });
-        div.innerHTML = `
-            <div class="answer-info">
-                <div class="answer-text">${ansObj.answer}</div>
-                <div class="player-label">by ${ansObj.playerName}</div>
-            </div>
-            ${gameState.isGM ? `<button class="eliminate-btn" onclick="eliminatePlayer('${ansObj.playerId}')">Eliminate</button>` : ''}
+    sortedAnswers.forEach(item => {
+        const card = createElement('div', { classes: ['answer-card'] });
+        card.innerHTML = `
+            <div class="answer-text">"${item.answer}"</div>
+            <div class="answer-player">— ${item.playerName}</div>
+            ${isLocalGM ? `<button class="btn btn-danger btn-sm" onclick="eliminatePlayer('${item.playerId}')">Eliminate</button>` : ''}
         `;
-        container.appendChild(div);
+        container.appendChild(card);
     });
 }
 
-function eliminatePlayer(id) {
-    const player = gameState.players.find(p => p.id === id);
-    if (!confirm(`Eliminate ${player.name}?`)) return;
-    player.isEliminated = true;
-    const alive = gameState.players.filter(p => !p.isEliminated);
-    if (alive.length === 1) showWinner(alive[0]);
-    else displayAnswersForJudging();
+function eliminatePlayer(playerId) {
+    const player = gameState.players.find(p => p.id === playerId);
+    if (player) {
+        player.isEliminated = true;
+        saveGame('odd-one-in', gameState);
+        showJudgingScreen();
+    }
 }
 
 function nextRound() {
+    const activePlayers = gameState.players.filter(p => !p.isEliminated);
+
+    if (activePlayers.length === 1) {
+        showWinner(activePlayers[0]);
+        return;
+    }
+
     gameState.currentRound++;
     selectQuestion();
+    saveGame('odd-one-in', gameState);
+
     showScreen('screen-playing');
     startAnswerCollection();
 }
 
+// ================================
+// WINNER
+// ================================
+
 function showWinner(winner) {
-    document.getElementById('winner-name').textContent = winner.name;
     showScreen('screen-winner');
-    showConfetti(document.getElementById('confetti-container'), 100);
+    document.getElementById('winner-name').textContent = winner.name;
+    showConfetti();
 }
 
-function playAgain() { location.reload(); }
-function updateGameHeader() {
-    const alive = gameState.players.filter(p => !p.isEliminated).length;
-    document.getElementById('current-round').textContent = gameState.currentRound;
-    document.getElementById('alive-players').textContent = alive;
-}
+function playAgain() {
+    gameState.players.forEach(p => p.isEliminated = false);
+    gameState.currentRound = 1;
+    gameState.answers = [];
+    gameState.usedQuestions.clear();
+    saveGame('odd-one-in', gameState);
 
-function showEditQuestionModal() {
-    document.getElementById('edit-question-input').value = gameState.currentQuestion;
-    document.getElementById('edit-question-modal').classList.remove('hidden');
+    if (isLocalGM) {
+        showScreen('screen-lobby-gm');
+    } else {
+        showScreen('screen-lobby-player');
+    }
+    updateLobbyView();
 }
-function hideEditQuestionModal() { document.getElementById('edit-question-modal').classList.add('hidden'); }
-function saveEditedQuestion() {
-    const val = document.getElementById('edit-question-input').value.trim();
-    if (!val) return;
-    gameState.currentQuestion = val;
-    document.getElementById('question-text').textContent = val;
-    hideEditQuestionModal();
-}
-function skipQuestion() { selectQuestion(); document.getElementById('question-text').textContent = gameState.currentQuestion; }
