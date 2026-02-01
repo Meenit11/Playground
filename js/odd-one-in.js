@@ -297,7 +297,17 @@ function updateLobby() {
     // Enable/disable start button
     const startBtn = document.getElementById('start-game-btn');
     if (startBtn) {
-        startBtn.disabled = gameState.players.length < 3;
+        const playerCount = gameState.players.length;
+        const canStart = playerCount >= 3;
+        startBtn.disabled = !canStart;
+
+        console.log(`Update Lobby: Players=${playerCount}, Start Button Disabled=${!canStart}`);
+
+        if (!canStart) {
+            startBtn.title = `Need ${3 - playerCount} more player(s) to start`;
+        } else {
+            startBtn.title = "Start the game!";
+        }
     }
 }
 
@@ -384,8 +394,28 @@ function shareOnWhatsApp() {
 // ================================
 
 function startGame() {
-    if (!isGM || gameState.players.length < 3) return;
+    console.log('=== START GAME CLICKED ===');
+    console.log('Current players:', gameState.players.length);
+    console.log('Local GM flag:', isGM);
+    console.log('Game GM ID:', gameState.gmId);
+    console.log('Local Player ID:', localPlayerId);
 
+    // Robust GM check
+    const isActivelyGM = isGM || (gameState.gmId === localPlayerId);
+
+    if (!isActivelyGM) {
+        console.error('❌ Action denied: User is not the GM.');
+        alert('Only the Game Master can start the game.');
+        return;
+    }
+
+    if (gameState.players.length < 3) {
+        console.warn('❌ Cannot start: Not enough players (Min 3 required).');
+        alert('You need at least 3 players to start the game!');
+        return;
+    }
+
+    console.log('✅ Starting game...');
     gameState.isStarted = true;
     gameState.currentRound = 1;
     saveGame('odd-one-in', gameState);
