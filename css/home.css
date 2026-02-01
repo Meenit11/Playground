@@ -843,8 +843,8 @@ body::after {
    Placed at the bottom to ensure it overrides generic icon sizes.
 */
 .mafia-icon {
-    width: 300px !important;
-    height: 250px !important;
+    width: 325px !important;
+    height: 275px !important;
     margin-top: -65px;
     margin-bottom: -45px;
 }
