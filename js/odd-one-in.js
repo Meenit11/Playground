@@ -45,43 +45,12 @@ async function loadQuestions() {
     }
 }
 
-// ================================
-// UTILITY FUNCTIONS
-// ================================
-
-function shakeElement(element) {
-    element.classList.add('shake');
-    setTimeout(() => element.classList.remove('shake'), 500);
-}
-
-function showElement(element) {
-    if (element) element.classList.remove('hidden');
-}
-
-function hideElement(element) {
-    if (element) element.classList.add('hidden');
-}
-
-function showConfetti() {
-    // Simple confetti effect - can be enhanced later
-    console.log('🎉 Confetti!');
-}
-
-// ================================
-// INVITE LINK HANDLING
-// ================================
-
 // Check if joined via invite link
 function checkInviteLink() {
     const params = new URLSearchParams(window.location.search);
     const joinCode = params.get('join');
 
-    console.log('=== CHECK INVITE LINK ===');
-    console.log('URL:', window.location.href);
-    console.log('Join code:', joinCode);
-
     if (joinCode) {
-        console.log('→ Player joining via link');
         const existingGame = loadGame('odd-one-in');
         if (existingGame && existingGame.gameId === joinCode) {
             gameState = existingGame;
@@ -93,10 +62,8 @@ function checkInviteLink() {
             if (el.closest('.screen-header')) el.classList.add('hidden');
         });
 
-        console.log('→ Showing screen-player-join');
         showScreen('screen-player-join');
     } else {
-        console.log('→ No join code, showing entry screen');
         showScreen('screen-entry');
     }
 
@@ -114,22 +81,6 @@ function checkInviteLink() {
             }
         }
     });
-
-    // Poll for state changes every second
-    setInterval(() => {
-        const currentScreen = document.querySelector('.screen:not(.hidden)');
-        if (currentScreen && (currentScreen.id === 'screen-lobby-gm' || currentScreen.id === 'screen-lobby-player')) {
-            const latest = loadGame('odd-one-in');
-            if (latest && latest.gameId === gameState.gameId) {
-                const oldPlayerCount = gameState.players.length;
-                gameState = latest;
-                if (gameState.players.length !== oldPlayerCount) {
-                    console.log('Player count changed:', oldPlayerCount, '->', gameState.players.length);
-                    updateLobbyView();
-                }
-            }
-        }
-    }, 1000);
 }
 
 // ================================
@@ -223,6 +174,34 @@ function createGame() {
     saveGame('odd-one-in', gameState);
     updateLobbyView();
     showScreen('screen-lobby-gm');
+    startLobbyPolling();
+}
+
+// Poll for updates while in lobby
+let lobbyPollInterval = null;
+
+function startLobbyPolling() {
+    stopLobbyPolling();
+    console.log('Starting lobby polling...');
+    lobbyPollInterval = setInterval(() => {
+        const latestState = loadGame('odd-one-in');
+        if (latestState && latestState.gameId === gameState.gameId) {
+            const oldPlayerCount = gameState.players.length;
+            gameState = latestState;
+            if (gameState.players.length !== oldPlayerCount) {
+                console.log(`Player count changed: ${oldPlayerCount} -> ${gameState.players.length}`);
+                updateLobbyView();
+            }
+        }
+    }, 2000);
+}
+
+function stopLobbyPolling() {
+    if (lobbyPollInterval) {
+        clearInterval(lobbyPollInterval);
+        lobbyPollInterval = null;
+        console.log('Stopped lobby polling');
+    }
 }
 
 function joinGame() {
@@ -267,6 +246,7 @@ function joinGame() {
     document.getElementById('screen-player-join').classList.add('hidden');
     document.getElementById('screen-lobby-player').classList.remove('hidden');
     console.log('Screen switched!');
+    startLobbyPolling();
 
     setTimeout(() => { if (btn) btn.disabled = false; }, 1000);
 }
