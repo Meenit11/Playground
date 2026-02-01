@@ -91,11 +91,25 @@ function checkInviteLink() {
 // ================================
 
 function setupEventListeners() {
+    console.log('Setting up event listeners...');
+
     // GM Create Game
-    document.getElementById('create-game-btn').addEventListener('click', createGame);
-    document.getElementById('gm-name').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') createGame();
-    });
+    const createBtn = document.getElementById('create-game-btn');
+    const gmNameInput = document.getElementById('gm-name');
+
+    if (createBtn) {
+        createBtn.addEventListener('click', createGame);
+        console.log('✓ Create game button listener added');
+    } else {
+        console.error('✗ Create game button not found!');
+    }
+
+    if (gmNameInput) {
+        gmNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') createGame();
+        });
+        console.log('✓ GM name input listener added');
+    }
 
     // Player Join
     document.getElementById('join-game-btn').addEventListener('click', joinGame);
@@ -170,10 +184,10 @@ function createGame() {
     const nameInput = document.getElementById('gm-name');
     const name = nameInput.value.trim();
 
-    console.log('GM Name entered:', name);
+    console.log('GM Name:', name);
 
     if (!name) {
-        console.log('No name entered, shaking input');
+        console.log('No name entered');
         shakeElement(nameInput);
         return;
     }
@@ -181,17 +195,15 @@ function createGame() {
     // Disable button
     if (btn) {
         btn.disabled = true;
-        console.log('Button disabled');
+        btn.textContent = 'Creating...';
     }
 
     // Initialize game
-    console.log('Initializing game...');
     isGM = true;
     localPlayerId = generateId();
     localPlayerName = name;
 
-    console.log('Local Player ID:', localPlayerId);
-    console.log('Local Player Name:', localPlayerName);
+    console.log('Generated Player ID:', localPlayerId);
 
     gameState.gameId = generateId().slice(0, 8).toUpperCase();
     gameState.gmId = localPlayerId;
@@ -204,15 +216,18 @@ function createGame() {
     gameState.isStarted = false;
 
     console.log('Game State:', gameState);
-    console.log('Saving game...');
-    saveGame('odd-one-in', gameState);
 
-    console.log('Updating lobby...');
+    saveGame('odd-one-in', gameState);
     updateLobby();
 
-    console.log('Showing GM lobby screen...');
+    console.log('Switching to GM lobby screen...');
     showScreen('screen-gm-lobby');
-    console.log('=== CREATE GAME COMPLETED ===');
+
+    // Re-enable button
+    if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Create Game';
+    }
 }
 
 function joinGame() {
@@ -419,52 +434,19 @@ function startQuestionRound() {
 }
 
 function selectRandomQuestion() {
-    if (!gameState.allQuestions) {
+    if (!gameState.allQuestions || !gameState.allQuestions.oddOneIn) {
         gameState.currentQuestion = 'What is your favorite color?';
-        console.warn('Questions not loaded, using fallback');
         return;
     }
 
     const activePlayers = gameState.players.filter(p => !p.isEliminated).length;
+    const questions = gameState.allQuestions.oddOneIn;
 
-    // Select tier based on player count
-    let tier;
-    let questions;
-
-    if (activePlayers >= 10) {
-        tier = 'tier1_broad';
-    } else if (activePlayers >= 5) {
-        tier = 'tier2_medium';
-    } else {
-        tier = 'tier3_narrow';
-    }
-
-    // Get questions from selected tier
-    if (gameState.allQuestions[tier] && gameState.allQuestions[tier].questions) {
-        questions = gameState.allQuestions[tier].questions;
-    } else {
-        // Fallback to any available tier
-        if (gameState.allQuestions.tier1_broad) {
-            questions = gameState.allQuestions.tier1_broad.questions;
-        } else if (gameState.allQuestions.tier2_medium) {
-            questions = gameState.allQuestions.tier2_medium.questions;
-        } else if (gameState.allQuestions.tier3_narrow) {
-            questions = gameState.allQuestions.tier3_narrow.questions;
-        } else {
-            gameState.currentQuestion = 'What is your favorite color?';
-            console.warn('No questions found in any tier, using fallback');
-            return;
-        }
-    }
-
-    console.log(`Selecting from ${tier} (${activePlayers} players, ${questions.length} questions available)`);
-
-    // Filter available questions (not used yet)
+    // Filter available questions
     const available = questions.filter(q => !gameState.usedQuestions.has(q));
 
     if (available.length === 0) {
         // Reset if all questions used
-        console.log('All questions used, resetting pool');
         gameState.usedQuestions.clear();
         gameState.currentQuestion = getRandomItem(questions);
     } else {
@@ -472,7 +454,6 @@ function selectRandomQuestion() {
     }
 
     gameState.usedQuestions.add(gameState.currentQuestion);
-    console.log('Selected question:', gameState.currentQuestion);
 }
 
 // ================================
