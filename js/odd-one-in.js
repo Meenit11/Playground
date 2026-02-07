@@ -56,15 +56,21 @@ function checkInitialState() {
     const params = new URLSearchParams(window.location.search);
     const joinCode = params.get('join');
 
+    // Try to restore session first
+    restoreLocalSession();
+
     if (joinCode) {
         // Player joining existing game
         const existing = loadGame('odd-one-in');
         if (existing && existing.gameId === joinCode) {
-            // Already part of this game locally?
             gameState = existing;
-            restoreLocalSession();
+
+            // If we have a local session but it doesn't match this game, clear it
+            if (gameState.gameId !== joinCode) {
+                clearLocalSession();
+            }
         } else {
-            // New joiner
+            // New joiner to this specific link
             gameState.gameId = joinCode;
         }
 
@@ -76,8 +82,16 @@ function checkInitialState() {
             updateUI();
         }
     } else {
-        // Potential GM or fresh access
-        showScreen('screen-gm-create');
+        // No join link - start/continue flow
+        const existing = loadGame('odd-one-in');
+        if (existing && localPlayerId && existing.players.find(p => p.id === localPlayerId)) {
+            // Returning user/GM
+            gameState = existing;
+            updateUI();
+        } else {
+            // Fresh start
+            showScreen('screen-gm-create');
+        }
     }
 
     // Storage listener for state sync (GM <-> Player tabs)
@@ -88,6 +102,7 @@ function checkInitialState() {
                 // Check if we were removed
                 if (localPlayerId && !updated.players.find(p => p.id === localPlayerId)) {
                     alert('You have been removed from the game.');
+                    clearLocalSession();
                     window.location.href = '../index.html';
                     return;
                 }
@@ -99,13 +114,34 @@ function checkInitialState() {
     });
 }
 
+function saveLocalSession() {
+    const session = {
+        isGM,
+        localPlayerId,
+        localPlayerName,
+        gameId: gameState.gameId
+    };
+    localStorage.setItem('meenit-odd-one-in-session', JSON.stringify(session));
+}
+
 function restoreLocalSession() {
-    // Attempt to recover local ID from session/local storage metadata if we tracked it
-    // For now, relies on memory if simple refresh. 
-    // In a real app we'd store "myPlayerId" separate from "gameState" in localStorage.
-    // Simplifying assumption: if gameState exists locally, try to find "me".
-    // Since we don't strictly persist "my local ID" separate from state in this simple implementation,
-    // players might need to rejoin on refresh if they didn't keep the tab open.
+    try {
+        const session = JSON.parse(localStorage.getItem('meenit-odd-one-in-session'));
+        if (session) {
+            isGM = session.isGM;
+            localPlayerId = session.localPlayerId;
+            localPlayerName = session.localPlayerName;
+        }
+    } catch (e) {
+        console.error('Error restoring session:', e);
+    }
+}
+
+function clearLocalSession() {
+    localStorage.removeItem('meenit-odd-one-in-session');
+    isGM = false;
+    localPlayerId = null;
+    localPlayerName = '';
 }
 
 // ================================
@@ -169,6 +205,7 @@ function createGame() {
     }];
 
     saveGame('odd-one-in', gameState);
+    saveLocalSession();
     updateUI();
     showScreen('screen-gm-lobby');
 }
@@ -199,6 +236,7 @@ function joinGame() {
     });
 
     saveGame('odd-one-in', gameState);
+    saveLocalSession();
     updateUI();
     showScreen('screen-player-lobby');
 }
@@ -206,6 +244,7 @@ function joinGame() {
 function gmBackToHome(e) {
     if (!confirm('End game for everyone?')) return e.preventDefault();
     localStorage.removeItem('meenit-odd-one-in'); // Wipes game
+    clearLocalSession();
     window.location.href = '../index.html';
 }
 
@@ -221,7 +260,9 @@ function removePlayer(playerId) {
 // ================================
 
 function startGame() {
+    console.log('Start Game clicked. Is GM?', isGM);
     if (!isGM) return;
+
     gameState.isStarted = true;
     gameState.currentRound = 1;
     gameState.eliminatedIds = [];
@@ -230,6 +271,7 @@ function startGame() {
 }
 
 function startRound() {
+    console.log('Starting Round...');
     // 1. Select Question
     selectQuestion();
 
@@ -242,33 +284,39 @@ function startRound() {
     updateUI();
 
     // GM-side triggers actual timing logic
-    if (isGM) runTimerSequence();
+    if (isGM) {
+        console.log('GM initiating timer sequence');
+        runTimerSequence();
+    }
 }
 
 function selectQuestion() {
     if (!gameState.allQuestions) return;
     const questions = gameState.allQuestions.oddOneIn;
     // Simple random selection
-    let available = questions.filter(q => !gameState.usedQuestions.includes(q));
+    let available = questions.filter(q => !gameState.usedQuestions.has(q));
     if (available.length === 0) {
-        gameState.usedQuestions = [];
+        gameState.usedQuestions = new Set();
         available = questions;
     }
     const q = available[Math.floor(Math.random() * available.length)];
     gameState.currentQuestion = q;
-    gameState.usedQuestions.push(q);
+    gameState.usedQuestions.add(q);
 }
 
 // GM-side central timer logic
 function runTimerSequence() {
+    // Clear any existing intervals
+    if (timerInterval) clearInterval(timerInterval);
+    if (previewTimeout) clearTimeout(previewTimeout);
+
     // Preview Phase (3s)
-    setTimeout(() => {
+    previewTimeout = setTimeout(() => {
         if (gameState.timerState !== 'preview') return; // Handled interrupt
         gameState.timerState = 'running';
         saveGame('odd-one-in', gameState);
 
         // Countdown Phase (10s)
-        clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             if (gameState.timerState === 'paused') return;
 
@@ -312,9 +360,11 @@ function togglePause() {
 }
 
 function resetTimer() {
+    if (timerInterval) clearInterval(timerInterval);
     gameState.timerValue = 10;
     gameState.timerState = 'running'; // Auto-resume on reset
     saveGame('odd-one-in', gameState);
+    runTimerSequence(); // Restart timer logic
 }
 
 function skipQuestion() {
