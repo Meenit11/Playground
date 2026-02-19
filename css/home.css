@@ -15,7 +15,8 @@ body {
         radial-gradient(circle at 100% 100%, #dcfce7 0%, transparent 55%),
         linear-gradient(180deg, #f9fafb 0%, #fefce8 40%, #fdf2f8 100%);
     background-color: #f9fafb;
-    background-attachment: fixed;
+    background-size: 140% 140%;
+    animation: homeGradientDrift 28s ease-in-out infinite;
     position: relative;
     overflow-x: hidden;
     color: #0f172a;
@@ -32,7 +33,21 @@ body::after {
         radial-gradient(circle at 80% 70%, rgba(45, 212, 191, 0.18) 0%, transparent 45%);
     pointer-events: none;
     z-index: 0;
-    opacity: 1;
+    opacity: 0.9;
+}
+
+@keyframes homeGradientDrift {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    100% {
+        background-position: 0% 0%;
+    }
 }
 
 /* ================================
@@ -191,7 +206,8 @@ body::after {
     text-align: center;
     margin-bottom: var(--spacing-xl);
     padding-top: var(--spacing-xl);
-    opacity: 1;
+    opacity: 0;
+    animation: fadeInUp 0.7s ease-out 0.1s forwards;
 }
 
 @keyframes fadeInUp {
@@ -208,6 +224,7 @@ body::after {
 
 .logo-container {
     margin-bottom: var(--spacing-md);
+    animation: floatGentle 4s ease-in-out infinite;
 }
 
 @keyframes floatGentle {
@@ -225,7 +242,7 @@ body::after {
 .main-logo {
     width: min(180px, 55vw);
     height: auto;
-    filter: drop-shadow(0 6px 16px rgba(148, 163, 184, 0.45));
+    filter: drop-shadow(0 6px 18px rgba(148, 163, 184, 0.55));
 }
 
 @keyframes logoRainbow {
@@ -249,6 +266,7 @@ body::after {
     font-weight: 700;
     margin-bottom: var(--spacing-xs);
     color: #0f172a;
+    animation: textFloat 3.2s ease-in-out infinite;
 }
 
 @keyframes rainbowSlide {
@@ -280,6 +298,7 @@ body::after {
     font-size: clamp(0.9rem, 4vw, 1.1rem);
     font-weight: 500;
     margin: 0;
+    animation: subtitleShimmer 5s ease-in-out infinite;
 }
 
 @keyframes subtitleShimmer {
@@ -349,11 +368,14 @@ body::after {
     padding: var(--spacing-xl) var(--spacing-lg);
     overflow: hidden;
     box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
-    transition: transform 0.2s ease;
+    transform: translateY(18px);
+    opacity: 0;
+    animation: cardFadeIn 0.6s ease-out forwards;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .game-card:nth-child(1) {
-    animation-delay: 0.15s;
+    animation-delay: 0.18s;
 }
 
 .game-card:nth-child(2) {
@@ -361,7 +383,7 @@ body::after {
 }
 
 .game-card:nth-child(3) {
-    animation-delay: 0.45s;
+    animation-delay: 0.42s;
 }
 
 @keyframes cardFadeIn {
@@ -378,6 +400,13 @@ body::after {
 
 .game-card:active {
     transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .game-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+    }
 }
 
 .game-card-glow {
@@ -488,6 +517,7 @@ body::after {
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 4px 10px rgba(148, 163, 184, 0.4));
+    animation: iconFloat 4.5s ease-in-out infinite;
 }
 
 /* Game specific class definitions moved or updated below */
@@ -509,6 +539,7 @@ body::after {
     font-weight: 700;
     margin: 0;
     text-align: center;
+    animation: nameScale 3.2s ease-in-out infinite;
 }
 
 @keyframes nameScale {
@@ -620,7 +651,7 @@ body::after {
     border-radius: var(--radius-full);
     text-decoration: none;
     animation: linkPulse 3.5s ease-in-out infinite;
-    transition: transform 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
     width: 100%;
     justify-content: center;
 }
@@ -653,6 +684,13 @@ body::after {
 
 .play-link:active {
     transform: scale(0.94) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .play-link:hover {
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+        transform: translateY(-1px);
+    }
 }
 
 .play-link .arrow {
