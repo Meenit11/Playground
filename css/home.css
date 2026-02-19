@@ -1,76 +1,34 @@
 /* ================================
-   HOME PAGE - MULTICOLOR JOYFUL THEME
+   HOME PAGE - DARK NEON THEME
+   Mobile-first, calmer visuals
    ================================ */
 
 body {
     min-height: 100vh;
-    background: linear-gradient(135deg,
-            #FEF3C7 0%,
-            /* Warm yellow */
-            #DBEAFE 25%,
-            /* Sky blue */
-            #D1FAE5 50%,
-            /* Mint green */
-            #FCE7F3 75%,
-            /* Soft pink */
-            #FEF3C7 100%
-            /* Back to yellow */
-        );
-    background-size: 400% 400%;
-    animation: rainbowShift 25s ease infinite;
+    background:
+        radial-gradient(circle at 0% 0%, #22d3ee 0%, transparent 55%),
+        radial-gradient(circle at 100% 0%, #a855f7 0%, transparent 55%),
+        radial-gradient(circle at 0% 100%, #f97316 0%, transparent 55%),
+        radial-gradient(circle at 100% 100%, #ec4899 0%, transparent 55%),
+        linear-gradient(135deg, #020617 0%, #020617 40%, #0f172a 100%);
+    background-color: #020617;
+    background-attachment: fixed;
     position: relative;
     overflow-x: hidden;
-}
-
-@keyframes rainbowShift {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    25% {
-        background-position: 50% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    75% {
-        background-position: 50% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
 }
 
 body::after {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background:
-        radial-gradient(circle at 15% 20%, rgba(251, 146, 60, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 20% 70%, rgba(236, 72, 153, 0.08) 0%, transparent 40%);
+        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 30%, rgba(129, 140, 248, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 30% 80%, rgba(249, 115, 22, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.16) 0%, transparent 45%);
     pointer-events: none;
     z-index: 0;
-    animation: glowPulse 12s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-
-    0%,
-    100% {
-        opacity: 0.6;
-    }
-
-    50% {
-        opacity: 1;
-    }
+    opacity: 0.9;
 }
 
 /* ================================
@@ -215,7 +173,9 @@ body::after {
     position: relative;
     z-index: 1;
     min-height: 100vh;
-    padding: var(--spacing-lg) var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-md) var(--spacing-2xl);
+    display: flex;
+    flex-direction: column;
 }
 
 /* ================================
@@ -259,7 +219,7 @@ body::after {
 }
 
 .main-logo {
-    width: 160px;
+    width: min(180px, 55vw);
     height: auto;
     filter: drop-shadow(0 6px 20px rgba(251, 146, 60, 0.25));
     animation: logoRainbow 6s ease-in-out infinite;
@@ -329,7 +289,7 @@ body::after {
 }
 
 .hero-subtitle {
-    color: #475569;
+    color: #cbd5f5;
     font-size: clamp(0.9rem, 4vw, 1.1rem);
     font-weight: var(--font-weight-semibold);
     margin: 0;
@@ -355,6 +315,7 @@ body::after {
    ================================ */
 .games-section {
     margin-bottom: var(--spacing-xl);
+    margin-top: var(--spacing-lg);
 }
 
 .section-title {
@@ -386,7 +347,7 @@ body::after {
 .games-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
+    gap: var(--spacing-lg);
     max-width: 500px;
     margin: 0 auto;
 }
@@ -397,14 +358,14 @@ body::after {
 .game-card {
     position: relative;
     opacity: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 3px solid;
-    border-radius: 28px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 22px;
     padding: var(--spacing-xl) var(--spacing-lg);
     overflow: hidden;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 14px 40px rgba(15, 23, 42, 0.7);
     animation: cardFadeIn 0.7s ease-out forwards;
     transition: transform 0.2s ease;
 }
@@ -443,7 +404,7 @@ body::after {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at center, var(--glow-color, rgba(255, 255, 255, 0.2)) 0%, transparent 55%);
+    background: radial-gradient(circle at center, var(--glow-color, rgba(59, 130, 246, 0.4)) 0%, transparent 60%);
     opacity: 0.5;
     pointer-events: none;
     z-index: 0;
@@ -466,20 +427,20 @@ body::after {
 
 /* Game-specific colors */
 .game-card[data-game="odd-one-in"] {
-    --glow-color: rgba(59, 130, 246, 0.2);
-    border-color: #60A5FA;
+    --glow-color: rgba(56, 189, 248, 0.45);
+    border-color: rgba(56, 189, 248, 0.9);
     animation: cardFadeIn 0.7s ease-out forwards, borderGlow1 4.5s ease-in-out infinite;
 }
 
 .game-card[data-game="undercover"] {
-    --glow-color: rgba(139, 92, 246, 0.2);
-    border-color: #A78BFA;
+    --glow-color: rgba(129, 140, 248, 0.5);
+    border-color: rgba(129, 140, 248, 0.95);
     animation: cardFadeIn 0.7s ease-out forwards, borderGlow2 4.5s ease-in-out infinite;
 }
 
 .game-card[data-game="mafia"] {
-    --glow-color: rgba(251, 146, 60, 0.2);
-    border-color: #FDBA74;
+    --glow-color: rgba(249, 115, 22, 0.5);
+    border-color: rgba(249, 115, 22, 0.95);
     animation: cardFadeIn 0.7s ease-out forwards, borderGlow3 4.5s ease-in-out infinite;
 }
 
@@ -544,8 +505,8 @@ body::after {
 }
 
 .game-icon-small {
-    width: 160px;
-    height: 160px;
+    width: min(150px, 52vw);
+    height: auto;
     object-fit: contain;
     animation: iconFloat 4.5s ease-in-out infinite;
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
@@ -586,28 +547,28 @@ body::after {
 }
 
 .game-card[data-game="odd-one-in"] .game-name {
-    background: linear-gradient(135deg, #3B82F6, #60A5FA);
+    background: linear-gradient(135deg, #22d3ee, #38bdf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .game-card[data-game="undercover"] .game-name {
-    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+    background: linear-gradient(135deg, #6366f1, #a855f7);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .game-card[data-game="mafia"] .game-name {
-    background: linear-gradient(135deg, #FB923C, #FDBA74);
+    background: linear-gradient(135deg, #f97316, #fb923c);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .game-description {
-    color: #475569;
+    color: #e2e8f0;
     font-size: clamp(0.85rem, 3.5vw, 0.95rem);
     line-height: 1.6;
     margin-bottom: var(--spacing-md);
@@ -620,26 +581,28 @@ body::after {
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-md);
+    width: 100%;
 }
 
 .game-meta {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     justify-content: center;
     width: 100%;
 }
 
 .meta-box {
-    flex: 1;
-    max-width: 140px;
+    flex: 1 1 46%;
+    max-width: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-xs);
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(15, 23, 42, 0.9);
     padding: var(--spacing-sm);
-    border-radius: var(--radius-xl);
-    border: 2px solid rgba(148, 163, 184, 0.25);
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(148, 163, 184, 0.45);
     animation: metaPulse 4.5s ease-in-out infinite;
 }
 
@@ -663,8 +626,8 @@ body::after {
 }
 
 .meta-text {
-    font-size: clamp(0.75rem, 3vw, 0.85rem);
-    color: #64748B;
+    font-size: clamp(0.75rem, 3vw, 0.9rem);
+    color: #cbd5f5;
     font-weight: var(--font-weight-semibold);
     text-align: center;
 }
@@ -675,28 +638,32 @@ body::after {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-2xl);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
-    border: 3px solid;
+    padding: var(--spacing-md) var(--spacing-xl);
+    background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.25), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.25), transparent 55%),
+        rgba(15, 23, 42, 0.9);
+    border: 1px solid;
     border-radius: var(--radius-full);
     text-decoration: none;
     animation: linkPulse 3.5s ease-in-out infinite;
     transition: transform 0.15s ease;
+    width: 100%;
+    justify-content: center;
 }
 
 .game-card[data-game="odd-one-in"] .play-link {
-    color: #3B82F6;
-    border-color: #60A5FA;
+    color: #e0f2fe;
+    border-color: rgba(56, 189, 248, 0.8);
 }
 
 .game-card[data-game="undercover"] .play-link {
-    color: #8B5CF6;
-    border-color: #A78BFA;
+    color: #e0e7ff;
+    border-color: rgba(129, 140, 248, 0.85);
 }
 
 .game-card[data-game="mafia"] .play-link {
-    color: #FB923C;
-    border-color: #FDBA74;
+    color: #ffedd5;
+    border-color: rgba(249, 115, 22, 0.85);
 }
 
 @keyframes linkPulse {
@@ -739,19 +706,19 @@ body::after {
 .footer {
     text-align: center;
     padding-top: var(--spacing-xl);
-    border-top: 2px solid rgba(148, 163, 184, 0.15);
-    margin-top: var(--spacing-2xl);
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+    margin-top: auto;
 }
 
 .footer-text {
-    color: #64748B;
+    color: #94a3b8;
     font-size: clamp(0.95rem, 4vw, 1.1rem);
     margin-bottom: var(--spacing-xs);
     font-weight: var(--font-weight-semibold);
 }
 
 .footer-heart {
-    color: #94A3B8;
+    color: #64748b;
     font-size: clamp(0.85rem, 3.5vw, 0.95rem);
     margin-top: var(--spacing-sm);
     margin-bottom: 0;
